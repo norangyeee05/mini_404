@@ -1,0 +1,139 @@
+/* 회원 메인 화면 */
+.page { max-width: 1200px; margin: 0 auto; padding: 0 20px 20px; }
+
+/* 헤더 */
+.site-header { display: flex; align-items: center; height: 56px; gap: 32px; }
+.brand { font-size: 17px; font-weight: 700; color: var(--teal); white-space: nowrap; }
+.brand-mark { font-size: 21px; letter-spacing: -2px; }
+.gnb { display: flex; gap: 32px; font-size: 14px; color: var(--teal); }
+.gnb a:hover { text-decoration: underline; }
+.user-menu { margin-left: auto; display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--teal); }
+.user-menu form { display: inline; }
+.link-btn { background: none; border: 0; color: inherit; font-size: 13px; cursor: pointer; }
+.link-btn:hover, .user-menu a:hover { text-decoration: underline; }
+.user-badge { padding: 3px 10px; border-radius: 10px; background: #d5dfe0; color: #8a8f90; font-size: 12px; }
+
+/* 히어로: /images/hero.jpg 가 없으면 그라데이션만 표시 */
+.hero {
+    position: relative;
+    height: 230px;
+    border-radius: 14px;
+    padding: 14px;
+    color: #fff;
+    overflow: hidden;
+    background:
+        url("/images/hero.jpg") center / cover no-repeat,
+        linear-gradient(120deg, #8fb0bc 0%, #c9d6d0 55%, #e9d9b8 100%);
+}
+.hero-eyebrow { font-size: 10px; letter-spacing: 0.4px; }
+.hero-copy { margin-top: 12px; font-size: 16px; line-height: 1.5; text-shadow: 0 1px 4px rgba(0, 0, 0, .25); }
+
+/* 공통 패널 */
+.panel { background: var(--panel); border-radius: 12px; }
+.panel-head { display: flex; align-items: center; justify-content: space-between; }
+.panel-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--teal);
+    border-left: 3px solid var(--teal);
+    padding-left: 8px;
+    line-height: 1.1;
+}
+.panel-title.lg { font-size: 18px; }
+.more { font-size: 11px; color: #666; }
+.more:hover { text-decoration: underline; }
+
+/* 역정보 */
+.stations-panel { margin-top: 14px; padding: 10px 0 14px; background: #dbe8ea; }
+.stations-panel .panel-title { margin: 0 0 10px 8px; }
+.stations { position: relative; display: flex; align-items: center; justify-content: space-between; }
+.stations::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 50%;
+    height: 10px;
+    transform: translateY(-50%);
+    background: var(--olive);
+}
+.stations li { position: relative; z-index: 1; }
+.station {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 66px;
+    padding: 6px 14px;
+    border-radius: 16px;
+    background: var(--olive);
+    color: #fff;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* 게시판 영역 */
+.board-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.07fr) minmax(0, 1fr);
+    gap: 16px;
+    margin-top: 14px;
+}
+.notice-panel { padding: 14px 8px 12px; }
+.notice-panel .panel-head { padding: 0 10px 12px 8px; }
+.side-col { display: flex; flex-direction: column; gap: 14px; }
+.qna-panel { padding: 12px 8px 10px; }
+.qna-panel .panel-head { padding: 0 10px 8px 8px; }
+
+.board { width: 100%; border-collapse: collapse; font-size: 12px; color: #555; text-align: center; }
+.board thead th { padding: 9px 4px; background: #e2ecee; font-weight: 500; }
+.board tbody td { padding: 14px 4px; border-bottom: 1px solid var(--panel-line); }
+.board tbody tr:last-child td { border-bottom: 0; }
+.board .t-title { text-align: left; padding-left: 12px; }
+.board.compact tbody td { padding: 6px 4px; border-bottom: 0; }
+.board.compact thead th { padding: 6px 4px; }
+.board .c-no { width: 8%; }
+.board .c-writer { width: 14%; }
+.board .c-view { width: 12%; }
+.board .c-date { width: 28%; }
+.board .empty { color: var(--muted); padding: 24px 0; }
+
+/* 자료실 배너: /images/archive.jpg 가 없으면 그라데이션만 표시 */
+.archive-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 4px;
+    height: 118px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    color: #fff;
+    overflow: hidden;
+    background:
+        linear-gradient(to top, rgba(20, 50, 70, .55), rgba(20, 50, 70, 0) 70%),
+        url("/images/archive.jpg") center / cover no-repeat,
+        linear-gradient(120deg, #5f93b0, #9ec3d3);
+}
+.archive-eyebrow { font-size: 9px; }
+.archive-title { font-size: 15px; line-height: 1.25; }
+.archive-go {
+    align-self: flex-start;
+    margin-top: 4px;
+    padding: 2px 10px;
+    border-radius: 10px;
+    background: #fff;
+    color: #333;
+    font-size: 10px;
+}
+
+/* 푸터 */
+.site-footer { margin-top: 22px; font-size: 11px; letter-spacing: 0.5px; color: #555; }
+
+/* 임시 화면 */
+.placeholder { margin-top: 14px; padding: 32px 24px; }
+.placeholder p { margin: 16px 0 20px; color: #666; }
+.btn-home { display: inline-block; width: 120px; height: 30px; line-height: 30px; font-size: 12px; text-align: center; background: #e3e3e3; border-radius: 4px; }
+
+@media (max-width: 860px) {
+    .board-grid { grid-template-columns: 1fr; }
+    .gnb { gap: 16px; }
+    .stations { flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .stations::before { display: none; }
+}
