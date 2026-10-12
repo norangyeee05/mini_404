@@ -36,4 +36,11 @@ public class Station {
 		this.staff = staff;
 		this.status = status;
 	}
+
+	public void update(String name, String stationNo, String staff, OperationStatus status) {
+		this.name = name;
+		this.stationNo = stationNo;
+		this.staff = staff;
+		this.status = status;
+	}
 }

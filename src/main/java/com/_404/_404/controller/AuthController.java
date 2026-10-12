@@ -2,6 +2,7 @@ package com._404._404.controller;
 
 import com._404._404.dto.LoginMember;
 import com._404._404.dto.SignupForm;
+import com._404._404.service.AccountRestrictedException;
 import com._404._404.service.MemberService;
 import com._404._404.web.SessionKeys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +31,14 @@ public class AuthController {
 	public String login(@RequestParam String loginId,
 						@RequestParam String password,
 						HttpServletRequest request, Model model) {
-		Optional<LoginMember> member = memberService.authenticate(loginId.trim(), password);
+		Optional<LoginMember> member;
+		try {
+			member = memberService.authenticate(loginId.trim(), password);
+		} catch (AccountRestrictedException e) {
+			model.addAttribute("error", e.getMessage());
+			model.addAttribute("loginId", loginId);
+			return "login";
+		}
 		if (member.isEmpty()) {
 			model.addAttribute("error", "아이디 또는 비밀번호가 올바르지 않습니다.");
 			model.addAttribute("loginId", loginId);

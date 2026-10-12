@@ -84,14 +84,11 @@ public class DashboardService {
 				memberShare(MemberStatus.BANNED, live.members())));
 
 		List<TrainRow> trains = trainRepository.findTop3ByOrderByIdDesc().stream()
-				.map(t -> new TrainRow(t.getId(), t.getStatus().name(), t.getStatus().getOperationLabel(),
-						t.getRoute(), t.getTrainNo(), t.getDriver(),
-						t.getDirection().name(), t.getDirection().getLabel()))
+				.map(TrainRow::from)
 				.toList();
 
 		List<StationRow> stations = stationRepository.findTop3ByOrderByIdDesc().stream()
-				.map(s -> new StationRow(s.getId(), s.getStatus().name(), s.getStatus().getOperationLabel(),
-						s.getName(), s.getStationNo(), s.getStaff()))
+				.map(StationRow::from)
 				.toList();
 
 		return new DashboardResponse(formatNow(now), cards, serviceStatus, weeklyTrend, memberStatus, trains, stations);

@@ -41,4 +41,12 @@ public class Train {
 		this.direction = direction;
 		this.status = status;
 	}
+
+	public void update(String trainNo, String route, String driver, TrainDirection direction, OperationStatus status) {
+		this.trainNo = trainNo;
+		this.route = route;
+		this.driver = driver;
+		this.direction = direction;
+		this.status = status;
+	}
 }

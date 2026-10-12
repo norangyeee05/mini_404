@@ -62,6 +62,7 @@ public class DataInitializer implements CommandLineRunner {
 					.passwordHash(passwordHasher.encode("hong1234!"))
 					.name("홍길동")
 					.email("hong@example.com")
+					.phone("010-1234-5678")
 					.build());
 		}
 
@@ -102,6 +103,8 @@ public class DataInitializer implements CommandLineRunner {
 						.passwordHash(demoHash)
 						.name(DEMO_NAMES[(i - 1) % DEMO_NAMES.length])
 						.email(String.format("user%03d@example.com", i))
+						.phone(String.format("010-%04d-%04d", 1000 + i, 5000 + i))
+						.createdAt(LocalDateTime.of(2026, 8, 1, 9, 0).plusHours(i * 8L))
 						.status(status)
 						.build());
 			}

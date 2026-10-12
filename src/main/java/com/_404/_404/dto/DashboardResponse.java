@@ -1,5 +1,8 @@
 package com._404._404.dto;
 
+import com._404._404.domain.Station;
+import com._404._404.domain.Train;
+
 import java.util.List;
 
 public record DashboardResponse(
@@ -31,9 +34,20 @@ public record DashboardResponse(
 
 	public record TrainRow(Long id, String status, String statusLabel, String route,
 						   String trainNo, String driver, String direction, String directionLabel) {
+
+		public static TrainRow from(Train t) {
+			return new TrainRow(t.getId(), t.getStatus().name(), t.getStatus().getOperationLabel(),
+					t.getRoute(), t.getTrainNo(), t.getDriver(),
+					t.getDirection().name(), t.getDirection().getLabel());
+		}
 	}
 
 	public record StationRow(Long id, String status, String statusLabel, String name,
 							 String stationNo, String staff) {
+
+		public static StationRow from(Station s) {
+			return new StationRow(s.getId(), s.getStatus().name(), s.getStatus().getOperationLabel(),
+					s.getName(), s.getStationNo(), s.getStaff());
+		}
 	}
 }

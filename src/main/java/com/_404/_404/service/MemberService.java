@@ -1,6 +1,7 @@
 package com._404._404.service;
 
 import com._404._404.domain.Member;
+import com._404._404.domain.MemberStatus;
 import com._404._404.dto.LoginMember;
 import com._404._404.dto.SignupForm;
 import com._404._404.repository.MemberRepository;
@@ -35,9 +36,16 @@ public class MemberService {
 	/** 로그인 검증. 성공하면 세션에 담을 LoginMember 반환 */
 	@Transactional(readOnly = true)
 	public Optional<LoginMember> authenticate(String loginId, String rawPassword) {
-		return memberRepository.findByLoginId(loginId)
-				.filter(m -> passwordHasher.matches(rawPassword, m.getPasswordHash()))
-				.map(m -> new LoginMember(m.getId(), m.getLoginId(), m.getName(), m.getRole()));
+		Optional<Member> found = memberRepository.findByLoginId(loginId)
+				.filter(m -> passwordHasher.matches(rawPassword, m.getPasswordHash()));
+		if (found.isEmpty()) {
+			return Optional.empty();
+		}
+		Member m = found.get();
+		if (m.getStatus() != MemberStatus.ACTIVE) {
+			throw new AccountRestrictedException(restrictedMessage(m.getStatus()));
+		}
+		return Optional.of(new LoginMember(m.getId(), m.getLoginId(), m.getName(), m.getRole()));
 	}
 
 	/** 이름 + 이메일로 아이디 조회. 앞 2글자만 보여주고 나머지는 *로 가린다 */
@@ -59,6 +67,15 @@ public class MemberService {
 		Member member = memberRepository.findByLoginId(loginId)
 				.orElseThrow(() -> new IllegalStateException("회원을 찾을 수 없습니다."));
 		member.changePassword(passwordHasher.encode(newPassword));
+	}
+
+	private String restrictedMessage(MemberStatus status) {
+		return switch (status) {
+			case BLOCKED -> "임시 차단된 계정입니다. 관리자에게 문의해 주세요.";
+			case INACTIVE -> "비활성화된 계정입니다. 관리자에게 문의해 주세요.";
+			case BANNED -> "이용이 제한된 계정입니다. 관리자에게 문의해 주세요.";
+			default -> "로그인할 수 없는 계정입니다.";
+		};
 	}
 
 	private String mask(String id) {
