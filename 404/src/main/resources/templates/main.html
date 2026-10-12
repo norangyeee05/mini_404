@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>인천교통사공사</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div class="page">
+    <header th:replace="~{fragments/layout :: header}"></header>
+
+    <!-- 히어로 배너 -->
+    <section class="hero">
+        <p class="hero-eyebrow">INCHEON TRANSIT CORPORATION</p>
+        <p class="hero-copy">안전하고 편리한 교통서비스로<br>시민의 행복한 일상을 만들어갑니다.</p>
+    </section>
+
+    <!-- 역정보 -->
+    <section class="panel stations-panel">
+        <h2 class="panel-title">역정보</h2>
+        <ul class="stations">
+            <li th:each="s : ${stations}"><span class="station" th:text="${s}">석남</span></li>
+        </ul>
+    </section>
+
+    <div class="board-grid">
+        <!-- 공지사항 -->
+        <section class="panel notice-panel">
+            <div class="panel-head">
+                <h2 class="panel-title lg">공지사항</h2>
+                <a th:href="@{/notices}" class="more">전체보기 &rsaquo;</a>
+            </div>
+            <table class="board">
+                <thead>
+                <tr><th class="c-no">번호</th><th>제목</th><th class="c-writer">작성자</th><th class="c-view">조회수</th><th class="c-date">등록일</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="n : ${notices}">
+                    <td th:text="${n.id}">100</td>
+                    <td class="t-title" th:text="${n.title}">제목</td>
+                    <td th:text="${n.writer}">관리자</td>
+                    <td th:text="${n.viewCount}">0</td>
+                    <td th:text="${#temporals.format(n.createdAt, 'yyyy.MM.dd HH:mm')}">2026.10.01 19:36</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(notices)}"><td colspan="5" class="empty">등록된 공지사항이 없습니다.</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <div class="side-col">
+            <!-- 자료실 배너 -->
+            <a th:href="@{/resources}" class="archive-card">
+                <span class="archive-eyebrow">더 편리한 교통, 더 좋은 일상</span>
+                <strong class="archive-title">인천교통사공사<br>자료실</strong>
+                <span class="archive-go">바로가기 &rsaquo;</span>
+            </a>
+
+            <!-- Q&A -->
+            <section class="panel qna-panel">
+                <div class="panel-head">
+                    <h2 class="panel-title">Q&amp;A</h2>
+                    <a th:href="@{/qna}" class="more">더보기 &rsaquo;</a>
+                </div>
+                <table class="board compact">
+                    <thead>
+                    <tr><th class="c-no">번호</th><th>제목</th><th class="c-writer">작성자</th><th class="c-view">조회수</th><th class="c-date">등록일</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="q : ${qnas}">
+                        <td th:text="${q.id}">95</td>
+                        <td class="t-title" th:text="${q.title}">제목</td>
+                        <td th:text="${q.writer}">홍길동</td>
+                        <td th:text="${q.viewCount}">0</td>
+                        <td th:text="${#temporals.format(q.createdAt, 'yyyy.MM.dd HH:mm')}">2026.10.01 05:18</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(qnas)}"><td colspan="5" class="empty">등록된 질문이 없습니다.</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</div>
+</body>
+</html>

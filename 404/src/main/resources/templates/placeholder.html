@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${pageTitle} + ' | 인천교통사공사'">준비 중</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div class="page">
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <section class="panel placeholder">
+        <h2 class="panel-title lg" th:text="${pageTitle}">페이지</h2>
+        <p>이 화면은 아직 구현되지 않았습니다.</p>
+        <a th:href="@{/}" class="btn-home">메인으로</a>
+    </section>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</div>
+</body>
+</html>

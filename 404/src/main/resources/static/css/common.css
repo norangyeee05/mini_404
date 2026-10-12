@@ -1,0 +1,24 @@
+:root {
+    --bg: #e5eeef;
+    --panel: #eef4f5;
+    --panel-line: #d7e3e5;
+    --teal: #2f6b7c;
+    --olive: #9aa35f;
+    --text: #333;
+    --muted: #8c8c8c;
+    --dark: #2f2f2f;
+    --font: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+ul { list-style: none; }
