@@ -1,0 +1,38 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: 404
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/traffic_db
+    username: postgres
+    # 비밀번호는 환경변수 DB_PASSWORD 또는 application-local.yml(Git 제외)로 덮어쓰세요.
+    password: ${DB_PASSWORD:1234}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 60MB
+
+app:
+  # 자료실 첨부파일 저장 위치 (실행 위치 기준 상대경로)
+  upload-dir: uploads
+  # Vue 개발 서버 주소 (쉼표로 여러 개 지정 가능)
+  cors-allowed-origins: http://localhost:5173
+  # 서버 시작 시 관리자 계정이 없으면 자동 생성합니다. (개발용 - 운영에서는 반드시 변경)
+  admin:
+    login-id: admin
+    password: ${ADMIN_PASSWORD:admin1234!}
+    name: 관리자
+    email: admin@example.com
