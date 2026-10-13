@@ -1,0 +1,13 @@
+.signup-complete-page { width: min(1440px, 100%); min-height: 100vh; margin: 0 auto; padding: 0 20px; display: flex; flex-direction: column; }
+.signup-complete-page .site-header { min-height: 60px; }
+.signup-complete-main { flex: 1; }
+.signup-complete-page .site-footer { margin-top: auto; }
+.signup-complete-backdrop { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(112,130,148,.62); }
+.signup-complete-dialog { position: relative; width: min(650px, 100%); min-height: 500px; display: flex; flex-direction: column; align-items: center; padding: 42px 36px 78px; border-radius: 28px; background: #fff; text-align: center; }
+.signup-complete-close { position: absolute; top: 18px; right: 42px; padding: 0; border: 0; background: transparent; color: #858b8d; font-size: 25px; line-height: 1; cursor: pointer; }
+.signup-complete-icon { width: 100px; height: 100px; display: grid; place-items: center; border: 5px solid #373737; border-radius: 50%; color: #373737; font-size: 54px; font-weight: 700; line-height: 1; }
+.signup-complete-dialog h1 { margin: 40px 0 54px; color: #111; font-size: 34px; }
+.signup-complete-dialog p { margin: 0; color: #898d8e; font-size: 20px; line-height: 1.5; }
+.signup-complete-login { width: min(400px, 80%); min-height: 40px; margin-top: auto; border: 0; border-radius: 9px; background: #ededed; color: #111; font: inherit; font-weight: 700; cursor: pointer; }
+.signup-complete-login:hover { background: #e3e3e3; }
+@media (max-width: 640px) { .signup-complete-page { padding: 0 12px; } .signup-complete-page .site-header { min-height: 72px; } .signup-complete-dialog { min-height: 390px; padding: 40px 20px 34px; border-radius: 22px; } .signup-complete-close { top: 14px; right: 20px; } .signup-complete-icon { width: 82px; height: 82px; font-size: 44px; } .signup-complete-dialog h1 { margin: 30px 0 36px; font-size: 25px; } .signup-complete-dialog p { font-size: 16px; } .signup-complete-login { width: 100%; } }

@@ -1,0 +1,27 @@
+.admin-resource-detail-page { width: min(1440px, 100%); min-height: 100vh; margin: 0 auto; padding: 0 20px; display: flex; flex-direction: column; }
+.admin-resource-detail-page .primary-nav a:nth-child(2)::after { transform: scaleX(1); }
+.admin-resource-detail-main { flex: 1; display: flex; flex-direction: column; padding: 0 12px 10px; }
+.admin-resource-detail-hero { min-height: 316px; display: flex; flex-direction: column; align-items: flex-start; padding: 42px 20px; border-radius: 18px; overflow: hidden; color: #f5f8f9; background-image: linear-gradient(90deg, rgba(44,57,75,.66), rgba(44,57,75,.28) 46%, rgba(44,57,75,.04) 82%), url('../../assets/notice-hero.png'); background-position: center 53%; background-size: cover; }
+.admin-resource-detail-breadcrumb { margin-bottom: 18px; font-size: 20px; font-weight: 500; }
+.admin-resource-detail-breadcrumb span { padding: 0 5px; }
+.admin-resource-detail-hero h1 { margin: 0 0 2px; font-size: 34px; }
+.admin-resource-detail-hero p { margin: 0; font-size: 20px; }
+.admin-resource-detail-card { min-height: 503px; display: flex; flex-direction: column; margin-top: 24px; padding: 16px 20px 84px; border-radius: 20px; background: #f1f5f6; }
+.admin-resource-detail-card > h2 { margin: 0 8px 2px; color: #17566d; font-size: 26px; line-height: 1.4; }
+.admin-resource-detail-meta { min-height: 45px; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 44px; margin: 0; padding: 0 17px; border-radius: 11px; background: #e5edef; color: #898d8e; font-size: 16px; font-weight: 600; }
+.admin-resource-detail-meta > div { display: flex; align-items: center; gap: 28px; }
+.admin-resource-detail-meta dt, .admin-resource-detail-meta dd { margin: 0; }
+.admin-resource-detail-content { margin: 30px 8px 0; color: #17566d; font-size: 20px; line-height: 1.55; white-space: pre-line; }
+.admin-resource-detail-attachment { margin-top: auto; padding: 16px 22px 18px; border-radius: 11px; background: #e5edef; }
+.admin-resource-detail-attachment h3 { margin: 0 0 8px 8px; color: #17566d; font-size: 15px; }
+.admin-resource-detail-file-row { min-height: 55px; display: flex; align-items: center; gap: 12px; padding: 0 10px 0 40px; border-radius: 10px; background: #dce5e7; }
+.admin-resource-detail-file-name { flex: 1; min-width: 0; overflow: hidden; color: #467b8c; font-size: 15px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.admin-resource-detail-file-name > span { margin-left: 8px; color: #898d8e; font-weight: 500; }
+.admin-resource-detail-download { min-height: 39px; padding: 0 14px; border: 0; border-radius: 10px; background: #467b8c; color: #fff; font: inherit; font-size: 15px; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.admin-resource-detail-message { margin: 8px 0 0; color: #467b8c; font-size: 14px; text-align: right; }
+.admin-resource-detail-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+.admin-resource-detail-actions > div { display: flex; gap: 16px; }
+.admin-resource-detail-button { min-width: 83px; min-height: 39px; padding: 0 18px; border: 0; border-radius: 10px; background: #467b8c; color: #fff; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+.admin-resource-detail-button:hover, .admin-resource-detail-download:hover { background: #356a7b; }
+@media (max-width: 1020px) { .admin-resource-detail-page { padding: 0 12px; } .admin-resource-detail-hero { min-height: 260px; padding: 34px 18px; } .admin-resource-detail-meta { gap: 24px; } .admin-resource-detail-meta > div { gap: 14px; } }
+@media (max-width: 640px) { .admin-resource-detail-main { padding: 0 0 10px; } .admin-resource-detail-hero { min-height: 200px; padding: 26px 15px; border-radius: 13px; background-position: 60% center; } .admin-resource-detail-breadcrumb { margin-bottom: 13px; font-size: 13px; } .admin-resource-detail-hero h1 { font-size: 24px; } .admin-resource-detail-hero p { font-size: 13px; } .admin-resource-detail-card { min-height: 440px; margin-top: 14px; padding: 14px 12px 20px; border-radius: 15px; } .admin-resource-detail-card > h2 { font-size: 19px; } .admin-resource-detail-meta { grid-template-columns: 1fr 1fr; gap: 6px 12px; padding: 9px 12px; font-size: 13px; } .admin-resource-detail-meta > div { gap: 10px; } .admin-resource-detail-content { margin: 20px 4px 0; font-size: 15px; } .admin-resource-detail-attachment { padding: 12px 9px; } .admin-resource-detail-file-row { align-items: stretch; flex-direction: column; padding: 12px; } .admin-resource-detail-file-name { width: 100%; font-size: 13px; } .admin-resource-detail-download { align-self: flex-end; min-height: 36px; font-size: 13px; } .admin-resource-detail-actions > div { gap: 8px; } .admin-resource-detail-button { min-width: 68px; min-height: 38px; padding: 0 12px; font-size: 14px; } }

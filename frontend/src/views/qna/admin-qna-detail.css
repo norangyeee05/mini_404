@@ -1,0 +1,121 @@
+.admin-qna-detail-page {
+  width: min(1440px, 100%);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-qna-detail-page .primary-nav a:nth-child(3)::after { transform: scaleX(1); }
+
+.admin-qna-detail-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 12px 10px;
+}
+
+.admin-qna-detail-hero {
+  min-height: 316px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 42px 20px;
+  border-radius: 18px;
+  overflow: hidden;
+  color: #f5f8f9;
+  background-image:
+    linear-gradient(90deg, rgba(44, 57, 75, .66), rgba(44, 57, 75, .28) 46%, rgba(44, 57, 75, .04) 82%),
+    url('../../assets/notice-hero.png');
+  background-position: center 53%;
+  background-size: cover;
+}
+
+.admin-qna-detail-breadcrumb { margin-bottom: 18px; font-size: 20px; font-weight: 500; }
+.admin-qna-detail-breadcrumb span { padding: 0 5px; }
+.admin-qna-detail-hero h1 { margin: 0 0 2px; font-size: 34px; font-weight: 700; }
+.admin-qna-detail-hero p { margin: 0; font-size: 20px; }
+
+.admin-qna-detail-card {
+  min-height: 503px;
+  margin-top: 24px;
+  padding: 16px 20px 28px;
+  border-radius: 20px;
+  background: #f1f5f6;
+}
+
+.admin-qna-detail-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 0 0 2px;
+}
+
+.admin-qna-detail-heading h2 { margin: 0; color: #17566d; font-size: 26px; line-height: 1.4; }
+.admin-qna-detail-status { padding: 5px 10px; border-radius: 16px; background: #daf1c8; color: #299b2c; font-size: 14px; font-weight: 700; white-space: nowrap; }
+.admin-qna-detail-status.is-pending { background: #fff3be; color: #e28c18; }
+
+.admin-qna-detail-meta {
+  min-height: 45px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 44px;
+  margin: 0 0 30px;
+  padding: 0 17px;
+  border-radius: 11px;
+  background: #e5edef;
+  color: #898d8e;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.admin-qna-detail-meta > div { display: flex; align-items: center; gap: 28px; }
+.admin-qna-detail-meta dt, .admin-qna-detail-meta dd { margin: 0; }
+
+.admin-qna-message {
+  min-height: 160px;
+  margin-top: 16px;
+  padding: 19px 24px;
+  border-radius: 10px;
+}
+
+.admin-qna-message h3 { margin: 0 0 12px; font-size: 15px; font-weight: 700; }
+.admin-qna-message p { margin: 0; font-size: 14px; line-height: 1.55; white-space: pre-line; }
+.admin-qna-message--question { background: #dfe4fb; color: #145db6; }
+.admin-qna-message--answer { background: #d2f3c3; color: #288624; }
+.admin-qna-message--pending { background: #e8eff0; color: #667b82; }
+
+.admin-qna-detail-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+.admin-qna-detail-actions > div { display: flex; gap: 16px; }
+.admin-qna-detail-button { min-width: 83px; min-height: 39px; display: inline-flex; align-items: center; justify-content: center; padding: 0 18px; border: 0; border-radius: 10px; background: #467b8c; color: #fff; font: inherit; font-size: 15px; font-weight: 700; }
+.admin-qna-detail-button:hover { background: #356a7b; }
+
+@media (max-width: 1020px) {
+  .admin-qna-detail-page { padding: 0 12px; }
+  .admin-qna-detail-hero { min-height: 260px; padding: 34px 18px; }
+  .admin-qna-detail-meta { gap: 24px; }
+  .admin-qna-detail-meta > div { gap: 14px; }
+}
+
+@media (max-width: 640px) {
+  .admin-qna-detail-main { padding: 0 0 10px; }
+  .admin-qna-detail-hero { min-height: 200px; padding: 26px 15px; border-radius: 13px; background-position: 60% center; }
+  .admin-qna-detail-breadcrumb { margin-bottom: 13px; font-size: 13px; }
+  .admin-qna-detail-hero h1 { font-size: 24px; }
+  .admin-qna-detail-hero p { max-width: 270px; font-size: 13px; }
+  .admin-qna-detail-card { min-height: 460px; margin-top: 14px; padding: 14px 12px; border-radius: 15px; }
+  .admin-qna-detail-heading h2 { font-size: 19px; }
+  .admin-qna-detail-status { padding: 4px 8px; font-size: 12px; }
+  .admin-qna-detail-meta { grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 20px; padding: 10px 12px; font-size: 12px; }
+  .admin-qna-detail-meta > div { justify-content: space-between; gap: 8px; }
+  .admin-qna-detail-meta > div:first-child { grid-column: 1 / -1; justify-content: flex-start; gap: 20px; }
+  .admin-qna-message { min-height: 140px; padding: 16px; }
+  .admin-qna-message h3 { font-size: 13px; }
+  .admin-qna-message p { font-size: 12px; }
+  .admin-qna-detail-actions { margin-top: 12px; }
+  .admin-qna-detail-actions > div { gap: 8px; }
+  .admin-qna-detail-button { min-width: 62px; min-height: 35px; padding: 0 12px; font-size: 13px; }
+}

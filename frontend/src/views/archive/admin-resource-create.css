@@ -1,0 +1,27 @@
+.admin-resource-create-page { width: min(1440px, 100%); min-height: 100vh; margin: 0 auto; padding: 0 20px; display: flex; flex-direction: column; }
+.admin-resource-create-page .primary-nav a:nth-child(2)::after { transform: scaleX(1); }
+.admin-resource-create-main { flex: 1; display: flex; flex-direction: column; padding: 0 12px 10px; }
+.admin-resource-create-hero { min-height: 316px; display: flex; flex-direction: column; align-items: flex-start; padding: 42px 20px; border-radius: 18px; overflow: hidden; color: #f5f8f9; background-image: linear-gradient(90deg, rgba(44,57,75,.66), rgba(44,57,75,.28) 46%, rgba(44,57,75,.04) 82%), url('../../assets/notice-hero.png'); background-position: center 53%; background-size: cover; }
+.admin-resource-create-breadcrumb { margin-bottom: 18px; font-size: 20px; font-weight: 500; }
+.admin-resource-create-breadcrumb span { padding: 0 5px; }
+.admin-resource-create-hero h1 { margin: 0 0 2px; font-size: 34px; }
+.admin-resource-create-hero p { margin: 0; font-size: 20px; }
+.admin-resource-create-form { margin-top: 24px; padding: 26px 24px 14px; border-radius: 20px; background: #f1f5f6; }
+.admin-resource-create-label { display: block; margin: 0 0 14px; color: #17566d; font-size: 30px; font-weight: 700; }
+.admin-resource-create-label span { color: #ed2424; }
+.admin-resource-create-form > input, .admin-resource-create-form textarea { width: 100%; border: 3px solid #c4d9dd; border-radius: 10px; background: #fff; color: #304f59; font: inherit; font-size: 16px; }
+.admin-resource-create-form > input { height: 65px; padding: 0 20px; }
+.admin-resource-create-form > input::placeholder, .admin-resource-create-form textarea::placeholder { color: #8b8b8b; font-weight: 600; }
+.admin-resource-create-count { margin-top: 6px; color: #898d8e; font-size: 16px; font-weight: 600; text-align: right; }
+.admin-resource-create-content-label { margin: 8px 0 10px; }
+.admin-resource-create-form textarea { min-height: 166px; padding: 22px 20px; resize: vertical; }
+.admin-resource-create-file-title { display: block; margin: 6px 0 4px; color: #17566d; font-size: 15px; font-weight: 700; }
+.admin-resource-create-file { min-height: 55px; display: flex; align-items: center; padding: 0 20px; border-radius: 10px; background: #dce5e7; color: #467b8c; font-size: 15px; font-weight: 700; cursor: pointer; }
+.admin-resource-create-file input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+.admin-resource-create-message { margin: 12px 0 0; color: #467b8c; font-size: 14px; text-align: center; }
+.admin-resource-create-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+.admin-resource-create-actions > div { display: flex; gap: 16px; }
+.admin-resource-create-button { min-width: 83px; min-height: 39px; padding: 0 18px; border: 0; border-radius: 10px; background: #467b8c; color: #fff; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+.admin-resource-create-button:hover { background: #356a7b; }
+@media (max-width: 1020px) { .admin-resource-create-page { padding: 0 12px; } .admin-resource-create-hero { min-height: 260px; padding: 34px 18px; } }
+@media (max-width: 640px) { .admin-resource-create-main { padding: 0 0 10px; } .admin-resource-create-hero { min-height: 200px; padding: 26px 15px; border-radius: 13px; background-position: 60% center; } .admin-resource-create-breadcrumb { margin-bottom: 13px; font-size: 13px; } .admin-resource-create-hero h1 { font-size: 24px; } .admin-resource-create-hero p { max-width: 270px; font-size: 13px; } .admin-resource-create-form { margin-top: 14px; padding: 18px 12px 14px; border-radius: 15px; } .admin-resource-create-label { margin-bottom: 10px; font-size: 22px; } .admin-resource-create-form > input { height: 54px; padding: 0 12px; font-size: 14px; } .admin-resource-create-count { font-size: 13px; } .admin-resource-create-content-label { margin-top: 12px; } .admin-resource-create-form textarea { min-height: 180px; padding: 15px 12px; font-size: 14px; } .admin-resource-create-file { min-height: 50px; padding: 0 12px; font-size: 13px; overflow-wrap: anywhere; } .admin-resource-create-actions > div { gap: 8px; } .admin-resource-create-button { min-width: 68px; min-height: 38px; padding: 0 12px; font-size: 14px; } }
