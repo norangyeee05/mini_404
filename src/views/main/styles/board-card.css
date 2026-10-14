@@ -1,0 +1,7 @@
+.board-card { min-width: 0; padding: 16px 14px 8px; border-radius: 22px; background: #f0f5f7; }
+.board-heading { display: flex; align-items: center; justify-content: space-between; margin: 0 3px 17px; }
+h2 { margin: 0; padding-left: 10px; border-left: 3px solid #155369; color: #155369; font-size: 24px; line-height: 30px; }
+.board-heading > a { color: #858585; font-size: 12px; }.board-heading span { margin-left: 8px; font-size: 22px; }
+.board-scroll { overflow-x: auto; } table { font-size: 16px; color: #858585; } thead { background: #e7eef0; } th { height: 54px; font-weight: 600; } td { height: 52px; border-top: 1px solid #e5edef; border-bottom: 1px solid #e5edef; border-left: 0; border-right: 0; padding: 4px 8px; } th:nth-child(2) { width: 40%; } td:nth-child(2) { text-align: left; } a:hover { text-decoration: underline; }
+.board-card--compact { padding: 12px 10px 8px; }.board-card--compact .board-heading { margin-bottom: 9px; }.board-card--compact th { height: 31px; }.board-card--compact td { height: 30px; padding: 2px 6px; border-right: 0; border-left: 0; }
+@media (max-width: 600px) { table { font-size: 13px; min-width: 500px; } h2 { font-size: 21px; } }
