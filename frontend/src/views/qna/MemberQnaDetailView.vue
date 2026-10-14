@@ -1,71 +1,24 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import PageHeader from '../../components/PageHeader.vue'
-import PageFooter from '../../components/PageFooter.vue'
-import { deleteQna as requestDeleteQna, getQna } from '../../api/qna'
-import { errorMessage } from '../../api/client'
-import { normalizeQna } from '../../api/normalize'
-import './member-qna-detail.css'
-
-const route = useRoute()
-const router = useRouter()
-
-const qna = ref({ id: null, title: '', writer: '', views: 0, date: '', status: '', content: '', answer: '', isOwner: false })
-const showDeleteConfirm = ref(false)
-const showDeleteComplete = ref(false)
-const isOwner = computed(() => qna.value.isOwner === true || qna.value.ownedByCurrentUser === true)
-const isAnswered = computed(() => ['답변완료', 'ANSWERED', 'COMPLETED'].includes(qna.value.status))
-const displayDate = computed(() => String(qna.value.date || '').split(' ')[0])
-const message = ref('')
-const loading = ref(true)
-
-onMounted(async () => {
-  const id = route.params.qnaId || route.query.id
-  if (!id) { message.value = 'Q&A 번호가 없습니다.'; loading.value = false; return }
-  try { qna.value = normalizeQna(await getQna(id)) }
-  catch (error) { message.value = errorMessage(error, 'Q&A를 불러오지 못했습니다.') }
-  finally { loading.value = false }
-})
-
-function deleteQna() {
-  showDeleteConfirm.value = true
-}
-
-async function confirmDeleteQna() {
-  try { await requestDeleteQna(qna.value.id) }
-  catch (error) { message.value = errorMessage(error, 'Q&A를 삭제하지 못했습니다.'); showDeleteConfirm.value = false; return }
-  showDeleteConfirm.value = false
-  showDeleteComplete.value = true
-}
-
-function closeDeleteConfirm() {
-  showDeleteConfirm.value = false
-}
-
-function closeDeleteComplete() {
-  showDeleteComplete.value = false
-  router.push('/qna/my')
-}
+import {computed,ref,watch} from 'vue';import {useRoute,useRouter} from 'vue-router';import PageHeader from '../../components/PageHeader.vue';import PageBanner from '../../components/PageBanner.vue';import PageFooter from '../../components/PageFooter.vue';import DeleteModal from '../../components/DeleteModal.vue';import './member-qna-detail.css';import {qnaApi} from '../../services/endpoints';import {apiError} from '../../services/api';import {currentMember} from '../../services/auth'
+const route=useRoute(),router=useRouter(),qna=ref({}),error=ref(''),deleteStage=ref(''),qnaId=computed(()=>route.params.qnaId||route.query.id),types={FACILITY:'시설',OPERATION:'운행',ETC:'기타'},statusText={WAITING:'답변대기',ANSWERED:'답변완료'}
+const isOwner=computed(()=>qna.value.writer&&qna.value.writer===currentMember.value?.name),isAnswered=computed(()=>qna.value.status==='ANSWERED'),displayDate=computed(()=>qna.value.createdAt?.split('T')[0]||'')
+async function load(){try{const r=await qnaApi.get(qnaId.value),d=r?.data??r;qna.value={...d,category:types[d.inquiryType],status:d.status,views:d.viewCount??'—',writer:d.writer}}catch(e){error.value=apiError(e)}}
+async function deleteQna(){deleteStage.value='confirm'}
+async function confirmDelete(){if(deleteStage.value==='complete'){deleteStage.value='';router.push('/qna/my');return}try{await qnaApi.remove(qnaId.value);deleteStage.value='complete'}catch(e){error.value=apiError(e);deleteStage.value=''}}
+watch(()=>route.fullPath,load,{immediate:true})
 </script>
 
 <template>
   <div class="member-qna-detail-page">
-    <PageHeader role="member" />
+    <PageHeader />
 
     <main class="member-qna-detail-main">
-      <section class="member-qna-detail-hero" aria-labelledby="member-qna-detail-page-title">
-        <div class="member-qna-detail-breadcrumb">HOME <span>›</span> Q&amp;A <span>›</span> 상세</div>
-        <h1 id="member-qna-detail-page-title">Q&amp;A</h1>
-        <p>궁금하신 내용을 확인하실 수 있습니다.</p>
-      </section>
+      <PageBanner title="Q&amp;A" description="궁금하신 내용을 확인하실 수 있습니다." stage="상세" />
 
-      <article class="member-qna-detail-card" aria-labelledby="member-qna-detail-title">
-        <p v-if="loading" role="status">불러오는 중...</p>
-        <p v-if="message" role="alert">{{ message }}</p>
+      <article class="member-qna-detail-card" aria-labelledby="member-qna-detail-title"><p v-if="error" role="alert">{{ error }}</p>
         <div class="member-qna-detail-heading">
           <h2 id="member-qna-detail-title">{{ qna.title }}</h2>
-          <span :class="['member-qna-detail-status', { 'is-pending': !isAnswered }]">{{ qna.status }}</span>
+          <span :class="['member-qna-detail-status', { 'is-pending': !isAnswered }]">{{ qna.status === 'ANSWERED' ? '답변완료' : '답변대기' }}</span>
         </div>
 
         <dl class="member-qna-detail-meta">
@@ -76,7 +29,7 @@ function closeDeleteComplete() {
 
         <section class="member-qna-message member-qna-message--question" aria-labelledby="member-qna-question-heading">
           <h3 id="member-qna-question-heading">질문 내용</h3>
-          <p>{{ qna.content }}</p>
+          <p>{{ qna.content }}</p><p v-if="qna.files?.length">첨부파일: {{ qna.files.map(file => file.fileName).join(', ') }}</p>
         </section>
 
         <section v-if="isAnswered" class="member-qna-message member-qna-message--answer" aria-labelledby="member-qna-answer-heading">
@@ -90,44 +43,16 @@ function closeDeleteComplete() {
       </article>
 
       <div class="member-qna-detail-actions">
-        <a class="member-qna-detail-button" href="/qna">목록</a>
+        <RouterLink class="member-qna-detail-button" to="/qna">목록</RouterLink>
         <div v-if="isOwner" class="member-qna-detail-actions__right">
-          <button class="member-qna-detail-button" type="button" @click="router.push(`/qna/${qna.id}/edit`)">수정</button>
+          <button class="member-qna-detail-button" type="button" @click="router.push(`/qna/${qna.qnaId}/edit`)">수정</button>
           <button class="member-qna-detail-button" type="button" @click="deleteQna">삭제</button>
         </div>
       </div>
     </main>
 
     <PageFooter />
-
-    <div v-if="showDeleteConfirm" class="qna-delete-modal-backdrop" @click.self="closeDeleteConfirm">
-      <section class="qna-delete-modal qna-delete-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="qna-delete-confirm-title">
-        <button class="qna-delete-modal__close" type="button" aria-label="닫기" @click="closeDeleteConfirm">×</button>
-        <div class="qna-delete-modal__icon qna-delete-modal__icon--warning" aria-hidden="true">
-          <svg viewBox="0 0 64 64">
-            <circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="4" />
-            <path d="M32 18v18m0 9v1" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
-          </svg>
-        </div>
-        <h2 id="qna-delete-confirm-title">삭제하시겠습니까?</h2>
-        <p>삭제 후 복구가 불가합니다.<br />진짜로 삭제하시겠습니까?</p>
-        <button class="qna-delete-modal__confirm" type="button" @click="confirmDeleteQna">확인</button>
-      </section>
-    </div>
-
-    <div v-if="showDeleteComplete" class="qna-delete-modal-backdrop" @click.self="closeDeleteComplete">
-      <section class="qna-delete-modal" role="dialog" aria-modal="true" aria-labelledby="qna-delete-title">
-        <button class="qna-delete-modal__close" type="button" aria-label="닫기" @click="closeDeleteComplete">×</button>
-        <div class="qna-delete-modal__icon" aria-hidden="true">
-          <svg viewBox="0 0 64 64">
-            <circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="4" />
-            <path d="m19 33 9 10 18-23" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </div>
-        <h2 id="qna-delete-title">삭제되었습니다.</h2>
-        <button class="qna-delete-modal__confirm" type="button" @click="closeDeleteComplete">확인</button>
-      </section>
-    </div>
-
+    <DeleteModal v-if="deleteStage" :completed="deleteStage === 'complete'" @confirm="confirmDelete" @close="deleteStage = ''" />
   </div>
 </template>
+

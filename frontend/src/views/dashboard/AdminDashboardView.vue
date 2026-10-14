@@ -1,44 +1,26 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import PageHeader from '../../components/PageHeader.vue'
-import DashboardStatCard from '../../components/DashboardStatCard.vue'
-import PageFooter from '../../components/PageFooter.vue'
-import { getAdminStations, getAdminTrains, getDashboard } from '../../api/admin'
-import { errorMessage } from '../../api/client'
-
-const data = ref(null)
-const message = ref('')
-const loading = ref(true)
-const summaryCards = computed(() => data.value?.summaryCards || [])
-const serviceStatuses = computed(() => data.value?.serviceStatuses || [])
-const memberStatuses = computed(() => data.value?.memberStatuses || [])
-const trains = computed(() => data.value?.trains || [])
-const stations = computed(() => data.value?.stations || [])
-const days = computed(() => data.value?.serviceTrend?.map((point) => point.date) || [])
-const pageDate = computed(() => data.value?.generatedAt || '')
-onMounted(async () => {
-  const [dashboard, trainData, stationData] = await Promise.allSettled([getDashboard(), getAdminTrains(), getAdminStations()])
-  if (dashboard.status === 'fulfilled') data.value = dashboard.value || {}
-  else message.value = errorMessage(dashboard.reason, '대시보드를 불러오지 못했습니다.')
-  if (trainData.status === 'fulfilled') data.value = { ...(data.value || {}), trains: Array.isArray(trainData.value) ? trainData.value : trainData.value?.items || [] }
-  if (stationData.status === 'fulfilled') data.value = { ...(data.value || {}), stations: Array.isArray(stationData.value) ? stationData.value : stationData.value?.items || [] }
-  loading.value = false
-})
+import {computed,onMounted,ref} from 'vue';import api,{apiError} from '../../services/api';import PageHeader from '../../components/PageHeader.vue';import DashboardStatCard from '../../components/DashboardStatCard.vue';import PageFooter from '../../components/PageFooter.vue';import {useRouter} from 'vue-router'
+const router=useRouter(),dashboard=ref(null),error=ref(''),loading=ref(true),days=ref([])
+const summaryCards=computed(()=>{const d=dashboard.value||{},s=d.statistics||d.stats||d;return [{label:'회원 수',value:s.memberCount??s.totalMembers??'—',unit:'명',note:''},{label:'공지 수',value:s.noticeCount??s.totalNotices??'—',unit:'건',note:''},{label:'QnA 답변 대기 수',value:s.waitingQnaCount??s.pendingQnaCount??s.unansweredQnaCount??'—',unit:'건',note:''},{label:'교통서비스 수',value:s.serviceCount??s.totalServices??s.trainCount??'—',unit:'건',note:''}]})
+const serviceStatuses=computed(()=>dashboard.value?.serviceStatuses||[]),memberStatuses=computed(()=>dashboard.value?.memberStatuses||[]),trains=computed(()=>dashboard.value?.recentTrains||[]),stations=computed(()=>dashboard.value?.recentStations||[])
+onMounted(async()=>{try{const r=await api.get('/admin/dashboard');dashboard.value=r.data?.data??r.data;days.value=[]}catch(e){error.value=apiError(e)}finally{loading.value=false}})
+function go(path){router.push(path)}
+function totalOf(items){return items.reduce((sum,item)=>sum+Number(item.count||0),0)}
+function statusLabel(value){return ({RUNNING:'운행 중',MAINTENANCE:'점검 중',BROKEN:'고장',INSPECTED:'점검 완료',NEEDS_INSPECTION:'점검 필요',IN_INSPECTION:'점검 중'})[value]||value}
+function tone(value){return ({RUNNING:'running',MAINTENANCE:'inspection',BROKEN:'broken',INSPECTED:'running',NEEDS_INSPECTION:'broken',IN_INSPECTION:'inspection'})[value]||'running'}
 </script>
 
 <template>
   <div class="dashboard-shell" id="dashboard">
-    <PageHeader role="admin" />
+    <PageHeader />
 
     <main class="dashboard-main">
       <div class="page-heading">
         <h1>대시보드</h1>
-        <time>{{ pageDate }}</time>
+        <time>{{ new Date().toLocaleString() }}</time>
       </div>
-      <p v-if="message" role="alert">{{ message }}</p>
-      <p v-if="loading" role="status">불러오는 중...</p>
 
-      <section class="summary-grid" aria-label="주요 현황">
+      <p v-if="error" role="alert">{{ error }}</p><p v-else-if="loading" role="status">현황을 불러오는 중입니다.</p><section class="summary-grid" aria-label="주요 현황">
         <DashboardStatCard v-for="card in summaryCards" :key="card.label" v-bind="card" />
       </section>
 
@@ -51,17 +33,19 @@ onMounted(async () => {
             교통서비스 상태 현황
           </h2>
           <div class="service-chart-content">
-            <div v-if="serviceStatuses.length"
+            <div
+              v-if="serviceStatuses.length"
               class="donut donut--service"
               role="img"
-              aria-label="교통서비스 정상 72.73%, 점검 22.73%, 고장 4.55%"
+              :aria-label="`교통서비스 전체 ${totalOf(serviceStatuses)}건`"
             >
               <div class="donut__center">
                 <strong>전체</strong>
-                <b>{{ data?.serviceTotal ?? '—' }}건</b>
+                <b>{{ totalOf(serviceStatuses) }}건</b>
               </div>
+              
             </div>
-            <ul class="legend-list">
+            <ul v-if="serviceStatuses.length" class="legend-list">
               <li v-for="item in serviceStatuses" :key="item.name">
                 <i :class="`legend-dot legend-dot--${item.color}`"></i>
                 <span>{{ item.name }}</span>
@@ -79,7 +63,7 @@ onMounted(async () => {
             주간 교통서비스 상태 추이
           </h2>
           <div class="line-chart-wrap">
-            <svg class="line-chart" viewBox="0 0 620 300" role="img" aria-label="주간 교통서비스 정상, 점검, 고장 건수 추이">
+            <p v-if="!days.length">주간 추이 데이터가 제공되지 않았습니다.</p><svg v-else class="line-chart" viewBox="0 0 620 300" role="img" aria-label="주간 교통서비스 상태 추이">
               <g class="chart-grid-lines">
                 <line
                   v-for="y in [40, 85, 130, 175, 220, 265]"
@@ -100,6 +84,45 @@ onMounted(async () => {
                   {{ day }}
                 </text>
               </g>
+              <polyline
+                class="chart-line chart-line--green"
+                points="55,104 143,104 231,99 319,94 407,81 495,92 583,64"
+              />
+              <polyline
+                class="chart-line chart-line--yellow"
+                points="55,213 143,206 231,201 319,214 407,219 495,210 583,205"
+              />
+              <polyline
+                class="chart-line chart-line--red"
+                points="55,229 143,224 231,220 319,231 407,235 495,229 583,224"
+              />
+              <g class="chart-points chart-points--green">
+                <circle
+                  v-for="(x, i) in [55,143,231,319,407,495,583]"
+                  :key="x"
+                  :cx="x"
+                  :cy="[104,104,99,94,81,92,64][i]"
+                  r="3"
+                />
+              </g>
+              <g class="chart-points chart-points--yellow">
+                <circle
+                  v-for="(x, i) in [55,143,231,319,407,495,583]"
+                  :key="x"
+                  :cx="x"
+                  :cy="[213,206,201,214,219,210,205][i]"
+                  r="3"
+                />
+              </g>
+              <g class="chart-points chart-points--red">
+                <circle
+                  v-for="(x, i) in [55,143,231,319,407,495,583]"
+                  :key="x"
+                  :cx="x"
+                  :cy="[229,224,220,231,235,229,224][i]"
+                  r="3"
+                />
+              </g>
               <g class="chart-legend">
                 <circle cx="455" cy="18" r="4" class="chart-points--green" />
                 <text x="463" y="21">정상</text>
@@ -115,17 +138,19 @@ onMounted(async () => {
         <article class="panel member-panel">
           <h2 class="panel-title">회원 현황</h2>
           <div class="member-chart-content">
-            <div v-if="memberStatuses.length"
+            <div
+              v-if="memberStatuses.length"
               class="donut donut--member"
               role="img"
-              aria-label="회원 일반 유저 74.1%, 임시 차단 15.6%, 강퇴 7.4%"
+              :aria-label="`회원 현황 전체 ${totalOf(memberStatuses)}명`"
             >
               <div class="donut__center donut__center--small">
                 <span>전체</span>
-                <b>{{ data?.memberTotal ?? '—' }}명</b>
+                <b>{{ totalOf(memberStatuses) }}명</b>
               </div>
+              
             </div>
-            <ul class="member-legend">
+            <ul v-if="memberStatuses.length" class="member-legend">
               <li v-for="item in memberStatuses" :key="item.name">
                 <i :class="`legend-dot legend-dot--${item.color}`"></i>
                 <span>
@@ -143,8 +168,8 @@ onMounted(async () => {
           <div class="management-heading">
             <h2 class="panel-title">열차 관리</h2>
             <div class="management-actions">
-              <button class="button button--primary" disabled>등록</button>
-              <button class="text-button" disabled>전체보기 ›</button>
+              <button class="button button--primary" @click="go('/admin/line7/trains/new')">등록</button>
+              <button class="text-button" @click="go('/admin/line7/trains')">전체보기 ›</button>
             </div>
           </div>
           <div class="table-scroll">
@@ -159,16 +184,19 @@ onMounted(async () => {
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="train in trains" :key="train.number">
+                <tr v-for="train in trains" :key="train.trainId">
                   <td>
-                    <span :class="`status-pill status-pill--${train.tone}`">
-                      {{ train.status }}
+                    <span :class="`status-pill status-pill--${tone(train.status)}`">
+                      {{ statusLabel(train.status) }}
                     </span>
                   </td>
-                  <td>{{ train.station }}</td>
-                  <td>{{ train.number }}</td>
-                  <td>{{ train.operator }}</td>
-                  <td class="row-actions"><button class="button button--edit" disabled>수정</button><button class="button button--delete" disabled>비활성화</button></td>
+                  <td>{{ train.section }}</td>
+                  <td>{{ train.trainNo }}</td>
+                  <td>{{ train.driver }}</td>
+                  <td class="row-actions">
+                    <button class="button button--edit" @click="go(`/admin/line7/trains/${train.trainId}`)">수정</button>
+                    <button class="button button--delete" @click="go(`/admin/line7/trains/${train.trainId}`)">비활성화</button>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -179,45 +207,33 @@ onMounted(async () => {
           <div class="management-heading">
             <h2 class="panel-title">역 관리</h2>
             <div class="management-actions">
-              <button class="button button--primary" disabled>등록</button>
-              <button class="text-button" disabled>전체보기 ›</button>
+              <button class="button button--primary" @click="go('/admin/line7/stations/new')">등록</button>
+              <button class="text-button" @click="go('/admin/line7/stations')">전체보기 ›</button>
             </div>
           </div>
           <div class="table-scroll">
             <table>
               <thead>
                 <tr>
-                  <th>운행 상태</th>
-                  <th>운행 구간</th>
-                  <th>열차 번호</th>
-                  <th>기관사</th>
-                  <th>상행/하행</th>
+                  <th>역 이름</th>
+                  <th>시설 상태</th>
+                  <th>역무원</th>
+                  <th>최근 점검일</th>
+                  <th>점검 예정일</th>
                   <th>관리</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="station in stations" :key="station.number">
-                  <td>
-                    <span :class="`status-pill status-pill--${station.tone}`">
-                      {{ station.status }}
-                    </span>
+                <tr v-for="station in stations" :key="station.stationId" :class="{ 'is-inactive': !station.active }">
+                  <td>{{ station.stationName }}</td>
+                  <td><span :class="`status-pill status-pill--${tone(station.facilityStatus)}`">{{ statusLabel(station.facilityStatus) }}</span></td>
+                  <td>{{ station.staffName }}</td>
+                  <td>{{ station.lastInspectionDate }}</td>
+                  <td>{{ station.nextInspectionDueDate }}</td>
+                  <td class="row-actions">
+                    <button class="button button--edit" @click="go(`/admin/line7/stations/${station.stationId}`)">수정</button>
+                    <button class="button button--delete" @click="go(`/admin/line7/stations/${station.stationId}`)">비활성화</button>
                   </td>
-                  <td>{{ station.section }}</td>
-                  <td>{{ station.number }}</td>
-                  <td>{{ station.operator }}</td>
-                  <td>
-                    <span
-                      :class="[
-                        'status-pill',
-                        station.tone === 'inspection'
-                          ? 'status-pill--direction-down'
-                          : 'status-pill--direction-up',
-                      ]"
-                    >
-                      {{ station.direction }}
-                    </span>
-                  </td>
-                  <td class="row-actions"><button class="button button--edit" disabled>수정</button><button class="button button--delete" disabled>비활성화</button></td>
                 </tr>
               </tbody>
             </table>
@@ -229,6 +245,7 @@ onMounted(async () => {
     <PageFooter />
   </div>
 </template>
+
 
 
 

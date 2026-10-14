@@ -1,4 +1,4 @@
-.member-qna-form-page { width: min(1440px, 100%); min-height: 100vh; margin: 0 auto; padding: 0 20px; display: flex; flex-direction: column; }
+.member-qna-form-page { background: var(--page-background); width: min(1440px, 100%); min-height: 100vh; margin: 0 auto; padding: 0 20px; display: flex; flex-direction: column; }
 .member-qna-form-page .primary-nav a:nth-child(3)::after { transform: scaleX(1); }
 .member-qna-form-main { flex: 1; display: flex; flex-direction: column; padding: 0 12px 10px; }
 .member-qna-form-hero { min-height: 316px; display: flex; flex-direction: column; align-items: flex-start; padding: 42px 20px; border-radius: 18px; overflow: hidden; color: #f5f8f9; background-image: linear-gradient(90deg, rgba(44,57,75,.66), rgba(44,57,75,.28) 46%, rgba(44,57,75,.04) 82%), url('../../assets/notice-hero.png'); background-position: center 53%; background-size: cover; }

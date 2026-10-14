@@ -1,4 +1,4 @@
-.admin-qna-detail-page {
+.admin-qna-detail-page { background: var(--page-background);
   width: min(1440px, 100%);
   min-height: 100vh;
   margin: 0 auto;

@@ -1,57 +1,25 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import PageHeader from '../../components/PageHeader.vue'
-import PageFooter from '../../components/PageFooter.vue'
-import { deleteAdminQna, getAdminQna } from '../../api/qna'
-import { errorMessage } from '../../api/client'
-import { normalizeQna } from '../../api/normalize'
-import './admin-qna-detail.css'
-
-const route = useRoute()
-const router = useRouter()
-
-const qna = ref({ id: null, title: '', writer: '', views: 0, date: '', status: '', content: '', answer: '' })
-const message = ref('')
-const loading = ref(true)
-const isAnswered = computed(() => ['답변완료', 'ANSWERED', 'COMPLETED'].includes(qna.value.status))
-
-onMounted(async () => {
-  const id = route.params.qnaId || route.query.id
-  if (!id) { message.value = 'Q&A 번호가 없습니다.'; loading.value = false; return }
-  try { qna.value = normalizeQna(await getAdminQna(id)) }
-  catch (error) { message.value = errorMessage(error, 'Q&A를 불러오지 못했습니다.') }
-  finally { loading.value = false }
-})
-
-function editQna() {
-  router.push({ path: '/admin/qna', query: { edit: qna.value.id } })
-}
-
-async function deleteQna() {
-  if (!window.confirm('이 Q&A를 삭제하시겠습니까?')) return
-  try { await deleteAdminQna(qna.value.id); router.push('/admin/qna') }
-  catch (error) { message.value = errorMessage(error, 'Q&A를 삭제하지 못했습니다.') }
-}
+import {computed,ref,watch} from 'vue';import {useRoute,useRouter} from 'vue-router';import PageHeader from '../../components/PageHeader.vue';import PageBanner from '../../components/PageBanner.vue';import PageFooter from '../../components/PageFooter.vue';import DeleteModal from '../../components/DeleteModal.vue';import './admin-qna-detail.css';import {qnaApi} from '../../services/endpoints';import {apiError} from '../../services/api'
+const route=useRoute(),router=useRouter(),qna=ref({}),error=ref(''),deleteStage=ref(''),qnaId=computed(()=>route.params.qnaId||route.query.id),isAnswered=computed(()=>qna.value.status==='ANSWERED'),types={FACILITY:'시설',OPERATION:'운행',ETC:'기타'}
+async function load(){try{const r=await qnaApi.adminGet(qnaId.value),d=r?.data??r;qna.value={...d,category:types[d.inquiryType],views:d.viewCount??'—',date:d.createdAt}}catch(e){error.value=apiError(e)}}
+function editQna(){router.push({path:'/admin/qna',query:{edit:qnaId.value}})}
+function deleteQna(){deleteStage.value='confirm'}
+async function confirmDelete(){if(deleteStage.value==='complete'){closeDelete();return}try{await qnaApi.adminRemove(qnaId.value);deleteStage.value='complete'}catch(e){error.value=apiError(e);deleteStage.value=''}}
+function closeDelete(){const done=deleteStage.value==='complete';deleteStage.value='';if(done)router.push('/admin/qna')}
+watch(()=>route.fullPath,load,{immediate:true})
 </script>
 
 <template>
   <div class="admin-qna-detail-page">
-    <PageHeader role="admin" />
+    <PageHeader />
 
     <main class="admin-qna-detail-main">
-      <section class="admin-qna-detail-hero" aria-labelledby="admin-qna-detail-page-title">
-        <div class="admin-qna-detail-breadcrumb">HOME <span>›</span> Q&amp;A <span>›</span> 상세</div>
-        <h1 id="admin-qna-detail-page-title">Q&amp;A</h1>
-        <p>궁금하신 내용을 확인하실 수 있습니다.</p>
-      </section>
+      <PageBanner title="Q&amp;A" description="궁금하신 내용을 확인하실 수 있습니다." stage="상세" />
 
-      <article class="admin-qna-detail-card" aria-labelledby="admin-qna-detail-title">
-        <p v-if="loading" role="status">불러오는 중...</p>
-        <p v-if="message" role="alert">{{ message }}</p>
+      <article class="admin-qna-detail-card" aria-labelledby="admin-qna-detail-title"><p v-if="error" role="alert">{{ error }}</p>
         <div class="admin-qna-detail-heading">
           <h2 id="admin-qna-detail-title">{{ qna.title }}</h2>
-          <span :class="['admin-qna-detail-status', { 'is-pending': !isAnswered }]">{{ qna.status }}</span>
+          <span :class="['admin-qna-detail-status', { 'is-pending': !isAnswered }]">{{ qna.status === 'ANSWERED' ? '답변완료' : '답변대기' }}</span>
         </div>
 
         <dl class="admin-qna-detail-meta">
@@ -76,7 +44,7 @@ async function deleteQna() {
       </article>
 
       <div class="admin-qna-detail-actions">
-        <a class="admin-qna-detail-button" href="/admin/qna">목록</a>
+        <RouterLink class="admin-qna-detail-button" to="/admin/qna">목록</RouterLink>
         <div>
           <button class="admin-qna-detail-button" type="button" @click="editQna">수정</button>
           <button class="admin-qna-detail-button" type="button" @click="deleteQna">삭제</button>
@@ -85,5 +53,7 @@ async function deleteQna() {
     </main>
 
     <PageFooter />
+    <DeleteModal v-if="deleteStage" :completed="deleteStage === 'complete'" @confirm="confirmDelete" @close="closeDelete" />
   </div>
 </template>
+

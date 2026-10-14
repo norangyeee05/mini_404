@@ -1,73 +1,39 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import PageHeader from '../../components/PageHeader.vue'
+import PageBanner from '../../components/PageBanner.vue'
 import PageFooter from '../../components/PageFooter.vue'
-import { getNotices } from '../../api/notices'
-import { errorMessage } from '../../api/client'
-import { normalizeNotice } from '../../api/normalize'
 import './notice-list.css'
-
-const notices = ref([])
-const searchField = ref('all')
-const searchInput = ref('')
-const currentPage = ref(1)
-const pageSize = 10
-const totalCount = ref(0)
-const loading = ref(false)
-const message = ref('')
+import { currentMember } from '../../services/auth'
+import { noticesApi } from '../../services/endpoints'
+import { apiError } from '../../services/api'
+const notices = ref([]), totalCount = ref(0), error = ref('')
+const searchField = ref('title'), searchInput = ref(''), appliedQuery = ref(''), currentPage = ref(1), pageSize = 10
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / pageSize)))
 const pageRows = computed(() => notices.value)
-const visiblePages = computed(() => Array.from({ length: Math.min(5, totalPages.value) }, (_, index) => index + 1))
-
-async function loadNotices() {
-  loading.value = true
-  message.value = ''
-  try {
-    const result = await getNotices({ page: currentPage.value, size: pageSize, searchType: searchField.value, keyword: searchInput.value.trim() })
-    notices.value = result.items.map(normalizeNotice)
-    totalCount.value = result.totalCount
-  } catch (error) { message.value = errorMessage(error, '공지사항을 불러오지 못했습니다.') }
-  finally { loading.value = false }
-}
-
-function searchNotices() {
-  currentPage.value = 1
-  loadNotices()
-}
-
-function goToPage(page) {
-  currentPage.value = Math.min(Math.max(page, 1), totalPages.value)
-  loadNotices()
-}
-
-onMounted(loadNotices)
+const visiblePages = computed(() => { const start=Math.floor((currentPage.value-1)/5)*5+1; return Array.from({length:Math.min(5,totalPages.value-start+1)},(_,index)=>start+index) })
+async function load() { error.value=''; try { const res=await noticesApi.list({page:currentPage.value,size:pageSize,searchType:searchField.value,keyword:appliedQuery.value}); notices.value=res.items; totalCount.value=res.totalCount } catch(e) { error.value=apiError(e) } }
+function searchNotices() { appliedQuery.value=searchInput.value.trim();currentPage.value=1;load() }
+function goToPage(page) { currentPage.value=Math.min(Math.max(page,1),totalPages.value);load() }
+load()
 </script>
 
 <template>
   <div class="notice-page">
-    <PageHeader role="guest" />
+    <PageHeader />
 
     <main class="notice-main">
-      <section class="notice-hero" aria-labelledby="notice-page-title">
-        <div class="notice-breadcrumb">HOME <span>›</span> 공지사항</div>
-        <h1 id="notice-page-title">공지사항</h1>
-        <p>교통서비스 관련 주요 내용을 확인하실 수 있습니다.</p>
-      </section>
+      <PageBanner title="공지사항" description="교통서비스 관련 주요 내용을 확인하실 수 있습니다."  />
 
       <div class="notice-content-grid">
-        <aside class="notice-sidebar" aria-label="고객센터 메뉴">
-          <a class="notice-sidebar__link notice-sidebar__link--active" href="#">목록</a>
-          <a class="notice-sidebar__link" href="#">문의하기</a>
-          <a class="notice-sidebar__link" href="#">내 문의 내역</a>
-          <a class="notice-sidebar__link" href="#">자주 묻는 질문</a>
-        </aside>
 
         <section class="notice-board" aria-label="공지사항 목록">
           <form class="notice-search" @submit.prevent="searchNotices">
             <label class="visually-hidden" for="notice-search-field">검색 범위</label>
             <select id="notice-search-field" v-model="searchField">
-              <option value="all">전체</option>
+              
               <option value="title">제목</option>
+              
               <option value="writer">작성자</option>
             </select>
             <label class="visually-hidden" for="notice-search-input">검색어</label>
@@ -83,8 +49,6 @@ onMounted(loadNotices)
             <button class="notice-search__button" type="submit">검색</button>
           </form>
 
-          <p v-if="loading" role="status">불러오는 중...</p>
-          <p v-if="message" role="alert">{{ message }}</p>
           <div class="notice-table-scroll">
             <table class="notice-table">
               <thead>
@@ -97,16 +61,17 @@ onMounted(loadNotices)
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="notice in pageRows" :key="notice.id">
-                  <td>{{ notice.id }}</td>
+                <tr v-for="notice in pageRows" :key="notice.noticeId">
+                  <td>{{ notice.noticeId }}</td>
                   <td class="notice-table__title">
-                    <a class="notice-table__title-link" href="/notice/detail">{{ notice.title }}</a>
+                    <RouterLink class="notice-table__title-link" :to="`/notices/${notice.noticeId}`">{{ notice.title }}</RouterLink>
                   </td>
                   <td>{{ notice.writer }}</td>
                   <td>{{ notice.viewCount }}</td>
                   <td>{{ notice.createdAt }}</td>
                 </tr>
-                <tr v-if="pageRows.length === 0">
+                <tr v-if="error"><td colspan="5" class="notice-table__empty">{{ error }}</td></tr>
+                <tr v-else-if="pageRows.length === 0">
                   <td colspan="5" class="notice-table__empty">검색 결과가 없습니다.</td>
                 </tr>
               </tbody>
@@ -128,10 +93,7 @@ onMounted(loadNotices)
               <button type="button" aria-label="다음 페이지" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">›</button>
               <button type="button" aria-label="마지막 페이지" :disabled="currentPage === totalPages" @click="goToPage(totalPages)">»</button>
             </nav>
-
-            <div class="notice-actions" aria-label="문의 작성">
-              <button type="button" class="notice-actions__button notice-actions__button--primary">질문하기</button>
-            </div>
+<div v-if="currentMember" class="notice-actions" aria-label="문의 작성"><RouterLink to="/qna/new" class="notice-actions__button notice-actions__button--primary">질문하기</RouterLink></div>
           </div>
         </section>
       </div>
@@ -140,3 +102,4 @@ onMounted(loadNotices)
     <PageFooter />
   </div>
 </template>
+

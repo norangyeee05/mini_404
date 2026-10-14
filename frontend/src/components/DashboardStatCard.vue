@@ -16,3 +16,4 @@ defineProps({
     <p class="stat-card__note">{{ note }}</p>
   </article>
 </template>
+

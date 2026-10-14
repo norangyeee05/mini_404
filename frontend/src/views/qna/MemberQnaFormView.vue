@@ -1,102 +1,26 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import PageHeader from '../../components/PageHeader.vue'
-import PageFooter from '../../components/PageFooter.vue'
-import { createQna, getQna, updateQna } from '../../api/qna'
-import { errorMessage } from '../../api/client'
-import { normalizeQna } from '../../api/normalize'
-import './member-qna-form.css'
-
-const props = defineProps({ mode: { type: String, default: 'create' } })
-const route = useRoute()
-const router = useRouter()
-const title = ref('')
-const content = ref('')
-const category = ref('운행')
-const selectedFiles = ref([])
-const titleLength = computed(() => title.value.length)
-const contentLength = computed(() => content.value.length)
-const isEdit = computed(() => props.mode === 'edit')
-const qnaId = computed(() => route.params.qnaId || route.query.id)
-const message = ref('')
-const saving = ref(false)
-
-onMounted(async () => {
-  if (!isEdit.value || !qnaId.value) return
-  try { fillForm(normalizeQna(await getQna(qnaId.value))) }
-  catch (error) { message.value = errorMessage(error, 'Q&A를 불러오지 못했습니다.') }
-})
-
-function fillForm(qna) {
-  title.value = qna.title || ''
-  content.value = qna.content || ''
-  category.value = qna.category || '운행'
-}
-
-function handleFileChange(event) {
-  const files = Array.from(event.target.files || [])
-  if (files.some((file) => file.size > 10 * 1024 * 1024)) {
-    window.alert('첨부파일은 파일당 10MB 이하만 선택할 수 있습니다.')
-    event.target.value = ''
-    selectedFiles.value = []
-    return
-  }
-  selectedFiles.value = files
-}
-
-function goBack() {
-  if (isEdit.value) {
-    router.push(`/qna/${qnaId.value}`)
-    return
-  }
-  router.push('/qna?mine=true')
-}
-
-async function saveQuestion() {
-  message.value = ''
-  saving.value = true
-  try {
-    const inquiryType = ({ '운행': 'OPERATION', '시설': 'FACILITY', '기타': 'ETC' })[category.value]
-    if (!inquiryType) throw new Error('명세에 정의되지 않은 문의 유형입니다.')
-    let body = { title: title.value, inquiryType, content: content.value }
-    if (selectedFiles.value.length) {
-      const formData = new FormData()
-      formData.append('title', title.value)
-      formData.append('inquiryType', inquiryType)
-      formData.append('content', content.value)
-      selectedFiles.value.forEach((file) => formData.append('files[]', file))
-      body = formData
-    }
-    if (isEdit.value) {
-      if (!qnaId.value) throw new Error('수정할 Q&A 번호가 없습니다.')
-      await updateQna(qnaId.value, body)
-      await router.push(`/qna/${qnaId.value}`)
-    } else {
-      await createQna(body)
-      await router.push('/qna/my')
-    }
-  } catch (error) { message.value = errorMessage(error, 'Q&A를 저장하지 못했습니다.') }
-  finally { saving.value = false }
-}
+import {computed,ref,watch} from 'vue';import {useRoute,useRouter} from 'vue-router';import PageHeader from '../../components/PageHeader.vue';import PageBanner from '../../components/PageBanner.vue';import PageFooter from '../../components/PageFooter.vue';import './member-qna-form.css';import {qnaApi} from '../../services/endpoints';import {apiError} from '../../services/api'
+const props=defineProps({mode:{type:String,default:'create'}}),route=useRoute(),router=useRouter(),title=ref(''),content=ref(''),category=ref('OPERATION'),visibility=ref('전체'),selectedFile=ref(null),error=ref(''),saving=ref(false),titleLength=computed(()=>title.value.length),contentLength=computed(()=>content.value.length),isEdit=computed(()=>props.mode==='edit'||Boolean(route.params.qnaId)),qnaId=computed(()=>route.params.qnaId||route.query.id)
+const types={'운행':'OPERATION','시설':'FACILITY','기타':'ETC','OPERATION':'OPERATION','FACILITY':'FACILITY','ETC':'ETC'}
+watch(()=>route.fullPath,async()=>{error.value='';if(isEdit.value)try{const r=await qnaApi.get(qnaId.value),q=r?.data??r;title.value=q.title;content.value=q.content;category.value=q.inquiryType||'OPERATION'}catch(e){error.value=apiError(e)}},{immediate:true})
+function handleFileChange(e){const f=e.target.files?.[0];if(f&&f.size>10*1024*1024){error.value='첨부파일은 10MB 이하만 선택할 수 있습니다.';e.target.value='';return}selectedFile.value=f||null}
+function goBack(){router.push(isEdit.value?`/qna/${qnaId.value}`:'/qna/my')}
+async function saveQuestion(){saving.value=true;error.value='';try{const body=new FormData();body.append('title',title.value.trim());body.append('inquiryType',types[category.value]||'ETC');body.append('content',content.value.trim());if(selectedFile.value)body.append('files[]',selectedFile.value);if(isEdit.value){await qnaApi.update(qnaId.value,body);router.push(`/qna/${qnaId.value}`)}else{const r=await qnaApi.create(body),data=r?.data??r;router.push(`/qna/${data.qnaId}`)}}catch(e){error.value=apiError(e)}finally{saving.value=false}}
 </script>
 
 <template>
   <div class="member-qna-form-page">
-    <PageHeader role="member" />
+    <PageHeader />
 
     <main class="member-qna-form-main">
-      <section class="member-qna-form-hero">
-        <div class="member-qna-form-breadcrumb">HOME <span>›</span> Q&amp;A <span>›</span> {{ isEdit ? '수정' : '등록' }}</div>
-        <h1>Q&amp;A</h1>
-        <p>궁금하신 내용을 확인하실 수 있습니다.</p>
-      </section>
+      <PageBanner title="Q&amp;A" description="궁금하신 내용을 확인하실 수 있습니다." :stage="isEdit ? '수정' : '등록'" />
 
       <form class="member-qna-form-card" @submit.prevent="saveQuestion">
-        <p v-if="message" role="alert">{{ message }}</p>
         <div class="member-qna-form-title-row">
           <label for="qna-title">제목 <span>*</span></label>
           <div class="member-qna-form-selects">
+            <label class="visually-hidden" for="qna-visibility">공개 여부</label>
+            <select id="qna-visibility" disabled><option>공개 여부는 명세에 없음</option></select>
             <label class="visually-hidden" for="qna-category">문의 유형</label>
             <select id="qna-category" v-model="category"><option>운행</option><option>시설</option><option>기타</option></select>
           </div>
@@ -110,15 +34,15 @@ async function saveQuestion() {
 
         <label class="member-qna-form-file-label" for="qna-file">첨부파일(선택사항)</label>
         <label class="member-qna-form-file-control" for="qna-file">
-          <span>{{ selectedFiles.map((file) => file.name).join(', ') || '파일을 첨부해주세요. (파일당 10MB 이하)' }}</span>
-          <input id="qna-file" type="file" multiple @change="handleFileChange" />
+          <span>{{ selectedFile?.name || '파일을 첨부해주세요. (10MB 이하)' }}</span>
+          <input id="qna-file" type="file" @change="handleFileChange" />
         </label>
 
-        <div class="member-qna-form-actions">
+        <p v-if="error" role="alert">{{ error }}</p><div class="member-qna-form-actions">
           <button type="button" class="member-qna-form-button" @click="goBack">목록</button>
           <div>
             <button type="button" class="member-qna-form-button" @click="goBack">취소</button>
-            <button type="submit" class="member-qna-form-button" :disabled="saving">{{ isEdit ? '수정' : '등록' }}</button>
+            <button type="submit" class="member-qna-form-button">{{ saving ? '저장 중...' : isEdit ? '수정' : '등록' }}</button>
           </div>
         </div>
       </form>
@@ -127,3 +51,4 @@ async function saveQuestion() {
     <PageFooter />
   </div>
 </template>
+

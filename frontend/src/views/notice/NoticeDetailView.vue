@@ -1,58 +1,30 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import DeleteModal from '../../components/DeleteModal.vue'
 import PageHeader from '../../components/PageHeader.vue'
+import PageBanner from '../../components/PageBanner.vue'
 import PageFooter from '../../components/PageFooter.vue'
-import { getNotice, deleteNotice } from '../../api/notices'
-import { errorMessage } from '../../api/client'
-import { normalizeNotice } from '../../api/normalize'
 import './notice-detail.css'
-
-const props = defineProps({
-  role: {
-    type: String,
-    default: 'guest',
-    validator: (value) => ['guest', 'admin'].includes(value),
-  },
-})
-
-const router = useRouter()
-const route = useRoute()
-const message = ref('')
-const loading = ref(true)
-
-const notice = ref({ title: '', writer: '', viewCount: 0, createdAt: '', content: '' })
-
-onMounted(async () => {
-  const id = route.params.noticeId || route.query.id
-  if (!id) { message.value = '공지사항 번호가 없습니다.'; loading.value = false; return }
-  try { notice.value = normalizeNotice(await getNotice(id)) }
-  catch (error) { message.value = errorMessage(error, '공지사항을 불러오지 못했습니다.') }
-  finally { loading.value = false }
-})
-
-async function removeNotice() {
-  if (!window.confirm('이 공지사항을 삭제하시겠습니까?')) return
-  try { await deleteNotice(notice.value.id); router.push('/admin/notices') }
-  catch (error) { message.value = errorMessage(error, '공지사항을 삭제하지 못했습니다.') }
-}
+import { noticesApi } from '../../services/endpoints'
+import { apiError } from '../../services/api'
+const props=defineProps({role:{type:String,default:'guest'}}),router=useRouter(),route=useRoute(),notice=ref({}),error=ref(''),deleteStage=ref(''),noticeId=computed(()=>route.params.noticeId||route.query.id)
+async function load(){try{const r=await noticesApi.get(noticeId.value);notice.value=r?.data??r}catch(e){error.value=apiError(e)}}
+function deleteNotice(){deleteStage.value='confirm'}
+async function confirmDelete(){if(deleteStage.value==='complete'){closeDelete();return}try{await noticesApi.remove(noticeId.value);deleteStage.value='complete'}catch(e){error.value=apiError(e);deleteStage.value=''}}
+function closeDelete(){const done=deleteStage.value==='complete';deleteStage.value='';if(done)router.push('/admin/notices')}
+watch(()=>route.fullPath,load,{immediate:true})
 </script>
 
 <template>
   <div class="notice-detail-page">
-    <PageHeader :role="props.role" />
+    <PageHeader />
 
     <main class="notice-detail-main">
-      <section class="notice-detail-hero" aria-labelledby="notice-detail-page-title">
-        <div class="notice-detail-breadcrumb">HOME <span>›</span> 공지사항 <span>›</span> 상세</div>
-        <h1 id="notice-detail-page-title">공지사항</h1>
-        <p>교통서비스 관련 주요 내용을 확인하실 수 있습니다.</p>
-      </section>
+      <PageBanner title="공지사항" description="교통서비스 관련 주요 내용을 확인하실 수 있습니다." stage="상세" />
 
       <article class="notice-detail-card" aria-labelledby="notice-detail-title">
-        <p v-if="loading" role="status">불러오는 중...</p>
-        <p v-if="message" role="alert">{{ message }}</p>
-        <h2 id="notice-detail-title">{{ notice.title }}</h2>
+        <h2 id="notice-detail-title">{{ notice.title }}</h2><p v-if="error" role="alert">{{ error }}</p>
 
         <dl class="notice-detail-meta">
           <div class="notice-detail-meta__author">
@@ -76,32 +48,36 @@ async function removeNotice() {
           ]"
         >
           <p v-if="notice.content" class="notice-detail-content__saved">{{ notice.content }}</p>
-          <p v-else>{{ notice.content }}</p>
+          <p>{{ notice.content }}</p>
 
-          <a
+          <RouterLink
             v-if="props.role === 'admin'"
             class="notice-detail-back-link"
-            href="/admin/notices"
+            to="/admin/notices"
           >
             ‹ &nbsp; 목록으로 돌아가기
-          </a>
+          </RouterLink>
         </div>
       </article>
 
       <div class="notice-detail-actions">
-        <a
-          class="notice-detail-list-button"
-          :href="props.role === 'admin' ? '/admin/notices' : '/notices'"
+        <RouterLink class="notice-detail-list-button" :to="props.role === 'admin' ? '/admin/notices' : '/notices'"
         >
           목록
-        </a>
+        </RouterLink>
         <div v-if="props.role === 'admin'" class="notice-detail-admin-actions">
-          <button class="notice-detail-admin-button" type="button" @click="router.push({ path: '/admin/notices/edit', query: { id: notice.id } })">수정</button>
-          <button class="notice-detail-admin-button" type="button" @click="removeNotice">삭제</button>
+          <button class="notice-detail-admin-button" type="button" @click="router.push(`/admin/notices/${noticeId}/edit`)">수정</button>
+          <button class="notice-detail-admin-button" type="button" @click="deleteNotice">삭제</button>
         </div>
       </div>
     </main>
 
     <PageFooter />
+    <DeleteModal v-if="deleteStage" :completed="deleteStage === 'complete'" @confirm="confirmDelete" @close="closeDelete" />
   </div>
 </template>
+
+<style scoped>
+.notice-attachment { margin-top: 24px; padding: 18px 22px; border-radius: 10px; background: #e6eef0; color: #427486; }.notice-attachment h3 { margin: 0 0 10px; font-size: 16px; }.notice-attachment > div { display: flex; align-items: center; gap: 16px; justify-content: space-between; }.notice-attachment span { overflow-wrap: anywhere; min-width: 0; }.notice-attachment button { flex-shrink: 0; }@media(max-width:640px){.notice-attachment > div { align-items: flex-start; flex-direction: column; }}
+</style>
+
