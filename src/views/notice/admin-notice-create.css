@@ -1,4 +1,5 @@
-.admin-notice-create-page { background: var(--page-background);
+.admin-notice-create-page {
+  background: var(--page-background);
   width: min(1440px, 100%);
   min-height: 100vh;
   margin: 0 auto;
@@ -6,18 +7,15 @@
   display: flex;
   flex-direction: column;
 }
-
 .admin-notice-create-page .primary-nav a:first-child::after {
   transform: scaleX(1);
 }
-
 .admin-notice-create-main {
   flex: 1;
   display: flex;
   flex-direction: column;
   padding: 0 12px 10px;
 }
-
 .admin-notice-create-hero {
   min-height: 316px;
   display: flex;
@@ -27,41 +25,34 @@
   border-radius: 18px;
   overflow: hidden;
   color: #f5f8f9;
-  background-image:
-    linear-gradient(90deg, rgba(44, 57, 75, .66), rgba(44, 57, 75, .28) 46%, rgba(44, 57, 75, .04) 82%),
+  background-image: linear-gradient(90deg, rgba(44, 57, 75, .66), rgba(44, 57, 75, .28) 46%, rgba(44, 57, 75, .04) 82%),
     url('../../assets/notice-hero.png');
   background-position: center 53%;
   background-size: cover;
 }
-
 .admin-notice-create-breadcrumb {
   margin-bottom: 18px;
   font-size: 20px;
   font-weight: 500;
 }
-
 .admin-notice-create-breadcrumb span {
   padding: 0 5px;
 }
-
 .admin-notice-create-hero h1 {
   margin: 0 0 2px;
   font-size: 34px;
   font-weight: 700;
 }
-
 .admin-notice-create-hero p {
   margin: 0;
   font-size: 20px;
 }
-
 .admin-notice-form {
   margin-top: 24px;
   padding: 16px 24px 8px;
   border-radius: 20px;
   background: #f1f5f6;
 }
-
 .admin-notice-form__title-row {
   display: flex;
   align-items: center;
@@ -69,7 +60,6 @@
   gap: 18px;
   margin-bottom: 16px;
 }
-
 .admin-notice-form__heading {
   display: block;
   color: #17566d;
@@ -77,11 +67,9 @@
   line-height: 1.3;
   font-weight: 700;
 }
-
 .admin-notice-form__heading span {
   color: #e33f3f;
 }
-
 .admin-notice-form__category {
   width: 140px;
   min-height: 47px;
@@ -93,7 +81,6 @@
   font: inherit;
   font-weight: 700;
 }
-
 .admin-notice-form__title-input,
 .admin-notice-form__content-input {
   width: 100%;
@@ -104,24 +91,20 @@
   font: inherit;
   font-size: 16px;
 }
-
 .admin-notice-form__title-input {
   min-height: 66px;
   padding: 0 20px;
 }
-
 .admin-notice-form__content-input {
   min-height: 234px;
   padding: 20px;
   resize: vertical;
 }
-
 .admin-notice-form__title-input::placeholder,
 .admin-notice-form__content-input::placeholder {
   color: #898d8e;
   font-weight: 600;
 }
-
 .admin-notice-form__count {
   margin: 7px 8px 6px 0;
   color: #898d8e;
@@ -129,23 +112,19 @@
   font-weight: 600;
   text-align: right;
 }
-
 .admin-notice-form__content-heading {
   margin: 4px 0 12px;
 }
-
 .admin-notice-create-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: 16px;
 }
-
 .admin-notice-create-actions__right {
   display: flex;
   gap: 16px;
 }
-
 .admin-notice-create-button {
   min-width: 83px;
   min-height: 39px;
@@ -160,89 +139,72 @@
   font-size: 15px;
   font-weight: 700;
 }
-
 .admin-notice-create-button:hover {
   background: #356a7b;
 }
-
 @media (max-width: 1020px) {
   .admin-notice-create-page {
     padding: 0 12px;
   }
-
   .admin-notice-create-hero {
     min-height: 260px;
     padding: 34px 18px;
   }
 }
-
 @media (max-width: 640px) {
   .admin-notice-create-main {
     padding: 0 0 10px;
   }
-
   .admin-notice-create-hero {
     min-height: 200px;
     padding: 26px 15px;
     border-radius: 13px;
     background-position: 60% center;
   }
-
   .admin-notice-create-breadcrumb {
     margin-bottom: 13px;
     font-size: 13px;
   }
-
   .admin-notice-create-hero h1 {
     font-size: 24px;
   }
-
   .admin-notice-create-hero p {
     max-width: 270px;
     font-size: 13px;
   }
-
   .admin-notice-form {
     margin-top: 14px;
     padding: 14px 12px 6px;
     border-radius: 15px;
   }
-
   .admin-notice-form__heading {
     font-size: 21px;
   }
-
   .admin-notice-form__category {
     width: 105px;
     min-height: 40px;
     border-width: 2px;
     font-size: 14px;
   }
-
   .admin-notice-form__title-input,
   .admin-notice-form__content-input {
     border-width: 2px;
     font-size: 14px;
   }
-
   .admin-notice-form__title-input {
     min-height: 54px;
     padding: 0 12px;
   }
-
   .admin-notice-form__content-input {
     min-height: 190px;
     padding: 14px 12px;
   }
-
   .admin-notice-form__count {
     font-size: 12px;
   }
-
   .admin-notice-create-actions__right {
     gap: 8px;
   }
-
   .admin-notice-create-button {
     min-width: 65px;
     min-height: 35px;

@@ -19,10 +19,74 @@ watch(()=>currentMember.value,()=>{if(stationId.value)load()})
     <p v-else-if="!error">역을 선택해 상세 정보를 확인하세요.</p>
   </section><RouterLink class="home-link" to="/">메인으로 돌아가기</RouterLink></main><PageFooter/></div>
 </template>
-<style scoped>
-.qna-delete-button { display: block; min-width: 84px; min-height: 40px; margin: 20px 0 16px auto; padding: 8px 20px; border: 0; border-radius: 9px; background: #457384; color: #fff; font-size: 16px; font-weight: 700; }.qna-delete-button:focus-visible { outline: 2px solid #155369; outline-offset: 3px; }
-.content-shell { display: flex; flex-direction: column; min-height: 100svh; width: min(1440px, 100%); margin: 0 auto; padding: 0 34px; background: var(--page-background); }.content-main { flex: 1; padding: 32px 0; } h1 { color: #155369; font-size: 32px; }.content-panel { padding: 28px; border-radius: 20px; background: #f0f5f7; line-height: 1.8; } h2 { color: #155369; }.dummy-body { margin: 32px 0; white-space: pre-line; }.home-link { display: inline-block; margin-top: 24px; }.content-panel a, .home-link { text-decoration: underline; }.station-links { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
-@media (max-width: 600px) { .content-shell { padding: 0 16px; }.content-panel { padding: 20px; } }
+<style scoped>.qna-delete-button {
+  display: block;
+  min-width: 84px;
+  min-height: 40px;
+  margin: 20px 0 16px auto;
+  padding: 8px 20px;
+  border: 0;
+  border-radius: 9px;
+  background: #457384;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+}
+.qna-delete-button:focus-visible {
+  outline: 2px solid #155369;
+  outline-offset: 3px;
+}
+.content-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: 0 34px;
+  background: var(--page-background);
+}
+.content-main {
+  flex: 1;
+  padding: 32px 0;
+}
+h1 {
+  color: #155369;
+  font-size: 32px;
+}
+.content-panel {
+  padding: 28px;
+  border-radius: 20px;
+  background: #f0f5f7;
+  line-height: 1.8;
+}
+h2 {
+  color: #155369;
+}
+.dummy-body {
+  margin: 32px 0;
+  white-space: pre-line;
+}
+.home-link {
+  display: inline-block;
+  margin-top: 24px;
+}
+.content-panel a, .home-link {
+  text-decoration: underline;
+}
+.station-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+@media (max-width: 600px) {
+  .content-shell {
+    padding: 0 16px;
+  }
+  .content-panel {
+    padding: 20px;
+  }
+}
 </style>
 
 

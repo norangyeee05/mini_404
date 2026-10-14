@@ -28,6 +28,90 @@ function statusLabel(value){return ({RUNNING:'운행 중',MAINTENANCE:'점검 �
     </form>
   </main><PageFooter/></div>
 </template>
-<style scoped>
-.line7-admin-shell{display:flex;flex-direction:column;min-height:100svh;width:min(1440px,100%);margin:auto;padding:20px 34px;background:var(--page-background)}main{flex:1}h1{color:#155369}.search,.editor{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:20px;background:#f0f5f7;border-radius:12px;margin:20px 0}.editor{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.editor h2,.editor>div,.editor>p{grid-column:1/-1}label{display:flex;flex-direction:column;gap:6px;color:#155369}input,select,textarea{padding:10px;border:2px solid #c6dadd;border-radius:8px;background:#fff;font:inherit}button,.search>a,.editor a{padding:9px 14px;border:0;border-radius:8px;background:#457384;color:white;text-decoration:none;cursor:pointer}table{width:100%;border-collapse:collapse;background:#fff}th,td{padding:12px;border:1px solid #d5e1e4;text-align:left}.inactive{color:#999;background:#eee}.pages{display:flex;justify-content:center;gap:8px;margin:20px}.active{flex-direction:row;align-items:center}@media(max-width:700px){.editor{grid-template-columns:1fr}.line7-admin-shell{padding:16px}}
+<style scoped>.line7-admin-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  width: min(1440px,100%);
+  margin: auto;
+  padding: 20px 34px;
+  background: var(--page-background);
+}
+main {
+  flex: 1;
+}
+h1 {
+  color: #155369;
+}
+.search,.editor {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 20px;
+  background: #f0f5f7;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+.editor {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+}
+.editor h2,.editor>div,.editor>p {
+  grid-column: 1/-1;
+}
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #155369;
+}
+input,select,textarea {
+  padding: 10px;
+  border: 2px solid #c6dadd;
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+}
+button,.search>a,.editor a {
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #457384;
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+th,td {
+  padding: 12px;
+  border: 1px solid #d5e1e4;
+  text-align: left;
+}
+.inactive {
+  color: #999;
+  background: #eee;
+}
+.pages {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px;
+}
+.active {
+  flex-direction: row;
+  align-items: center;
+}
+@media (max-width:700px) {
+  .editor {
+    grid-template-columns: 1fr;
+  }
+  .line7-admin-shell {
+    padding: 16px;
+  }
+}
 </style>

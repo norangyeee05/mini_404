@@ -17,6 +17,72 @@ async function confirmDelete(){if(deleteStage.value==='complete'){deleteStage.va
   <template v-if="detail"><article v-if="record" class="request-card"><h2>{{ record.title }}</h2><p>요청자: {{ record.requester }} · {{ record.createdAt }}</p><p>상태: {{ record.status==='COMPLETED'?'처리 완료':'처리 전' }}</p><p class="body">{{ record.content }}</p><section v-if="record.files?.length"><h3>첨부파일</h3><p v-for="file in record.files" :key="file.fileId">{{ file.fileName }}</p></section><div class="actions"><RouterLink to="/admin/resource-requests">목록</RouterLink><button v-if="record.status==='PENDING'" @click="setStatus('COMPLETED')">처리 완료</button><button @click="deleteStage='confirm'">삭제</button></div></article><p v-else>요청을 찾을 수 없습니다.</p></template>
   <template v-else><div class="toolbar"><label>처리 상태<select v-model="status" @change="page=1;load()"><option value="">전체</option><option value="PENDING">처리 전</option><option value="COMPLETED">처리 완료</option></select></label></div><table><thead><tr><th>번호</th><th>제목</th><th>요청자</th><th>상태</th><th>등록일</th></tr></thead><tbody><tr v-for="item in items" :key="item.requestId"><td>{{ item.requestId }}</td><td><RouterLink :to="`/admin/resource-requests/${item.requestId}`">{{ item.title }}</RouterLink></td><td>{{ item.requester }}</td><td>{{ item.status==='COMPLETED'?'처리 완료':'처리 전' }}</td><td>{{ item.createdAt }}</td></tr><tr v-if="!items.length"><td colspan="5">표시할 요청이 없습니다.</td></tr></tbody></table><nav class="pages"><button :disabled="page===1" @click="page=1;load()">«</button><button :disabled="page===1" @click="page--;load()">‹</button><span>{{ page }} / {{ pageCount }}</span><button :disabled="page===pageCount" @click="page++;load()">›</button><button :disabled="page===pageCount" @click="page=pageCount;load()">»</button></nav></template>
 </main><PageFooter/><DeleteModal v-if="deleteStage" :completed="deleteStage==='complete'" @confirm="confirmDelete" @close="deleteStage=''"/></div></template>
-<style scoped>
-.request-admin-shell{display:flex;flex-direction:column;min-height:100svh;width:min(1440px,100%);margin:auto;padding:20px 34px;background:var(--page-background)}main{flex:1}table{width:100%;border-collapse:collapse;background:white}th,td{padding:13px;border:1px solid #d5e1e4;text-align:left}.toolbar,.request-card{margin:20px 0;padding:22px;border-radius:14px;background:#f0f5f7}.toolbar label{display:flex;gap:12px;align-items:center}.toolbar select{padding:8px;border:2px solid #c6dadd;border-radius:8px}.request-card .body{white-space:pre-wrap;margin:32px 0}.actions,.pages{display:flex;justify-content:center;gap:10px;margin:20px 0}.actions a,.actions button,.pages button{padding:9px 14px;border:0;border-radius:8px;background:#457384;color:white;text-decoration:none;cursor:pointer}.actions button:last-child{background:#888}.pages button:disabled{opacity:.5}@media(max-width:700px){.request-admin-shell{padding:16px}}
+<style scoped>.request-admin-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  width: min(1440px,100%);
+  margin: auto;
+  padding: 20px 34px;
+  background: var(--page-background);
+}
+main {
+  flex: 1;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+th,td {
+  padding: 13px;
+  border: 1px solid #d5e1e4;
+  text-align: left;
+}
+.toolbar,.request-card {
+  margin: 20px 0;
+  padding: 22px;
+  border-radius: 14px;
+  background: #f0f5f7;
+}
+.toolbar label {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.toolbar select {
+  padding: 8px;
+  border: 2px solid #c6dadd;
+  border-radius: 8px;
+}
+.request-card .body {
+  white-space: pre-wrap;
+  margin: 32px 0;
+}
+.actions,.pages {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+.actions a,.actions button,.pages button {
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #457384;
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+}
+.actions button:last-child {
+  background: #888;
+}
+.pages button:disabled {
+  opacity: .5;
+}
+@media (max-width:700px) {
+  .request-admin-shell {
+    padding: 16px;
+  }
+}
 </style>

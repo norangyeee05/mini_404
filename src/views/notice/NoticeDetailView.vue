@@ -77,7 +77,35 @@ watch(()=>route.fullPath,load,{immediate:true})
   </div>
 </template>
 
-<style scoped>
-.notice-attachment { margin-top: 24px; padding: 18px 22px; border-radius: 10px; background: #e6eef0; color: #427486; }.notice-attachment h3 { margin: 0 0 10px; font-size: 16px; }.notice-attachment > div { display: flex; align-items: center; gap: 16px; justify-content: space-between; }.notice-attachment span { overflow-wrap: anywhere; min-width: 0; }.notice-attachment button { flex-shrink: 0; }@media(max-width:640px){.notice-attachment > div { align-items: flex-start; flex-direction: column; }}
+<style scoped>.notice-attachment {
+  margin-top: 24px;
+  padding: 18px 22px;
+  border-radius: 10px;
+  background: #e6eef0;
+  color: #427486;
+}
+.notice-attachment h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+.notice-attachment > div {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+}
+.notice-attachment span {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.notice-attachment button {
+  flex-shrink: 0;
+}
+@media (max-width:640px) {
+  .notice-attachment > div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
 </style>
 

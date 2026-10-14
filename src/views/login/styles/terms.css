@@ -1,16 +1,136 @@
-.terms-page { min-height: 100vh; min-height: 100svh; padding: 54px 20px 52px; background: var(--page-background); color: #155369; }
-.terms-panel { width: min(720px, 100%); min-height: 918px; margin: 0 auto; padding: 39px 60px 64px; border-radius: 12px; background: #f0f5f7; }
-h1 { margin: 0 0 23px; font-size: 36px; font-weight: 800; line-height: 48px; }
-.terms-description { margin: 0 0 43px 4px; color: #858585; font-size: 16px; line-height: 23px; }
-.agree-all { display: flex; align-items: center; gap: 9px; min-height: 60px; padding: 13px 20px; background: #d2e6e9; font-size: 24px; font-weight: 700; line-height: 34px; cursor: pointer; }
-.agree-all input { appearance: none; flex: 0 0 18px; width: 18px; height: 18px; margin: 0; border: 2px solid #155369; border-radius: 0; cursor: pointer; }
-.agree-all input:checked { background: #155369; box-shadow: inset 0 0 0 3px #d2e6e9; }
-.agree-all input:indeterminate { background: linear-gradient(#155369, #155369) center / 10px 3px no-repeat; }
-input:focus-visible, button:focus-visible { outline: 2px solid #155369; outline-offset: 4px; }
-.agreement-list { display: grid; gap: 32px; margin: 31px 10px 0 3px; }
-.terms-actions { position: relative; margin-top: 109px; }
-.terms-next { display: block; width: min(400px, 100%); height: 40px; margin: 0 auto; padding: 0 16px; border: 0; border-radius: 8px; background: #eee; color: #000; font-size: 16px; cursor: pointer; }
-.terms-next:hover { background: #e0e0e0; }
-.terms-error { position: absolute; right: 0; bottom: 48px; left: 0; margin: 0; color: #f00; font-size: 14px; text-align: center; }
-@media (max-width: 760px) { .terms-page { padding: 24px 16px; } .terms-panel { min-height: auto; padding: 32px 24px 40px; } .agree-all { font-size: 20px; } .agreement-list { margin-right: 0; margin-left: 0; } .terms-actions { margin-top: 80px; } }
-@media (max-width: 480px) { .terms-panel { padding: 26px 18px 32px; } h1 { font-size: 30px; margin-bottom: 16px; } .terms-description { margin-left: 0; margin-bottom: 28px; font-size: 14px; } .agree-all { padding: 12px; font-size: 18px; line-height: 28px; } .terms-actions { margin-top: 72px; } }
+.terms-page {
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 54px 20px 52px;
+  background: var(--page-background);
+  color: #155369;
+}
+.terms-panel {
+  width: min(720px, 100%);
+  min-height: 918px;
+  margin: 0 auto;
+  padding: 39px 60px 64px;
+  border-radius: 12px;
+  background: #f0f5f7;
+}
+h1 {
+  margin: 0 0 23px;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 48px;
+}
+.terms-description {
+  margin: 0 0 43px 4px;
+  color: #858585;
+  font-size: 16px;
+  line-height: 23px;
+}
+.agree-all {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 60px;
+  padding: 13px 20px;
+  background: #d2e6e9;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 34px;
+  cursor: pointer;
+}
+.agree-all input {
+  appearance: none;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 2px solid #155369;
+  border-radius: 0;
+  cursor: pointer;
+}
+.agree-all input:checked {
+  background: #155369;
+  box-shadow: inset 0 0 0 3px #d2e6e9;
+}
+.agree-all input:indeterminate {
+  background: linear-gradient(#155369, #155369) center / 10px 3px no-repeat;
+}
+input:focus-visible, button:focus-visible {
+  outline: 2px solid #155369;
+  outline-offset: 4px;
+}
+.agreement-list {
+  display: grid;
+  gap: 32px;
+  margin: 31px 10px 0 3px;
+}
+.terms-actions {
+  position: relative;
+  margin-top: 109px;
+}
+.terms-next {
+  display: block;
+  width: min(400px, 100%);
+  height: 40px;
+  margin: 0 auto;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #eee;
+  color: #000;
+  font-size: 16px;
+  cursor: pointer;
+}
+.terms-next:hover {
+  background: #e0e0e0;
+}
+.terms-error {
+  position: absolute;
+  right: 0;
+  bottom: 48px;
+  left: 0;
+  margin: 0;
+  color: #f00;
+  font-size: 14px;
+  text-align: center;
+}
+@media (max-width: 760px) {
+  .terms-page {
+    padding: 24px 16px;
+  }
+  .terms-panel {
+    min-height: auto;
+    padding: 32px 24px 40px;
+  }
+  .agree-all {
+    font-size: 20px;
+  }
+  .agreement-list {
+    margin-right: 0;
+    margin-left: 0;
+  }
+  .terms-actions {
+    margin-top: 80px;
+  }
+}
+@media (max-width: 480px) {
+  .terms-panel {
+    padding: 26px 18px 32px;
+  }
+  h1 {
+    font-size: 30px;
+    margin-bottom: 16px;
+  }
+  .terms-description {
+    margin-left: 0;
+    margin-bottom: 28px;
+    font-size: 14px;
+  }
+  .agree-all {
+    padding: 12px;
+    font-size: 18px;
+    line-height: 28px;
+  }
+  .terms-actions {
+    margin-top: 72px;
+  }
+}

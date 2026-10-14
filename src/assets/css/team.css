@@ -722,7 +722,7 @@ td {
     font-size: 9px;
   }
 }
-/* Admin dashboard: Frame 71 desktop layout */
+/*Admin dashboard: Frame 71 desktop layout*/
 @media (min-width: 1021px) {
   .dashboard-shell .brand {
     gap: 6px;

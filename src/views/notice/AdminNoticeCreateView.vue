@@ -33,10 +33,145 @@ const cancelPath=computed(()=>editing.value?`/admin/notices/${noticeId.value}`:'
     <div class="editor-actions"><RouterLink class="editor-button" to="/admin/notices">목록</RouterLink><div><RouterLink class="editor-button" :to="cancelPath">취소</RouterLink><button v-if="!editing || existing" class="editor-button" type="submit" form="notice-editor" :disabled="saving">{{ saving ? '저장 중...' : editing ? '저장' : '등록' }}</button></div></div>
   </main><PageFooter /></div>
 </template>
-<style scoped>
-.admin-notice-editor-shell { display: flex; flex-direction: column; min-height: 100svh; width: min(1440px, 100%); margin: 0 auto; padding: 0 34px; background: var(--page-background); } main { flex: 1; }.notice-editor { margin-top: 24px; padding: 26px 24px 15px; border-radius: 22px; background: #f0f5f7; }.editor-label { display: block; margin-bottom: 15px; color: #155369; font-size: 32px; font-weight: 700; line-height: 40px; }.editor-label span { color: #f00; } input:not([type=file]), textarea { display: block; width: 100%; padding: 18px 20px; border: 3px solid #c6dadd; border-radius: 10px; background: #fff; color: #333; font: inherit; } input:not([type=file]) { height: 65px; } textarea { min-height: 166px; resize: vertical; }.character-count { margin: 7px 8px 8px; text-align: right; color: #858585; font-weight: 600; }.file-label { display: block; margin-top: -22px; color: #155369; font-weight: 600; }.file-picker { display: block; margin-top: 3px; padding: 18px 22px; border-radius: 10px; background: #dbe4e7; color: #427486; font-weight: 600; cursor: pointer; overflow-wrap: anywhere; }.file-input { position: absolute; width: 1px; height: 1px; opacity: 0; }.file-picker:has(+ .file-input:focus-visible) { outline: 2px solid #155369; }.remove-file { margin-top: 8px; border: 0; background: none; color: #427486; text-decoration: underline; }.editor-error { color: #f00; }.editor-actions { display: flex; justify-content: space-between; margin-top: 16px; }.editor-actions > div { display: flex; gap: 16px; }.editor-button { display: inline-flex; align-items: center; justify-content: center; min-width: 84px; min-height: 40px; padding: 8px 20px; border: 0; border-radius: 9px; background: #457384; color: #fff; font-size: 16px; font-weight: 600; } input:focus-visible, textarea:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid #155369; outline-offset: 3px; }
-@media (max-width: 760px) { .admin-notice-editor-shell { padding: 0 16px; }.notice-editor { padding: 20px 16px; }.editor-label { font-size: 26px; }.file-label { margin-top: 0; }.editor-actions > div { gap: 8px; }.editor-button { min-width: 70px; padding: 8px 14px; } }
-
-.editor-button:disabled { opacity: .6; cursor: wait; }
+<style scoped>.admin-notice-editor-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: 0 34px;
+  background: var(--page-background);
+}
+main {
+  flex: 1;
+}
+.notice-editor {
+  margin-top: 24px;
+  padding: 26px 24px 15px;
+  border-radius: 22px;
+  background: #f0f5f7;
+}
+.editor-label {
+  display: block;
+  margin-bottom: 15px;
+  color: #155369;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+}
+.editor-label span {
+  color: #f00;
+}
+input:not([type=file]), textarea {
+  display: block;
+  width: 100%;
+  padding: 18px 20px;
+  border: 3px solid #c6dadd;
+  border-radius: 10px;
+  background: #fff;
+  color: #333;
+  font: inherit;
+}
+input:not([type=file]) {
+  height: 65px;
+}
+textarea {
+  min-height: 166px;
+  resize: vertical;
+}
+.character-count {
+  margin: 7px 8px 8px;
+  text-align: right;
+  color: #858585;
+  font-weight: 600;
+}
+.file-label {
+  display: block;
+  margin-top: -22px;
+  color: #155369;
+  font-weight: 600;
+}
+.file-picker {
+  display: block;
+  margin-top: 3px;
+  padding: 18px 22px;
+  border-radius: 10px;
+  background: #dbe4e7;
+  color: #427486;
+  font-weight: 600;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.file-picker:has(+ .file-input:focus-visible) {
+  outline: 2px solid #155369;
+}
+.remove-file {
+  margin-top: 8px;
+  border: 0;
+  background: none;
+  color: #427486;
+  text-decoration: underline;
+}
+.editor-error {
+  color: #f00;
+}
+.editor-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+.editor-actions > div {
+  display: flex;
+  gap: 16px;
+}
+.editor-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 84px;
+  min-height: 40px;
+  padding: 8px 20px;
+  border: 0;
+  border-radius: 9px;
+  background: #457384;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+input:focus-visible, textarea:focus-visible, a:focus-visible, button:focus-visible {
+  outline: 2px solid #155369;
+  outline-offset: 3px;
+}
+@media (max-width: 760px) {
+  .admin-notice-editor-shell {
+    padding: 0 16px;
+  }
+  .notice-editor {
+    padding: 20px 16px;
+  }
+  .editor-label {
+    font-size: 26px;
+  }
+  .file-label {
+    margin-top: 0;
+  }
+  .editor-actions > div {
+    gap: 8px;
+  }
+  .editor-button {
+    min-width: 70px;
+    padding: 8px 14px;
+  }
+}
+.editor-button:disabled {
+  opacity: .6;
+  cursor: wait;
+}
 </style>
 

@@ -14,15 +14,93 @@ onMounted(() => { dialog.value.showModal(); confirmButton.value.focus() })
     <button ref="confirmButton" class="permission-confirm" type="button" @click="emit('confirm')">확인</button>
   </dialog>
 </template>
-<style scoped>
-.permission-dialog { width: 650px; max-width: calc(100vw - 32px); height: 500px; max-height: calc(100svh - 32px); overflow-y: auto; padding: 42px 40px 50px; border: 0; border-radius: 28px; background: #fff; color: #000; text-align: center; }
-.permission-dialog::backdrop { background: rgba(67, 84, 105, .4); }
-.permission-close { position: absolute; top: 22px; right: 46px; padding: 4px 6px; border: 0; background: transparent; color: #858585; font-size: 20px; }
-.permission-icon { display: block; width: 100px; height: 100px; margin: 0 auto; }
-h2 { margin: 42px 0 42px; font-size: 36px; font-weight: 700; line-height: 48px; }
-p { margin: 0; color: #858585; font-size: 20px; font-weight: 600; line-height: 30px; }
-.permission-confirm { display: block; width: min(400px, 100%); height: 40px; margin: 54px auto 0; border: 0; border-radius: 8px; background: #eee; color: #000; font-size: 16px; }
-.permission-confirm:hover { background: #ddd; } button:focus-visible { outline: 2px solid #155369; outline-offset: 3px; }
-@media (max-width: 600px) { .permission-dialog { height: auto; padding: 44px 20px 36px; }.permission-close { top: 14px; right: 18px; }.permission-icon { width: 80px; height: 80px; } h2 { margin: 32px 0; font-size: 28px; line-height: 38px; } p { font-size: 17px; }.permission-confirm { margin-top: 38px; } }
+<style scoped>.permission-dialog {
+  width: 650px;
+  max-width: calc(100vw - 32px);
+  height: 500px;
+  max-height: calc(100svh - 32px);
+  overflow-y: auto;
+  padding: 42px 40px 50px;
+  border: 0;
+  border-radius: 28px;
+  background: #fff;
+  color: #000;
+  text-align: center;
+}
+.permission-dialog::backdrop {
+  background: rgba(67, 84, 105, .4);
+}
+.permission-close {
+  position: absolute;
+  top: 22px;
+  right: 46px;
+  padding: 4px 6px;
+  border: 0;
+  background: transparent;
+  color: #858585;
+  font-size: 20px;
+}
+.permission-icon {
+  display: block;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+}
+h2 {
+  margin: 42px 0 42px;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 48px;
+}
+p {
+  margin: 0;
+  color: #858585;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 30px;
+}
+.permission-confirm {
+  display: block;
+  width: min(400px, 100%);
+  height: 40px;
+  margin: 54px auto 0;
+  border: 0;
+  border-radius: 8px;
+  background: #eee;
+  color: #000;
+  font-size: 16px;
+}
+.permission-confirm:hover {
+  background: #ddd;
+}
+button:focus-visible {
+  outline: 2px solid #155369;
+  outline-offset: 3px;
+}
+@media (max-width: 600px) {
+  .permission-dialog {
+    height: auto;
+    padding: 44px 20px 36px;
+  }
+  .permission-close {
+    top: 14px;
+    right: 18px;
+  }
+  .permission-icon {
+    width: 80px;
+    height: 80px;
+  }
+  h2 {
+    margin: 32px 0;
+    font-size: 28px;
+    line-height: 38px;
+  }
+  p {
+    font-size: 17px;
+  }
+  .permission-confirm {
+    margin-top: 38px;
+  }
+}
 </style>
 
