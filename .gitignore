@@ -1,0 +1,14 @@
+.gradle/
+build/
+out/
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# 개인 설정(DB 비밀번호 등) / 업로드 파일
+application-local.yml
+uploads/
+
+# 삭제 예정 파일 보관 폴더
+_to_delete/
