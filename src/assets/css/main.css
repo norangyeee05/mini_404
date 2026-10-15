@@ -478,6 +478,22 @@ a {
   font-size: 15px;
 }
 
+.donut--service .donut__center {
+  width: 78px;
+  height: 78px;
+  color: #576c84;
+}
+
+.donut--service .donut__center strong, .donut--service .donut__center span {
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.donut--service .donut__center b {
+  font-size: 15px;
+  font-weight: 700;
+}
+
 .member-donut-label {
   position: absolute;
   right: 34px;
@@ -1009,4 +1025,36 @@ body .resource-list .list-toolbar {
   body .resource-search .search-input {
     height: 34px;
   }
+}
+
+.dashboard-shell .donut--service,
+.dashboard-shell .donut--member {
+  background: none;
+}
+
+.dashboard-shell .donut-chart-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.dashboard-shell .donut__center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.dashboard-shell .line-chart-wrap {
+  position: relative;
+  height: 230px;
+}
+
+.dashboard-shell .line-chart {
+  width: 100% !important;
+  height: 100% !important;
 }

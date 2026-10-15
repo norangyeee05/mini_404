@@ -1,5 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { ArcElement, CategoryScale, Chart as ChartJS, DoughnutController, LineController, LineElement, LinearScale, PointElement, Tooltip } from 'chart.js'
+import { Doughnut, Line } from 'vue-chartjs'
 import DeleteModal from '../../components/DeleteModal.vue'
 import { trains as managedTrains, deleteTrain, fetchTrains } from '../line/services/trainData'
 import { adminStations, deleteStation, fetchAdminStations } from '../station/services/adminStationData'
@@ -8,6 +10,8 @@ import PageHeader from '../../components/PageHeader.vue'
 import DashboardStatCard from '../../components/DashboardStatCard.vue'
 import PageFooter from '../../components/PageFooter.vue'
 
+ChartJS.register(ArcElement, CategoryScale, DoughnutController, LineController, LineElement, LinearScale, PointElement, Tooltip)
+
 const summaryCards = ref([
   { label: '회원 수', value: '—', unit: '명', note: '' },
   { label: '공지 수', value: '—', unit: '건', note: '' },
@@ -15,17 +19,17 @@ const summaryCards = ref([
   { label: '교통서비스 수', value: '—', unit: '건', note: '' },
 ])
 
-const serviceStatuses = [
-  { name: '정상', count: 80, percent: '72.73%', color: 'green' },
-  { name: '점검', count: 25, percent: '22.73%', color: 'yellow' },
-  { name: '고장', count: 5, percent: '4.55%', color: 'red' },
-]
+const serviceStatuses = ref([
+  { name: '정상', count: 45, percent: '50.00%', color: 'green' },
+  { name: '점검', count: 27, percent: '30.00%', color: 'yellow' },
+  { name: '고장', count: 18, percent: '20.00%', color: 'red' },
+])
 
-const memberStatuses = [
-  { name: '일반 유저', count: 100, percent: '74.1%', color: 'green' },
-  { name: '임시 차단', count: 21, percent: '15.6%', color: 'yellow' },
-  { name: '강퇴', count: 10, percent: '7.4%', color: 'red' },
-]
+const memberStatuses = ref([
+  { name: '일반 유저', count: 90, percent: '75.0%', color: 'green' },
+  { name: '임시 차단', count: 18, percent: '15.0%', color: 'yellow' },
+  { name: '강퇴', count: 12, percent: '10.0%', color: 'red' },
+])
 
 const trains = computed(() => managedTrains.value.slice(0, 3).map(row => ({
   ...row, station: row.section, tone: row.status === '운행' ? 'running' : row.status === '점검' ? 'inspection' : 'broken',
@@ -54,6 +58,88 @@ async function confirmDelete() {
   }
 }
 const days = ['10.02', '10.03', '10.04', '10.05', '10.06', '10.07', '10.08']
+const weeklyStatuses = ref({
+  normal: [18, 34, 28, 46, 37, 29, 43],
+  inspection: [6, 17, 11, 22, 14, 19, 8],
+  broken: [13, 8, 16, 10, 5, 12, 17],
+})
+const statusColors = { green: '#67c89d', yellow: '#ffd15f', red: '#e87377' }
+const memberColors = { green: '#67c89d', yellow: '#ffd15f', red: '#e87377' }
+const serviceTotal = computed(() => serviceStatuses.value.reduce((sum, item) => sum + item.count, 0))
+const memberTotal = computed(() => memberStatuses.value.reduce((sum, item) => sum + item.count, 0))
+const servicePercent = count => serviceTotal.value ? `${((count / serviceTotal.value) * 100).toFixed(2)}%` : '0.00%'
+const memberPercent = count => memberTotal.value ? `${((count / memberTotal.value) * 100).toFixed(1)}%` : '0.0%'
+const percentageLabelsPlugin = {
+  id: 'percentageLabels',
+  afterDatasetsDraw(chart) {
+    const values = chart.data.datasets[0]?.data || []
+    const total = values.reduce((sum, value) => sum + Number(value || 0), 0)
+    if (!total) return
+    const context = chart.ctx
+    const color = chart.options.plugins.percentageLabels?.color || '#ffffff'
+    chart.getDatasetMeta(0).data.forEach((arc, index) => {
+      const { x, y, startAngle, endAngle, innerRadius, outerRadius } = arc.getProps(['x', 'y', 'startAngle', 'endAngle', 'innerRadius', 'outerRadius'], true)
+      const angle = (startAngle + endAngle) / 2
+      const radius = (innerRadius + outerRadius) / 2
+      const percent = `${Math.round((Number(values[index]) / total) * 100)}%`
+      context.save()
+      context.fillStyle = color
+      context.font = '700 10px Arial, sans-serif'
+      context.textAlign = 'center'
+      context.textBaseline = 'middle'
+      context.fillText(percent, x + Math.cos(angle) * radius, y + Math.sin(angle) * radius)
+      context.restore()
+    })
+  },
+}
+const serviceChartData = computed(() => ({
+  labels: [serviceStatuses.value[2], serviceStatuses.value[0], serviceStatuses.value[1]].map(item => item.name),
+  datasets: [{
+    data: [serviceStatuses.value[2], serviceStatuses.value[0], serviceStatuses.value[1]].map(item => item.count),
+    backgroundColor: [serviceStatuses.value[2], serviceStatuses.value[0], serviceStatuses.value[1]].map(item => statusColors[item.color]),
+    borderWidth: 0,
+    hoverOffset: 3,
+  }],
+}))
+const memberChartData = computed(() => ({
+  labels: [...memberStatuses.value].map(item => item.name),
+  datasets: [{
+    data: memberStatuses.value.map(item => item.count),
+    backgroundColor: memberStatuses.value.map(item => memberColors[item.color]),
+    borderWidth: 0,
+    hoverOffset: 3,
+  }],
+}))
+const weeklyChartData = computed(() => ({
+  labels: days,
+  datasets: [
+    { label: '정상', data: weeklyStatuses.value.normal, borderColor: '#27bd89', backgroundColor: '#27bd89', pointBackgroundColor: '#27bd89', pointRadius: 2, pointHoverRadius: 4, borderWidth: 2, tension: 0.15 },
+    { label: '점검', data: weeklyStatuses.value.inspection, borderColor: '#ffae24', backgroundColor: '#ffae24', pointBackgroundColor: '#ffae24', pointRadius: 2, pointHoverRadius: 4, borderWidth: 2, tension: 0.15 },
+    { label: '고장', data: weeklyStatuses.value.broken, borderColor: '#fa6c66', backgroundColor: '#fa6c66', pointBackgroundColor: '#fa6c66', pointRadius: 2, pointHoverRadius: 4, borderWidth: 2, tension: 0.15 },
+  ],
+}))
+const doughnutOptions = cutout => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  cutout,
+  rotation: -90,
+  plugins: { legend: { display: false }, tooltip: { enabled: true }, percentageLabels: { color: '#ffffff' } },
+})
+const serviceChartOptions = doughnutOptions('40%')
+const memberChartOptions = {
+  ...doughnutOptions('54%'),
+  plugins: { ...doughnutOptions('54%').plugins, percentageLabels: { color: '#ffffff' } },
+}
+const trendChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  interaction: { intersect: false, mode: 'index' },
+  plugins: { legend: { display: true, position: 'top', align: 'end', labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 5, boxHeight: 5, padding: 10, color: '#8b9aab', font: { size: 8 } } }, tooltip: { enabled: true } },
+  scales: {
+    x: { grid: { display: false }, border: { display: false }, ticks: { color: '#8b9aab', font: { size: 8 }, maxRotation: 0 } },
+    y: { min: 0, max: 50, ticks: { stepSize: 10, color: '#8b9aab', font: { size: 8 } }, grid: { color: '#edf1f3' }, border: { display: false } },
+  },
+}
 onMounted(async () => {
   const results = await Promise.allSettled([
     api.members.list({ page: 1, size: 1 }),
@@ -90,24 +176,18 @@ onMounted(async () => {
             교통서비스 상태 현황
           </h2>
           <div class="service-chart-content">
-            <div
-              class="donut donut--service"
-              role="img"
-              aria-label="교통서비스 정상 72.73%, 점검 22.73%, 고장 4.55%"
-            >
+            <div class="donut donut--service" role="img" :aria-label="`교통서비스 전체 ${serviceTotal}건`">
+              <Doughnut class="donut-chart-canvas" :data="serviceChartData" :options="serviceChartOptions" :plugins="[percentageLabelsPlugin]" />
               <div class="donut__center">
                 <strong>전체</strong>
-                <b>110건</b>
+                <b>{{ serviceTotal }}건</b>
               </div>
-              <span class="donut-label donut-label--top">5%</span>
-              <span class="donut-label donut-label--left">23%</span>
-              <span class="donut-label donut-label--bottom">73%</span>
             </div>
             <ul class="legend-list">
               <li v-for="item in serviceStatuses" :key="item.name">
                 <i :class="`legend-dot legend-dot--${item.color}`"></i>
                 <span>{{ item.name }}</span>
-                <b>{{ item.count }}건 ({{ item.percent }})</b>
+                <b>{{ item.count }}건 ({{ servicePercent(item.count) }})</b>
               </li>
             </ul>
           </div>
@@ -121,99 +201,26 @@ onMounted(async () => {
             주간 교통서비스 상태 추이
           </h2>
           <div class="line-chart-wrap">
-            <svg class="line-chart" viewBox="0 0 620 300" role="img" aria-label="주간 교통서비스 정상, 점검, 고장 건수 추이">
-              <g class="chart-grid-lines">
-                <line
-                  v-for="y in [40, 85, 130, 175, 220, 265]"
-                  :key="y"
-                  x1="42"
-                  :y1="y"
-                  x2="600"
-                  :y2="y"
-                />
-              </g>
-              <g class="chart-y-labels">
-                <text v-for="(n, i) in [50, 40, 30, 20, 10, 0]" :key="n" x="25" :y="45 + i * 45">
-                  {{ n }}
-                </text>
-              </g>
-              <g class="chart-x-labels">
-                <text v-for="(day, i) in days" :key="day" :x="55 + i * 88" y="286">
-                  {{ day }}
-                </text>
-              </g>
-              <polyline
-                class="chart-line chart-line--green"
-                points="55,104 143,104 231,99 319,94 407,81 495,92 583,64"
-              />
-              <polyline
-                class="chart-line chart-line--yellow"
-                points="55,213 143,206 231,201 319,214 407,219 495,210 583,205"
-              />
-              <polyline
-                class="chart-line chart-line--red"
-                points="55,229 143,224 231,220 319,231 407,235 495,229 583,224"
-              />
-              <g class="chart-points chart-points--green">
-                <circle
-                  v-for="(x, i) in [55,143,231,319,407,495,583]"
-                  :key="x"
-                  :cx="x"
-                  :cy="[104,104,99,94,81,92,64][i]"
-                  r="3"
-                />
-              </g>
-              <g class="chart-points chart-points--yellow">
-                <circle
-                  v-for="(x, i) in [55,143,231,319,407,495,583]"
-                  :key="x"
-                  :cx="x"
-                  :cy="[213,206,201,214,219,210,205][i]"
-                  r="3"
-                />
-              </g>
-              <g class="chart-points chart-points--red">
-                <circle
-                  v-for="(x, i) in [55,143,231,319,407,495,583]"
-                  :key="x"
-                  :cx="x"
-                  :cy="[229,224,220,231,235,229,224][i]"
-                  r="3"
-                />
-              </g>
-              <g class="chart-legend">
-                <circle cx="455" cy="18" r="4" class="chart-points--green" />
-                <text x="463" y="21">정상</text>
-                <circle cx="512" cy="18" r="4" class="chart-points--yellow" />
-                <text x="520" y="21">점검</text>
-                <circle cx="568" cy="18" r="4" class="chart-points--red" />
-                <text x="576" y="21">고장</text>
-              </g>
-            </svg>
+            <Line class="line-chart" :data="weeklyChartData" :options="trendChartOptions" aria-label="주간 교통서비스 상태 추이" />
           </div>
         </article>
 
         <article class="panel member-panel">
           <h2 class="panel-title">회원 현황</h2>
           <div class="member-chart-content">
-            <div
-              class="donut donut--member"
-              role="img"
-              aria-label="회원 일반 유저 74.1%, 임시 차단 15.6%, 강퇴 7.4%"
-            >
+            <div class="donut donut--member" role="img" :aria-label="`회원 현황 전체 ${memberTotal}명`">
+              <Doughnut class="donut-chart-canvas" :data="memberChartData" :options="memberChartOptions" :plugins="[percentageLabelsPlugin]" />
               <div class="donut__center donut__center--small">
                 <span>전체</span>
-                <b>131명</b>
+                <b>{{ memberTotal }}명</b>
               </div>
-              <span class="member-donut-label">74.1%</span>
-              <span class="member-donut-label member-donut-label--top">7.4%</span>
             </div>
             <ul class="member-legend">
               <li v-for="item in memberStatuses" :key="item.name">
                 <i :class="`legend-dot legend-dot--${item.color}`"></i>
                 <span>
                   {{ item.name }}
-                  <b>{{ item.count }}명 <small>({{ item.percent }})</small></b>
+                  <b>{{ item.count }}명 <small>({{ memberPercent(item.count) }})</small></b>
                 </span>
               </li>
             </ul>
