@@ -1,0 +1,134 @@
+.auth-page {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(64px, 29.3vh, 300px) 20px 48px;
+  background: #e2ecee;
+  color: #000;
+}
+
+.auth-panel {
+  width: 400px;
+  max-width: 100%;
+}
+
+.auth-panel form {
+  margin: 0;
+}
+
+.auth-panel input:not([type='checkbox']) {
+  display: block;
+  width: 100%;
+  height: 40px;
+  margin: 0 0 7px;
+  padding: 0 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #222;
+  font: 20px/1.4 Arial, 'Noto Sans KR', sans-serif;
+}
+
+.auth-panel input::placeholder {
+  color: #858585;
+  opacity: 1;
+}
+
+.auth-panel input:focus-visible, .auth-button:focus-visible, .terms-check a:focus-visible {
+  outline: 2px solid #155369;
+  outline-offset: 3px;
+}
+
+.auth-feedback {
+  min-height: 31px;
+  padding: 1px 8px 7px;
+}
+
+.auth-error {
+  margin: 0;
+  color: #ff0000;
+  font-size: 16px;
+  line-height: 23px;
+}
+
+.auth-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.auth-button--primary {
+  background: #000;
+  color: #fff;
+}
+
+.auth-button--secondary {
+  background: #eee;
+  color: #000;
+}
+
+.auth-button:hover {
+  filter: brightness(.9);
+}
+
+.signup-link {
+  margin-top: 29px;
+}
+
+.terms-check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 14px;
+  font-size: 14px;
+}
+
+.terms-check input {
+  margin: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.terms-check a {
+  text-decoration: underline;
+}
+
+.home-panel {
+  text-align: center;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 480px) {
+  .auth-page {
+    padding-top: 24vh;
+  }
+}
+
+@media (max-height: 600px) {
+  .auth-page {
+    padding-top: 48px;
+  }
+}

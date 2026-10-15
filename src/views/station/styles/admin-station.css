@@ -1,0 +1,299 @@
+.station-admin-editor {
+  min-width: 0;
+  border-radius: 20px;
+  background: #f0f5f7;
+  padding: 28px 18px 80px 4px;
+  color: #858585;
+}
+
+.station-admin-editor h1 {
+  margin: 0 0 40px;
+  border-left: 4px solid #155369;
+  padding-left: 14px;
+  color: #155369;
+  font-size: 34px;
+  line-height: 40px;
+}
+
+.station-editor-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2.07fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.station-base-panel, .station-extra-panel {
+  min-width: 0;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: white;
+  min-height: 626px;
+}
+
+.station-base-panel {
+  padding-left: 12px;
+}
+
+label, h3 {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+}
+
+input, select, textarea {
+  min-width: 0;
+  height: 50px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0 15px;
+  background: white;
+  color: #858585;
+  font: inherit;
+  font-size: 20px;
+  width: 100%;
+}
+
+select {
+  border: 3px solid #c6dadd;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #467486;
+}
+
+.station-name-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.15fr) auto minmax(0, .75fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.station-name-row label:nth-of-type(2) {
+  margin-left: 25px;
+  white-space: nowrap;
+}
+
+.station-staff-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 12px;
+}
+
+.station-staff-row input {
+  width: 222px;
+}
+
+.station-base-panel h2 {
+  font-size: 24px;
+  font-weight: 500;
+  margin: 48px 0 18px 6px;
+}
+
+.station-address-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1.6fr) auto minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+}
+
+.station-usage-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2.5fr) minmax(0, 1fr);
+  gap: 15px;
+  margin-top: 34px;
+}
+
+.station-usage-row h3 {
+  margin-bottom: 8px;
+}
+
+.station-active {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.station-date-row {
+  display: grid;
+  grid-template-columns: 222px minmax(0, 1fr);
+  gap: 22px;
+  margin-top: 30px;
+  padding-left: 6px;
+}
+
+.station-date-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.station-date-row input {
+  max-width: 222px;
+}
+
+.station-inspection-note {
+  font-size: 20px;
+  white-space: normal;
+}
+
+.station-inspection-note b {
+  color: red;
+  font-weight: 500;
+}
+
+.station-extra-panel {
+  padding: 36px 26px;
+}
+
+.station-extra-panel > label {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.station-extra-panel select {
+  width: 195px;
+  max-width: 100%;
+}
+
+.station-extra-panel textarea {
+  height: 115px;
+  resize: vertical;
+  margin-top: 20px;
+  padding: 16px;
+  background: #f1f5f7;
+  border: 0;
+  line-height: 1.5;
+}
+
+.station-extra-panel h3 {
+  margin: 60px 0 8px;
+}
+
+.station-extra-panel :deep(.tag-list) {
+  min-height: 168px;
+  background: #f1f5f7;
+  border: 0;
+  align-content: center;
+}
+
+.station-extra-panel :deep(select) {
+  margin-top: 8px;
+}
+
+.station-admin-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 49px;
+  padding: 10px 24px;
+  border: 0;
+  border-radius: 9px;
+  color: white;
+  background: #467486;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.station-editor-actions {
+  display: flex;
+  justify-content: space-between;
+  margin: 18px 0 0 8px;
+}
+
+.station-editor-actions > div {
+  display: flex;
+  gap: 8px;
+}
+
+.station-form-error {
+  color: #b32128;
+  margin: 16px;
+}
+
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid #155369;
+  outline-offset: 3px;
+}
+
+@media (max-width: 1250px) {
+  .station-editor-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .station-base-panel, .station-extra-panel {
+    min-height: 0;
+  }
+
+  .station-extra-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .station-extra-panel h3 {
+    margin: 0;
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .station-extra-panel > .tag-picker {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .station-extra-panel textarea {
+    grid-column: 1;
+    margin: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .station-admin-editor {
+    padding: 24px 16px;
+  }
+
+  .station-admin-editor h1 {
+    font-size: 26px;
+    margin-bottom: 24px;
+  }
+
+  .station-name-row, .station-address-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .station-name-row label:nth-of-type(2) {
+    margin-left: 0;
+  }
+
+  .station-staff-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .station-staff-row input {
+    width: 100%;
+  }
+
+  .station-usage-row, .station-date-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .station-date-row input {
+    max-width: none;
+  }
+
+  .station-extra-panel {
+    display: flex;
+    flex-direction: column;
+    padding: 24px 18px;
+  }
+
+  .station-extra-panel h3 {
+    margin-top: 20px;
+  }
+
+  label, h3, input, textarea, .station-inspection-note {
+    font-size: 18px;
+  }
+}
