@@ -16,6 +16,7 @@ const deleteStage = ref('')
 const deletingId = ref(null)
 const totalCount = ref(0)
 const pageSize = 10
+const page = ref(1)
 const resource = ref(null)
 const pageCount = computed(() => Math.max(1, Math.ceil(totalCount.value / pageSize)))
 const rows = computed(() => resources.value)
@@ -39,7 +40,6 @@ async function confirmDelete() {
 const field = ref('all')
 const keyword = ref('')
 const applied = ref({ field: 'all', keyword: '' })
-const page = ref(1)
 function search() { applied.value = { field: field.value, keyword: keyword.value }; page.value = 1; load() }
 function goPage(value) { page.value = Math.min(pageCount.value, Math.max(1, value)) }
 async function download() {

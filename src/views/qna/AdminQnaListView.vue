@@ -148,7 +148,6 @@ function openQna(qnaId) {
                       @click="editQna(qna)"
                     >답변하기</button>
                     <template v-else>
-                      <button class="admin-qna-row-button admin-qna-row-button--edit" type="button" @click="editQna(qna)">수정</button>
                       <button class="admin-qna-row-button admin-qna-row-button--delete" type="button" @click="deleteQna(qna.id)">삭제</button>
                     </template>
                   </td>

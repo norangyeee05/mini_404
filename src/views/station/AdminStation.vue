@@ -81,7 +81,7 @@ async function confirmDelete() {
       <StationAdminForm v-else :key="route.fullPath" />
     </main>
     <PageFooter />
-    <DeleteModal v-if="deleting" action-label="비활성화" :completed="deleteComplete" @confirm="confirmDelete" @close="deleting = null; deleteComplete = false" />
+    <DeleteModal v-if="deleting" :completed="deleteComplete" @confirm="confirmDelete" @close="deleting = null; deleteComplete = false" />
   </div>
 </template>
 <style scoped src="../line/styles/admin-line.css"></style>

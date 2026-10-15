@@ -6,7 +6,6 @@ import PageBanner from '../../components/PageBanner.vue'
 import PageFooter from '../../components/PageFooter.vue'
 import './notice-list.css'
 import { getNotices } from './noticeMockData'
-import { currentMember } from '../../services/auth'
 import { apiError } from '../../services/backendApi'
 
 const notices = ref([])
@@ -115,7 +114,6 @@ function goToPage(page) {
               <button type="button" aria-label="다음 페이지" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">›</button>
               <button type="button" aria-label="마지막 페이지" :disabled="currentPage === totalPages" @click="goToPage(totalPages)">»</button>
             </nav>
-<div v-if="!currentMember" class="notice-actions" aria-label="문의 작성"><button type="button" class="notice-actions__button notice-actions__button--primary">질문하기</button></div>
           </div>
         </section>
       </div>

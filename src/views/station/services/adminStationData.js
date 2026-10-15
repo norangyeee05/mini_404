@@ -1,6 +1,6 @@
 import { ref } from 'vue'
-import { api, responseItems } from '../../../services/backendApi'
-import { facilityStatusToApi, stationFromApi } from '../../../services/apiMappers'
+import { api, isMockApiEnabled, responseItems } from '../../../services/backendApi'
+import { facilityStatusFromApi, facilityStatusToApi, formatDate, stationFromApi } from '../../../services/apiMappers'
 
 export const adminStations = ref([])
 export const usageOptions = ['상대식 승강장', '섬식 승강장', '반대편 횡단 가능', '화장실 개찰구 밖', '화장실 개찰구 안']
@@ -12,9 +12,22 @@ export async function fetchAdminStations(params = {}) {
 }
 export async function fetchAdminStation(id) { return stationFromApi(await api.line.stationAdmin(id)) }
 export async function saveStation(values, id) {
-  if (!Number.isInteger(Number(values.stationOrder))) throw new Error('역 등록 API의 필수 stationOrder가 기존 입력 화면에 없어 저장 요청을 구성할 수 없습니다.')
-  const body = { stationName: values.name, staffName: values.staff, phone: values.phone, address: values.address, usageInfo: values.usage.join(', '), active: values.active, nextInspectionDueDate: values.nextInspectionDueDate || null, stationOrder: Number(values.stationOrder), facilityStatus: facilityStatusToApi[values.facilityStatus] || values.facilityStatus, lastInspectionDate: values.lastInspectionDate || null, inspectionDate: values.inspectionDate || null }
+  const hasOrder = values.stationOrder !== null && values.stationOrder !== '' && Number.isInteger(Number(values.stationOrder))
+  if (!hasOrder && !isMockApiEnabled) throw new Error('역 등록 API의 필수 stationOrder가 기존 입력 화면에 없어 저장 요청을 구성할 수 없습니다.')
+  const mockOrder = Math.max(7, ...adminStations.value.map(station => Number(station.stationOrder) || 0)) + 1
+  const body = { stationName: values.name, staffName: values.staff, phone: values.phone, address: values.address, usageInfo: values.usage.join(', '), active: values.active, nextInspectionDueDate: values.nextInspectionDueDate || null, stationOrder: hasOrder ? Number(values.stationOrder) : mockOrder, facilityStatus: facilityStatusToApi[values.facilityStatus] || values.facilityStatus, lastInspectionDate: values.lastInspectionDate || null, inspectionDate: values.inspectionDate || null }
   const response = id ? await api.line.updateStation(id, body) : await api.line.createStation(body)
+  if (id) {
+    adminStations.value = adminStations.value.map(station => station.id === String(id) ? {
+      ...station,
+      name: body.stationName,
+      staff: body.staffName,
+      status: facilityStatusFromApi[body.facilityStatus] || body.facilityStatus,
+      active: body.active,
+      inspection: body.inspectionDate || body.lastInspectionDate || '',
+      updated: formatDate(response?.updatedAt || new Date().toISOString()),
+    } : station)
+  }
   return response?.stationId ?? id
 }
 export async function deleteStation(id) { await api.line.setStationActive(id, false); adminStations.value = adminStations.value.map(row => row.id === String(id) ? { ...row, active: false } : row); return true }

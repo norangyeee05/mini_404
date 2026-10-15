@@ -30,7 +30,7 @@ watch(() => [props.station.id, currentMember.value], loadTransfer)
   </aside>
 </template>
 <style scoped>
-.station-facilities { min-width: 0; padding: 30px 22px; border-radius: 20px; background: #bdd2d6; color: #155369; display: flex; flex-direction: column; justify-content: center; }
+.station-facilities { min-width: 0; padding: 30px 22px; border-radius: 20px; background: #b5cce0; color: #155369; display: flex; flex-direction: column; justify-content: center; }
 .guest-message { margin: 0; text-align: center; font-size: 24px; font-weight: 700; line-height: 1.6; }
 .station-facilities--member { justify-content: flex-start; padding: 54px 28px 35px; }
 h2 { margin: 0; padding-left: 10px; border-left: 3px solid #155369; font-size: 24px; font-weight: 700; line-height: 29px; }

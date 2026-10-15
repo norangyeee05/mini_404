@@ -306,7 +306,7 @@ onMounted(async () => {
 
     <p v-if="deletionError" role="alert">{{ deletionError }}</p>
     <PageFooter />
-    <DeleteModal v-if="deletion" action-label="비활성화" :completed="deletionComplete" @confirm="confirmDelete" @close="closeDelete" />
+    <DeleteModal v-if="deletion" :completed="deletionComplete" @confirm="confirmDelete" @close="closeDelete" />
   </div>
 </template>
 

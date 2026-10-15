@@ -133,7 +133,7 @@
 
 .admin-qna-message p {
   margin: 0;
-  font-size: 14px;
+  font-size: 17px;
   line-height: 1.55;
   white-space: pre-line;
 }
@@ -275,7 +275,7 @@
   }
 
   .admin-qna-message p {
-    font-size: 12px;
+    font-size: 17px;
   }
 
   .admin-qna-detail-actions {

@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-defineProps({ completed: Boolean, actionLabel: { type: String, default: '삭제' } })
+defineProps({ completed: Boolean })
 const emit = defineEmits(['confirm', 'close'])
 const dialog = ref(null)
 const confirmButton = ref(null)
@@ -10,8 +10,8 @@ onMounted(() => { dialog.value.showModal(); confirmButton.value.focus() })
   <dialog ref="dialog" class="permission-dialog" :class="{ 'permission-dialog--complete': completed }" aria-labelledby="permission-title" :aria-describedby="completed ? undefined : 'permission-description'" @cancel.prevent="emit('close')">
     <button class="permission-close" type="button" aria-label="삭제 팝업 닫기" @click="emit('close')">X</button>
     <svg v-if="!completed" class="permission-icon" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47" fill="none" stroke="#ff4b59" stroke-width="5" /><path d="M50 32 V57" stroke="#ff6671" stroke-width="6" /><circle cx="50" cy="65" r="3.5" fill="#ff6671" /></svg><svg v-else class="permission-icon" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47" fill="none" stroke="#333" stroke-width="5" /><path d="M32 51 L45 68 L67 33" fill="none" stroke="#444" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" /></svg>
-    <h2 id="permission-title">{{ completed ? `${actionLabel}되었습니다.` : `${actionLabel}하시겠습니까?` }}</h2>
-    <p v-if="!completed" id="permission-description">{{ actionLabel }} 후 복구가 불가합니다.<br />진행하시겠습니까?</p>
+    <h2 id="permission-title">{{ completed ? '삭제되었습니다.' : '삭제하시겠습니까?' }}</h2>
+    <p v-if="!completed" id="permission-description">삭제 후 복구가 불가합니다.<br />진짜로 삭제하시겠습니까?</p>
     <button ref="confirmButton" class="permission-confirm" type="button" @click="emit('confirm')">확인</button>
   </dialog>
 </template>

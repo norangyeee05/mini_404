@@ -103,7 +103,7 @@
   gap: 4px;
   padding: 16px 8px;
   border-radius: 20px;
-  background: #b9d0d3;
+  background: #b5cce0;
 }
 
 .resource-sidebar a {
@@ -332,7 +332,7 @@ h2 {
 .resource-body {
   margin: 32px 10px 48px;
   color: #155369;
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 500;
   line-height: 30px;
   white-space: pre-line;

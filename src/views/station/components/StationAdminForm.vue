@@ -1,8 +1,8 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import StationTagPicker from './StationTagPicker.vue'
-import { fetchAdminStation, saveStation, usageOptions, facilityOptions } from '../services/adminStationData'
+import { adminStations, fetchAdminStation, saveStation, usageOptions, facilityOptions } from '../services/adminStationData'
 import { apiError } from '../../../services/backendApi'
 const route = useRoute()
 const router = useRouter()
@@ -10,6 +10,10 @@ const editing = computed(() => route.name === 'admin-station-edit')
 const existing = ref(null)
 const form = reactive({ name: '', english: '', number: '', staff: '', address: '', phone: '', active: true, status: '양호', registered: '', inspection: '', usage: [], facilities: [], transferLine: '', transferText: '', stationOrder: null, nextInspectionDueDate: null })
 const error = ref('')
+watch(() => form.status, status => {
+  if (!editing.value || !existing.value) return
+  adminStations.value = adminStations.value.map(station => station.id === String(existing.value.id) ? { ...station, status } : station)
+})
 onMounted(async () => {
   if (!editing.value) return
   try {

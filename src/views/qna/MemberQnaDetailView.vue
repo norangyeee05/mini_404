@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import PageHeader from '../../components/PageHeader.vue'
 import PageBanner from '../../components/PageBanner.vue'
 import PageFooter from '../../components/PageFooter.vue'
+import DeleteModal from '../../components/DeleteModal.vue'
 import { getQna, deleteQna as removeQna } from './qnaMockData'
 import { currentMember } from '../../services/auth'
 import { apiError } from '../../services/backendApi'
@@ -16,6 +17,7 @@ const qna = ref({ id: null, title: '', writer: '', views: 0, date: '', status: '
 const isOwner = computed(() => Boolean(qna.value.id) && qna.value.writer === currentMember.value?.name)
 const isAnswered = computed(() => qna.value.status === '답변완료')
 const displayDate = computed(() => qna.value.date.split(' ')[0])
+const deleteStage = ref('')
 
 onMounted(async () => {
   if (!route.query.id) return
@@ -23,12 +25,26 @@ onMounted(async () => {
   catch (error) { console.error(apiError(error)) }
 })
 
-async function deleteQna() {
+function deleteQna() {
   if (!isOwner.value) return
-  if (!window.confirm('내 문의를 삭제하시겠습니까?')) return
+  deleteStage.value = 'confirm'
+}
 
-  try { await removeQna(qna.value.id); router.push('/qna?mine=true') }
-  catch (error) { window.alert(apiError(error)) }
+async function confirmDelete() {
+  if (deleteStage.value === 'complete') { closeDelete(); return }
+  try {
+    await removeQna(qna.value.id)
+    deleteStage.value = 'complete'
+  } catch (error) {
+    deleteStage.value = ''
+    window.alert(apiError(error))
+  }
+}
+
+function closeDelete() {
+  const completed = deleteStage.value === 'complete'
+  deleteStage.value = ''
+  if (completed) router.push('/qna?mine=true')
 }
 </script>
 
@@ -76,6 +92,6 @@ async function deleteQna() {
     </main>
 
     <PageFooter />
-
+    <DeleteModal v-if="deleteStage" :completed="deleteStage === 'complete'" @confirm="confirmDelete" @close="closeDelete" />
   </div>
 </template>

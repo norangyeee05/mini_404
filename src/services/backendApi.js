@@ -1,6 +1,10 @@
 import axios from 'axios'
+import { createMockAdapter } from './mockApi'
+
+export const isMockApiEnabled = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true'
 
 const client = axios.create({ baseURL: '/api', withCredentials: true })
+if (isMockApiEnabled) client.defaults.adapter = createMockAdapter()
 
 client.interceptors.response.use(response => response, error => {
   const status = error.response?.status

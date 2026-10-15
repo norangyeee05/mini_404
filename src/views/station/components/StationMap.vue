@@ -45,7 +45,7 @@ onBeforeUnmount(() => { active = false; revision++; observer?.disconnect(); mark
   </aside>
 </template>
 <style scoped>
-.station-map-card { padding: 39px 8px 34px; border-radius: 20px; background: #bdd2d6; display: flex; flex-direction: column; align-items: center; gap: 30px; min-width: 0; }
+.station-map-card { padding: 39px 8px 34px; border-radius: 20px; background: #b5cce0; display: flex; flex-direction: column; align-items: center; gap: 30px; min-width: 0; }
 h2 { display: grid; place-items: center; width: 172px; max-width: 100%; min-height: 56px; margin: 0; padding: 8px 4px; border-radius: 30px; background: #858e40; color: #fff; font-size: 24px; white-space: nowrap; }
 .map-frame { position: relative; width: 100%; flex: 1; min-height: 420px; border-radius: 15px; overflow: hidden; background: #eef3f4; }
 .map-canvas { position: absolute; inset: 0; }

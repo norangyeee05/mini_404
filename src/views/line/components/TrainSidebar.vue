@@ -10,7 +10,7 @@
   </aside>
 </template>
 <style scoped>
-.train-sidebar { border-radius: 20px; background: #bdd2d6; padding: 26px 8px; }
+.train-sidebar { border-radius: 20px; background: #b5cce0; padding: 26px 8px; }
 nav { display: grid; gap: 5px; } a, button { display: block; width: 100%; border: 0; padding: 10px 16px; border-radius: 9px; background: white; color: #858585; font-size: 16px; line-height: 20px; text-align: left; }
 .selected { background: #f7f7f7; } a:hover, button:hover { color: #155369; } a:focus-visible, button:focus-visible { outline: 2px solid #155369; outline-offset: 2px; }
 .station-notice { padding: 10px; font-size: 14px; line-height: 1.6; }
