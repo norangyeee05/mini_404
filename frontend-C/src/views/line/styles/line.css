@@ -1,0 +1,42 @@
+.rail-shell {
+  width: min(1448px, 100%);
+  min-height: 100svh;
+  padding: 0 33px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.rail-main {
+  flex: 1;
+}
+
+.rail-panel {
+  position: relative;
+  margin-top: 12px;
+  border-radius: 20px;
+  background: #f0f5f7;
+}
+
+.rail-panel h2 {
+  position: absolute;
+  z-index: 1;
+  top: 14px;
+  left: 18px;
+  margin: 0;
+  padding-left: 10px;
+  border-left: 3px solid #155369;
+  color: #155369;
+  font-size: 26px;
+  line-height: 29px;
+}
+
+@media (max-width: 760px) {
+  .rail-shell {
+    padding: 0 16px;
+  }
+
+  .rail-panel h2 {
+    font-size: 22px;
+  }
+}

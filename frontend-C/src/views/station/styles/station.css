@@ -1,0 +1,174 @@
+.station-shell {
+  width: min(1448px, 100%);
+  min-height: 100svh;
+  padding: 0 33px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  color: #155369;
+}
+
+.station-main {
+  flex: 1;
+}
+
+.station-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 254fr 724fr 362fr;
+  gap: 20px;
+  height: min(580px, 41vw);
+  min-height: 0;
+}
+
+.station-info {
+  position: relative;
+  min-width: 0;
+  padding: clamp(24px, 2.4vw, 35px) clamp(16px, 1.8vw, 26px) 32px;
+  border-radius: 20px;
+  background: #f0f5f7;
+}
+
+.station-info h1, .station-info h2 {
+  padding-left: 10px;
+  border-left: 3px solid #155369;
+  font-size: clamp(17px, 1.65vw, 24px);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.station-info h1 {
+  padding-right: 80px;
+}
+
+.station-code {
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+.station-english {
+  margin: 5px 0 clamp(38px, 5.8vw, 83px);
+  font-size: clamp(17px, 1.65vw, 24px);
+  font-weight: 700;
+}
+
+.line-back {
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  padding: 10px 20px;
+  border-radius: 9px;
+  background: #467486;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.station-info dl {
+  margin: 32px 0 0;
+  font-size: clamp(16px, 1.6vw, 23px);
+  line-height: 1.5;
+}
+
+.station-info dl > div + div {
+  margin-top: 24px;
+}
+
+.station-info dl > div.usage {
+  margin-top: 36px;
+}
+
+.station-info dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.usage dd {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px 20px;
+}
+
+.station-missing {
+  position: relative;
+  min-height: 200px;
+  padding: 30px;
+  margin-top: 12px;
+  background: #f0f5f7;
+  border-radius: 20px;
+}
+
+.line-back:focus-visible, .station-info a:focus-visible {
+  outline: 3px solid #858e40;
+  outline-offset: 3px;
+}
+
+@media (max-width: 900px) {
+  .station-grid {
+    height: auto;
+    min-height: 580px;
+    grid-template-columns: 210px minmax(0, 1fr);
+  }
+
+  .station-grid > :last-child {
+    grid-column: 1 / -1;
+  }
+
+  .station-info dl {
+    font-size: 19px;
+  }
+
+  .station-english {
+    font-size: 21px;
+  }
+}
+
+@media (max-width: 760px) {
+  .station-shell {
+    padding: 0 16px;
+  }
+
+  .station-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .station-info {
+    grid-row: 1;
+    padding: 28px 20px;
+  }
+
+  .station-info h1 {
+    font-size: 20px;
+    padding-right: 70px;
+  }
+
+  .station-info h2 {
+    font-size: 22px;
+  }
+
+  .station-english {
+    font-size: 20px;
+    margin-bottom: 36px;
+  }
+
+  .station-info dl {
+    margin-top: 24px;
+    font-size: 18px;
+  }
+
+  .station-info dl > div + div, .station-info dl > div.usage {
+    margin-top: 25px;
+  }
+
+  .usage dd {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .line-back {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}
