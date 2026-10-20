@@ -1,7 +1,9 @@
 package com.project.common;
 
 import org.springframework.http.HttpStatus;
+import lombok.Getter;
 
+@Getter
 public class BusinessException extends RuntimeException {
 
     private final HttpStatus status;
@@ -9,10 +11,6 @@ public class BusinessException extends RuntimeException {
     public BusinessException(HttpStatus status, String message) {
         super(message);
         this.status = status;
-    }
-
-    public HttpStatus getStatus() {
-        return status;
     }
 
     public static BusinessException badRequest(String message) {

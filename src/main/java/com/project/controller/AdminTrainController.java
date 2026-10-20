@@ -1,53 +1,56 @@
 package com.project.controller;
 
-import com.project.dto.DashboardResponse.TrainRow;
-import com.project.dto.TransitAdminDto.TrainListResponse;
-import com.project.dto.TransitAdminDto.TrainRequest;
+import com.project.common.ApiResponse;
+import com.project.dto.AdminTrainDto.ListResponse;
+import com.project.dto.AdminTrainDto.Request;
+import com.project.dto.AdminTrainDto.Row;
+import jakarta.validation.Valid;
 import com.project.service.TrainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/admin/api/trains")
+@RequestMapping("/api/admin/line7/trains")
 @RequiredArgsConstructor
 public class AdminTrainController {
 
 	private final TrainService trainService;
 
 	@GetMapping
-	public TrainListResponse list(@RequestParam(defaultValue = "1") int page) {
-		return trainService.list(page);
+	public ApiResponse<ListResponse> list(@RequestParam(defaultValue = "1") int page,
+							  @RequestParam(defaultValue = "10") int size,
+							  @RequestParam(required = false) String searchType,
+							  @RequestParam(required = false) String keyword) {
+		return ApiResponse.ok(trainService.list(page, size, searchType, keyword));
 	}
 
 	@GetMapping("/{id}")
-	public TrainRow get(@PathVariable Long id) {
-		return trainService.get(id);
+	public ApiResponse<Row> get(@PathVariable Long id) {
+		return ApiResponse.ok(trainService.get(id));
 	}
 
 	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public TrainRow create(@RequestBody TrainRequest request) {
-		return trainService.create(request);
+	public ResponseEntity<ApiResponse<Row>> create(@Valid @RequestBody Request request) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(trainService.create(request)));
 	}
 
 	@PutMapping("/{id}")
-	public TrainRow update(@PathVariable Long id, @RequestBody TrainRequest request) {
-		return trainService.update(id, request);
+	public ApiResponse<Row> update(@PathVariable Long id, @Valid @RequestBody Request request) {
+		return ApiResponse.ok(trainService.update(id, request));
 	}
 
-	@DeleteMapping("/{id}")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void delete(@PathVariable Long id) {
-		trainService.delete(id);
+	@PatchMapping("/{id}/active")
+	public ApiResponse<Row> active(@PathVariable Long id, @RequestBody java.util.Map<String, Boolean> body) {
+		return ApiResponse.ok(trainService.setActive(id, Boolean.TRUE.equals(body.get("active"))));
 	}
 }

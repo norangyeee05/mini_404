@@ -2,6 +2,7 @@ package com.project.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.security.SecureRandom;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -10,41 +11,46 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.project.common.BusinessException;
 import com.project.common.PageResponse;
 import com.project.common.SearchUtil;
 import com.project.domain.Member;
 import com.project.domain.MemberStatus;
+import com.project.domain.Role;
 import com.project.dto.AdminMemberDto.Detail;
 import com.project.dto.AdminMemberDto.ListItem;
 import com.project.repository.MemberRepository;
 
 import jakarta.persistence.criteria.Predicate;
 
-/** 관리자 회원관리 (목록·상세·상태 변경). 비밀번호는 어떤 응답에도 포함하지 않음 */
+/** 회원관리 서비스. 비밀번호 해시는 응답하지 않으며 초기화 시 임시 비밀번호를 한 번 발급합니다. */
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
 public class AdminMemberService {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
+    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final char[] PASSWORD_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%".toCharArray();
 
     /** searchType: name(기본) / loginId / email, status: 상태 필터(선택) */
     public PageResponse<ListItem> list(String searchType, String keyword, MemberStatus status,
                                                   int page, int size) {
         Pageable pageable = PageResponse.pageable(page, size,
-                Sort.by(Sort.Direction.DESC, "updatedAt").and(Sort.by(Sort.Direction.DESC, "id")));
+                Sort.by(Sort.Direction.DESC, "id"));
         Page<ListItem> result = memberRepository.findAll(search(searchType, keyword, status), pageable)
                 .map(m -> new ListItem(
-                        m.getId(), m.getName(), m.getLoginId(), m.getEmail(), m.getStatus(), m.getUpdatedAt()));
+                        m.getId(), m.getName(), m.getLoginId(), m.getEmail(), m.getRole(), m.getStatus(), m.getUpdatedAt()));
         return PageResponse.of(result);
     }
 
     public Detail detail(Long memberId) {
         Member m = find(memberId);
         return new Detail(m.getId(), m.getName(), m.getLoginId(), m.getEmail(), m.getPhone(),
-                m.getStatus(), m.getCreatedAt(), m.getUpdatedAt());
+                m.getRole(), m.getStatus(), m.getCreatedAt(), m.getUpdatedAt());
     }
 
     @Transactional
@@ -58,6 +64,33 @@ public class AdminMemberService {
         }
         m.changeStatus(status);
         return m;
+    }
+
+    @Transactional
+    public Member changeRole(Long memberId, String role) {
+        Member m = find(memberId);
+        if (m.getStatus() == MemberStatus.WITHDRAWN) {
+            throw BusinessException.badRequest("탈퇴한 회원의 등급은 변경할 수 없습니다.");
+        }
+        try { Role.valueOf(role); }
+        catch (IllegalArgumentException | NullPointerException e) {
+            throw BusinessException.badRequest("지원하지 않는 회원 등급입니다.");
+        }
+        m.changeRole(role);
+        return m;
+    }
+
+    @Transactional
+    public String resetPassword(Long memberId) {
+        Member member = find(memberId);
+        if (member.getStatus() == MemberStatus.WITHDRAWN) {
+            throw BusinessException.badRequest("탈퇴한 회원의 비밀번호는 초기화할 수 없습니다.");
+        }
+        StringBuilder temporaryPassword = new StringBuilder(16);
+        for (int i = 0; i < 16; i++) temporaryPassword.append(PASSWORD_CHARS[RANDOM.nextInt(PASSWORD_CHARS.length)]);
+        String raw = temporaryPassword.toString();
+        member.changePassword(passwordEncoder.encode(raw));
+        return raw;
     }
 
     private Member find(Long memberId) {

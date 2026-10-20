@@ -12,10 +12,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /** 첨부파일 공용 테이블 (자료실 / 자료실 요청 / QnA). 대상은 target_type + target_id 로 구분 */
 @Entity
 @Table(name = "attachment", indexes = @Index(name = "idx_attachment_target", columnList = "target_type, target_id"))
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Attachment {
 
     @Id
@@ -44,9 +49,6 @@ public class Attachment {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    protected Attachment() {
-    }
-
     public static Attachment of(AttachmentTarget targetType, Long targetId, String originalName,
                                 String storedName, String contentType, long fileSize) {
         Attachment a = new Attachment();
@@ -64,12 +66,4 @@ public class Attachment {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Long getId() { return id; }
-    public AttachmentTarget getTargetType() { return targetType; }
-    public Long getTargetId() { return targetId; }
-    public String getOriginalName() { return originalName; }
-    public String getStoredName() { return storedName; }
-    public String getContentType() { return contentType; }
-    public long getFileSize() { return fileSize; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
 }

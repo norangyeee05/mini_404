@@ -34,8 +34,11 @@ public final class MemberDto {
             @Size(max = 20, message = "전화번호는 20자 이내로 입력해주세요.")
             String phone,
 
-            @AssertTrue(message = "이용약관 및 개인정보 처리방침에 동의해주세요.")
-            boolean agreeTerms
+            @AssertTrue(message = "이용약관에 동의해주세요.")
+            boolean agreeTerms,
+
+            @AssertTrue(message = "개인정보 처리방침에 동의해주세요.")
+            boolean agreePrivacy
     ) {
     }
 
@@ -46,8 +49,11 @@ public final class MemberDto {
     ) {
     }
 
+    public record FindIdRequest(@NotBlank String name, @NotBlank @Email String email) { }
+    public record FindIdResponse(String maskedLoginId) { }
+
     /** 로그인 응답 */
-    public record LoginResponse(Long memberId, String name, String role) {
+    public record LoginResponse(Long memberId, String name, String role, boolean adminAccount) {
     }
 
     /** 내 정보 조회 응답 */
@@ -64,6 +70,9 @@ public final class MemberDto {
             @Email(message = "이메일 형식이 올바르지 않습니다.")
             @Size(max = 100, message = "이메일은 100자 이내로 입력해주세요.")
             String email,
+
+            @Size(max = 20, message = "전화번호는 20자 이내로 입력해주세요.")
+            String phone,
 
             @Size(max = 64, message = "비밀번호는 8~64자로 입력해주세요.")
             String password

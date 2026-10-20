@@ -5,6 +5,7 @@ import com.project.dto.DashboardResponse.StationRow;
 import com.project.dto.PageInfo;
 import com.project.dto.TransitAdminDto.StationListResponse;
 import com.project.dto.TransitAdminDto.StationRequest;
+import com.project.dto.Line7StationDto;
 import com.project.repository.StationRepository;
 import com.project.util.Validators;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
+import java.util.List;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +32,13 @@ public class StationService {
 		Page<Station> result = stationRepository.findAll(
 				PageRequest.of(Math.max(page, 1) - 1, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "id")));
 		return new StationListResponse(result.getContent().stream().map(StationRow::from).toList(), PageInfo.from(result));
+	}
+
+	public List<Line7StationDto> publicList() {
+		List<Station> stations = stationRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+		return IntStream.range(0, stations.size())
+				.mapToObj(index -> new Line7StationDto(stations.get(index).getId(), stations.get(index).getName(), index + 1))
+				.toList();
 	}
 
 	public StationRow get(Long id) {

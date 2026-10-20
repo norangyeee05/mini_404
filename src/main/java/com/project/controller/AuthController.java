@@ -2,6 +2,7 @@ package com.project.controller;
 
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,10 @@ import com.project.common.SessionKeys;
 import com.project.dto.MemberDto.LoginRequest;
 import com.project.dto.MemberDto.LoginResponse;
 import com.project.dto.MemberDto.SignupRequest;
+import com.project.dto.MemberDto.FindIdRequest;
+import com.project.dto.MemberDto.FindIdResponse;
 import com.project.service.AuthService;
+import com.project.service.MemberService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -26,14 +30,12 @@ import jakarta.validation.Valid;
 
 /** 인증 (2-1): 회원가입, 아이디 중복 확인, 로그인, 로그아웃 */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
+    private final MemberService memberService;
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<Map<String, Long>>> signup(@Valid @RequestBody SignupRequest request) {
@@ -50,6 +52,19 @@ public class AuthController {
         return ApiResponse.ok(Map.of("available", authService.isAvailable(loginId.trim())));
     }
 
+    @GetMapping("/me")
+    public ApiResponse<SessionResponse> me(
+            @org.springframework.web.bind.annotation.SessionAttribute(name = SessionKeys.LOGIN_USER, required = false) LoginUser user) {
+        if (user == null) return ApiResponse.ok(new SessionResponse(false, "GUEST", null, null, false));
+        return ApiResponse.ok(new SessionResponse(true, user.role().name(), user.id(), user.name(), user.adminAccount()));
+    }
+
+    @PostMapping("/find-id")
+    public ApiResponse<FindIdResponse> findId(@Valid @RequestBody FindIdRequest request) {
+        String masked = memberService.findMaskedLoginId(request.name(), request.email()).orElse(null);
+        return ApiResponse.ok(new FindIdResponse(masked));
+    }
+
     @PostMapping("/login")
     public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         LoginUser user = authService.login(request);
@@ -62,7 +77,7 @@ public class AuthController {
         HttpSession session = httpRequest.getSession(true);
         session.setAttribute(SessionKeys.LOGIN_USER, user);
 
-        return ApiResponse.ok(new LoginResponse(user.id(), user.name(), user.role().name()), "로그인되었습니다.");
+        return ApiResponse.ok(new LoginResponse(user.id(), user.name(), user.role().name(), user.adminAccount()), "로그인되었습니다.");
     }
 
     @PostMapping("/logout")
@@ -73,4 +88,6 @@ public class AuthController {
         }
         return ApiResponse.ok();
     }
+
+    public record SessionResponse(boolean authenticated, String role, Long memberId, String name, boolean adminAccount) { }
 }

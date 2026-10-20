@@ -1,67 +1,104 @@
 package com.project.service;
 
 import com.project.domain.Train;
-import com.project.dto.DashboardResponse.TrainRow;
-import com.project.dto.PageInfo;
-import com.project.dto.TransitAdminDto.TrainListResponse;
-import com.project.dto.TransitAdminDto.TrainRequest;
+import com.project.common.SearchUtil;
+import com.project.dto.AdminTrainDto.Row;
+import com.project.dto.AdminTrainDto.ListResponse;
+import com.project.dto.AdminTrainDto.Request;
 import com.project.repository.TrainRepository;
+import com.project.repository.RailwayLineRepository;
 import com.project.util.Validators;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TrainService {
 
-	private static final int PAGE_SIZE = 10;
-
 	private final TrainRepository trainRepository;
+	private final RailwayLineRepository lineRepository;
 
-	public TrainListResponse list(int page) {
-		Page<Train> result = trainRepository.findAll(
-				PageRequest.of(Math.max(page, 1) - 1, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "id")));
-		return new TrainListResponse(result.getContent().stream().map(TrainRow::from).toList(), PageInfo.from(result));
+	public ListResponse list(int page, int size, String searchType, String keyword) {
+		Specification<Train> spec = (root, query, cb) -> {
+			if (SearchUtil.isBlank(keyword)) return cb.conjunction();
+			String like = SearchUtil.likePattern(keyword);
+			return switch (searchType == null ? "" : searchType) {
+				case "trainNo" -> cb.like(cb.lower(root.get("trainNo")), like, '\\');
+				case "driver" -> cb.like(cb.lower(root.get("driver")), like, '\\');
+				case "section", "route" -> cb.like(cb.lower(root.get("route")), like, '\\');
+				default -> cb.or(cb.like(cb.lower(root.get("trainNo")), like, '\\'),
+						cb.like(cb.lower(root.get("driver")), like, '\\'), cb.like(cb.lower(root.get("route")), like, '\\'));
+			};
+		};
+		Page<Train> result = trainRepository.findAll(spec,
+				PageRequest.of(Math.max(page, 1) - 1, Math.min(Math.max(size, 1), 100), Sort.by(Sort.Direction.DESC, "id")));
+		return new ListResponse(result.getTotalElements(), result.getNumber() + 1, result.getSize(), result.getContent().stream().map(Row::from).toList());
 	}
 
-	public TrainRow get(Long id) {
-		return TrainRow.from(find(id));
+	public Row get(Long id) {
+		return Row.from(find(id));
 	}
 
 	@Transactional
-	public TrainRow create(TrainRequest request) {
+	public Row create(Request request) {
 		Train train = Train.builder()
 				.trainNo(Validators.requireText(request.trainNo(), "열차 번호", 20))
-				.route(Validators.requireText(request.route(), "운행 구간", 100))
+				.route(Validators.requireText(request.section(), "운행 구간", 100))
 				.driver(Validators.requireText(request.driver(), "기관사", 50))
 				.direction(Validators.requireNotNull(request.direction(), "상행/하행"))
-				.status(Validators.requireNotNull(request.status(), "운행 상태"))
+				.status(parseStatus(request.status()))
+				.registeredAt(request.registeredAt() == null ? LocalDate.now() : request.registeredAt())
+				.inspectionDate(request.inspectionDate())
 				.build();
-		return TrainRow.from(trainRepository.save(train));
+		train.setLine(lineRepository.findById(request.lineId()).orElseThrow(() -> new NoSuchElementException("노선을 찾을 수 없습니다.")));
+		train.setActive(!Boolean.FALSE.equals(request.active()));
+		return Row.from(trainRepository.saveAndFlush(train));
 	}
 
 	@Transactional
-	public TrainRow update(Long id, TrainRequest request) {
+	public Row update(Long id, Request request) {
 		Train train = find(id);
 		train.update(
 				Validators.requireText(request.trainNo(), "열차 번호", 20),
-				Validators.requireText(request.route(), "운행 구간", 100),
+				Validators.requireText(request.section(), "운행 구간", 100),
 				Validators.requireText(request.driver(), "기관사", 50),
 				Validators.requireNotNull(request.direction(), "상행/하행"),
-				Validators.requireNotNull(request.status(), "운행 상태"));
-		return TrainRow.from(trainRepository.saveAndFlush(train));
+				parseStatus(request.status()),
+				request.registeredAt() == null ? train.getRegisteredAt() : request.registeredAt(),
+				request.inspectionDate() == null ? train.getInspectionDate() : request.inspectionDate());
+		train.setLine(lineRepository.findById(request.lineId()).orElseThrow(() -> new NoSuchElementException("노선을 찾을 수 없습니다.")));
+		train.setActive(!Boolean.FALSE.equals(request.active()));
+		return Row.from(trainRepository.saveAndFlush(train));
 	}
 
 	@Transactional
 	public void delete(Long id) {
-		trainRepository.delete(find(id));
+		find(id).setActive(false);
+	}
+
+	@Transactional
+	public Row setActive(Long id, boolean active) {
+		Train train = find(id);
+		train.setActive(active);
+		return Row.from(train);
+	}
+
+	private com.project.domain.OperationStatus parseStatus(String status) {
+		return switch (status == null ? "" : status.toUpperCase()) {
+			case "RUNNING", "NORMAL" -> com.project.domain.OperationStatus.NORMAL;
+			case "MAINTENANCE" -> com.project.domain.OperationStatus.MAINTENANCE;
+			case "BROKEN", "FAULT" -> com.project.domain.OperationStatus.FAULT;
+			default -> throw com.project.common.BusinessException.badRequest("운행 상태 값이 올바르지 않습니다.");
+		};
 	}
 
 	private Train find(Long id) {

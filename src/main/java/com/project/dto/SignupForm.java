@@ -2,6 +2,8 @@ package com.project.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -9,6 +11,8 @@ import java.util.regex.Pattern;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class SignupForm {
 
 	private static final Pattern LOGIN_ID = Pattern.compile("^[a-zA-Z0-9]{4,20}$");

@@ -3,6 +3,7 @@ package com.project.controller;
 import java.util.List;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,18 +28,13 @@ import com.project.dto.ResourceDto.PostForm;
 import com.project.service.ResourceRequestService;
 import com.project.service.ResourceService;
 
-/** 자료실 (2-3): 목록·상세·파일 다운로드(전체 공개), 추가 요청(회원) */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/resources")
 public class ResourceController {
 
     private final ResourceService resourceService;
     private final ResourceRequestService requestService;
-
-    public ResourceController(ResourceService resourceService, ResourceRequestService requestService) {
-        this.resourceService = resourceService;
-        this.requestService = requestService;
-    }
 
     @GetMapping
     public ApiResponse<PageResponse<ListItem>> list(
@@ -59,7 +55,6 @@ public class ResourceController {
         return FileHelper.download(resourceService.file(resourceId, fileId));
     }
 
-    /** 자료실 추가 요청 (일반 회원). multipart/form-data: title, content, files[] */
     @PostMapping("/requests")
     public ResponseEntity<ApiResponse<Map<String, Long>>> createRequest(
             @SessionAttribute(name = SessionKeys.LOGIN_USER) LoginUser user,

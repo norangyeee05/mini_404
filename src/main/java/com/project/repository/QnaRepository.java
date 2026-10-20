@@ -1,13 +1,13 @@
 package com.project.repository;
 
 import com.project.domain.Qna;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+public interface QnaRepository extends JpaRepository<Qna, Long>, JpaSpecificationExecutor<Qna> {
 
-public interface QnaRepository extends JpaRepository<Qna, Long> {
+    List<Qna> findTop3ByOrderByIdDesc();
 
-	List<Qna> findTop3ByOrderByIdDesc();
+    long countByAnswered(boolean answered);
 
-	long countByAnswered(boolean answered);
 }

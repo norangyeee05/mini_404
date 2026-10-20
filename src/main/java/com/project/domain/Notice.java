@@ -1,40 +1,64 @@
 package com.project.domain;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import org.springframework.web.ErrorResponse;
 
 @Entity
 @Table(name = "notice")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notice {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Column(nullable = false, length = 200)
+    private String title;
 
-	@Column(nullable = false, length = 200)
-	private String title;
+    /** Nullable to keep pre-existing rows valid when this column is added. */
+    @Column(columnDefinition = "TEXT")
+    private String content;
 
-	@Column(nullable = false, length = 50)
-	private String writer;
+    @Column(nullable = false, length = 50)
+    private String writer;
 
-	@Column(name = "view_count", nullable = false)
-	private int viewCount;
+    @Column(name = "view_count", nullable = false)
+    private int viewCount;
 
-	@Column(name = "created_at", nullable = false)
-	private LocalDateTime createdAt;
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 
-	@Builder
-	public Notice(String title, String writer, int viewCount, LocalDateTime createdAt) {
-		this.title = title;
-		this.writer = writer;
-		this.viewCount = viewCount;
-		this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
-	}
+    public static Notice create(String title, String content, String writer) {
+        Notice notice = new Notice();
+        notice.title = title;
+        notice.content = content;
+        notice.writer = writer;
+        notice.viewCount = 0;
+        return notice;
+    }
+
+    public static ErrorResponse.Builder builder() {
+        return null;
+    }
+
+    @PrePersist
+    void onCreate() {
+        if (createdAt == null) createdAt = LocalDateTime.now();
+    }
+
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
 }

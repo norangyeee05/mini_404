@@ -3,10 +3,12 @@ package com.project.service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
 
 import com.project.common.BusinessException;
 import com.project.common.LoginUser;
 import com.project.domain.Admin;
+import com.project.domain.AdminRole;
 import com.project.domain.Member;
 import com.project.domain.MemberStatus;
 import com.project.domain.Role;
@@ -43,6 +45,7 @@ public class AuthService {
                 req.name().trim(),
                 req.email().trim(),
                 phone);
+        member.acceptLegalAgreements(LocalDateTime.now());
         return memberRepository.save(member).getId();
     }
 
@@ -64,7 +67,7 @@ public class AuthService {
             if (member.getStatus() == MemberStatus.BANNED) {
                 throw BusinessException.forbidden("이용이 정지된 계정입니다. 관리자에게 문의해주세요.");
             }
-            return new LoginUser(member.getId(), member.getName(), Role.USER);
+            return new LoginUser(member.getId(), member.getName(), Role.valueOf(member.getRole()));
         }
 
         Admin admin = adminRepository.findByLoginId(req.loginId()).orElse(null);
@@ -73,6 +76,7 @@ public class AuthService {
                 || !passwordEncoder.matches(req.password(), admin.getPassword())) {
             throw BusinessException.unauthorized(LOGIN_FAIL);
         }
-        return new LoginUser(admin.getId(), admin.getName(), Role.ADMIN);
+        Role role = admin.getRole() == AdminRole.MANAGER ? Role.WEB_ADMIN : Role.ADMIN;
+        return new LoginUser(admin.getId(), admin.getName(), role, true);
     }
 }

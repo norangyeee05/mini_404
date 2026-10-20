@@ -13,10 +13,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /** 자료실 게시글 (DB 설계의 RESOURCE 테이블). Spring의 Resource 클래스와 이름이 겹치지 않도록 ResourcePost로 명명 */
 @Entity
 @Table(name = "resource")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ResourcePost {
 
     @Id
@@ -42,9 +47,6 @@ public class ResourcePost {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
-    protected ResourcePost() {
-    }
 
     public static ResourcePost create(String title, String content, Admin admin) {
         ResourcePost r = new ResourcePost();
@@ -72,11 +74,4 @@ public class ResourcePost {
         this.content = content;
     }
 
-    public Long getId() { return id; }
-    public String getTitle() { return title; }
-    public String getContent() { return content; }
-    public Admin getAdmin() { return admin; }
-    public int getViewCount() { return viewCount; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
 }

@@ -62,7 +62,7 @@ public class DashboardService {
 				new CountCard(live.members(), diff(live.members(), yesterday.map(DailyStat::getMemberCount))),
 				new CountCard(live.notices(), diff(live.notices(), yesterday.map(DailyStat::getNoticeCount))),
 				new CountCard(live.qnaPending(), diff(live.qnaPending(), yesterday.map(DailyStat::getQnaPendingCount))),
-				new ServiceCard(live.serviceTotal(), live.normal()));
+				new ServiceCard(live.serviceTotal(), live.normal(), trainRepository.countByStatusAndActiveTrue(OperationStatus.NORMAL)));
 
 		ShareChart serviceStatus = new ShareChart(live.serviceTotal(), List.of(
 				serviceShare(OperationStatus.NORMAL, live.normal(), live.serviceTotal()),

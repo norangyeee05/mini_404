@@ -1,6 +1,6 @@
 package com.project.domain;
 
-/** 첨부 대상 유형 (QNA는 다른 팀원 담당이며 여기서는 사용하지 않음) */
+/** 첨부 대상 유형 (자료실 / 자료실 요청 / Q&A) */
 public enum AttachmentTarget {
-    RESOURCE, RESOURCE_REQUEST, QNA
+    RESOURCE, RESOURCE_REQUEST, QNA, NOTICE
 }

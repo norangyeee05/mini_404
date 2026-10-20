@@ -3,6 +3,7 @@ server:
 
 app:
   upload-dir: uploads
+  seed-sample-data: true
   cors-allowed-origins: http://localhost:5173
   admin:
     login-id: admin
@@ -15,7 +16,7 @@ spring:
     name: 404
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/mini
+    url: jdbc:postgresql://localhost:5433/mini2
     username: postgres
     password: ${DB_PASSWORD:1234}
 

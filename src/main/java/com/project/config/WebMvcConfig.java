@@ -14,9 +14,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .excludePathPatterns(
                         "/api/**", "/admin/api/**",
-                        "/login", "/signup", "/find-id", "/find-password", "/reset-password",
+                        "/", "/index", "/login", "/signup", "/find-id", "/find-password", "/reset-password",
                         "/terms", "/privacy", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/error");
 
         registry.addInterceptor(new AdminCheckInterceptor()).addPathPatterns("/admin/**");
     }
 }
+

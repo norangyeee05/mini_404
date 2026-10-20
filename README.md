@@ -2,8 +2,7 @@
 
 Spring Boot 4.x + Java 21 + Gradle + Spring Data JPA + PostgreSQL (세션 기반 로그인, REST API)
 
-> 이 백엔드는 **인증·회원, 자료실(+추가 요청), 관리자 회원관리/자료실/자료실 요청**까지 구현되어 있습니다.
-> 공지사항, Q&A, 관리자 대시보드, 철도정보(7호선 노선·열차·역)는 다른 팀원 담당이라 제외했습니다.
+> 이 백엔드는 **인증·회원, 자료실(+추가 요청), Q&A, 관리자 회원관리/자료실/자료실 요청/Q&A 답변, 대시보드, 철도정보(7호선 노선·열차·역)**를 제공합니다.
 
 ## 실행 방법
 
@@ -36,10 +35,26 @@ Spring Boot 4.x + Java 21 + Gradle + Spring Data JPA + PostgreSQL (세션 기반
 | GET | `/api/members/me` | 내 정보 조회 | 회원 |
 | PUT | `/api/members/me` | 내 정보 수정 (`name,email,password`선택) | 회원 |
 | DELETE | `/api/members/me` | 회원 탈퇴 (`loginId,password,passwordConfirm`) | 회원 |
-| GET | `/api/resources` | 자료실 목록 (`searchType`: title/writer) | 전체 |
-| GET | `/api/resources/{resourceId}` | 상세 (조회수 +1, `files[]`) | 전체 |
-| GET | `/api/resources/{resourceId}/files/{fileId}` | 파일 다운로드 | 전체 |
+| GET | `/api/notices` | 공지사항 목록 (searchType: title/writer) | 전체 |
+| GET | `/api/notices/{noticeId}` | 공지사항 상세 (조회수 +1) | 전체 |
+| POST | `/api/admin/notices` | 공지사항 등록 (`title,content`) | 관리자 |
+| PUT | `/api/admin/notices/{noticeId}` | 공지사항 수정 | 관리자 |
+| DELETE | `/api/admin/notices/{noticeId}` | 공지사항 삭제 | 관리자 |
+| GET | `/api/resources` | 자료실 목록 (`searchType`: title/writer) | 로그인 회원/관리자 |
+| GET | `/api/resources/{resourceId}` | 상세 (조회수 +1, `files[]`) | 로그인 회원/관리자 |
+| GET | `/api/resources/{resourceId}/files/{fileId}` | 파일 다운로드 | 로그인 회원/관리자 |
 | POST | `/api/resources/requests` | 자료실 추가 요청 (`title,content,files[]`) | 회원 |
+| GET | `/api/qna` | Q&A 목록 (`searchType`, `inquiryType`, `keyword`) | 회원 |
+| GET | `/api/qna/my` | 내 질문 목록 | 회원 |
+| GET | `/api/qna/{qnaId}` | Q&A 상세 (`content`, `files[]`, `answer`) | 회원 |
+| POST | `/api/qna` | 질문 등록 (JSON 또는 multipart) | 회원 |
+| PUT | `/api/qna/{qnaId}` | 질문 수정 (작성자) | 작성자 |
+| DELETE | `/api/qna/{qnaId}` | 질문 삭제 (작성자) | 작성자 |
+| GET | `/api/qna/{qnaId}/files/{fileId}` | 첨부파일 다운로드 | 회원 |
+| GET | `/api/admin/qna` | Q&A 답변 목록 (`inquiryType`, `status`) | 관리자 |
+| GET | `/api/admin/qna/{qnaId}` | 답변 상세 | 관리자 |
+| POST | `/api/admin/qna/{qnaId}/answer` | 답변 등록 | 관리자 |
+| DELETE | `/api/admin/qna/{qnaId}` | Q&A 삭제 | 관리자 |
 | POST | `/api/admin/resources` | 자료 등록 | 관리자 |
 | PUT | `/api/admin/resources/{resourceId}` | 자료 수정 (`deleteFileIds`로 기존 파일 삭제) | 관리자 |
 | DELETE | `/api/admin/resources/{resourceId}` | 자료 삭제 | 관리자 |
@@ -60,3 +75,8 @@ Spring Boot 4.x + Java 21 + Gradle + Spring Data JPA + PostgreSQL (세션 기반
 - 로그인은 `member` → `admin` 순으로 조회하며, 관리자는 `role=ADMIN` 으로 응답합니다.
 - 아이디 규칙(영문·숫자·밑줄 4~20자), 비밀번호 규칙(8~64자)은 임의로 정한 값이므로 피그마 화면 규칙과 다르면 `SignupRequest` 를 수정하세요.
 - Spring Security 필터 대신 `AuthInterceptor` 로 권한을 검사하고, 비밀번호 암호화에만 `spring-security-crypto`(BCrypt)를 사용합니다.
+
+
+
+
+

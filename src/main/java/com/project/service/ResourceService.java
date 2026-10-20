@@ -49,7 +49,7 @@ public class ResourceService {
     /** searchType: title(기본) / writer */
     public PageResponse<ListItem> list(String searchType, String keyword, int page, int size) {
         Pageable pageable = PageResponse.pageable(page, size,
-                Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.DESC, "id")));
+                Sort.by(Sort.Direction.DESC, "id"));
         Page<ListItem> result = resourceRepository.findAll(search(searchType, keyword), pageable)
                 .map(this::toListItem);
         return PageResponse.of(result);
@@ -64,6 +64,13 @@ public class ResourceService {
         ResourcePost r = find(resourceId);
         return new Detail(
                 r.getId(), r.getTitle(), r.getViewCount(), r.getAdmin().getName(), r.getCreatedAt(),
+                r.getContent(), attachmentService.list(AttachmentTarget.RESOURCE, r.getId()));
+    }
+
+    /** 관리자 상세 조회는 조회수를 증가시키지 않습니다. */
+    public Detail adminDetail(Long resourceId) {
+        ResourcePost r = find(resourceId);
+        return new Detail(r.getId(), r.getTitle(), r.getViewCount(), r.getAdmin().getName(), r.getCreatedAt(),
                 r.getContent(), attachmentService.list(AttachmentTarget.RESOURCE, r.getId()));
     }
 

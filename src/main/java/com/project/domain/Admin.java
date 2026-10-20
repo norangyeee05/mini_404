@@ -12,9 +12,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "admin")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Admin {
 
     @Id
@@ -33,6 +38,9 @@ public class Admin {
     @Column(nullable = false, length = 100)
     private String email;
 
+    @Column(length = 20)
+    private String phone;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private AdminRole role;
@@ -47,9 +55,6 @@ public class Admin {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    protected Admin() {
-    }
-
     public static Admin create(String loginId, String encodedPassword, String name, String email, AdminRole role) {
         Admin a = new Admin();
         a.loginId = loginId;
@@ -59,6 +64,13 @@ public class Admin {
         a.role = role;
         a.status = MemberStatus.ACTIVE;
         return a;
+    }
+
+    public void updateProfile(String name, String email, String phone, String encodedPassword) {
+        this.name = name;
+        this.email = email;
+        this.phone = phone == null || phone.isBlank() ? null : phone.trim();
+        if (encodedPassword != null && !encodedPassword.isBlank()) this.password = encodedPassword;
     }
 
     @PrePersist
@@ -73,13 +85,4 @@ public class Admin {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Long getId() { return id; }
-    public String getLoginId() { return loginId; }
-    public String getPassword() { return password; }
-    public String getName() { return name; }
-    public String getEmail() { return email; }
-    public AdminRole getRole() { return role; }
-    public MemberStatus getStatus() { return status; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
 }

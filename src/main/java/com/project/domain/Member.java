@@ -12,11 +12,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "member")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
     public static final String ROLE_USER = "USER";
+    public static final String ROLE_WEB_ADMIN = "WEB_ADMIN";
     public static final String ROLE_ADMIN = "ADMIN";
 
     @Id
@@ -51,7 +57,11 @@ public class Member {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    protected Member() { }
+    @Column(name = "terms_accepted_at")
+    private LocalDateTime termsAcceptedAt;
+
+    @Column(name = "privacy_accepted_at")
+    private LocalDateTime privacyAcceptedAt;
 
     public static Builder builder() { return new Builder(); }
 
@@ -84,20 +94,16 @@ public class Member {
     }
 
     public void changePassword(String encodedPassword) { this.password = encodedPassword; }
+    public void changePhone(String phone) { this.phone = phone; }
+    public void acceptLegalAgreements(LocalDateTime acceptedAt) {
+        this.termsAcceptedAt = acceptedAt;
+        this.privacyAcceptedAt = acceptedAt;
+    }
     public void changeStatus(MemberStatus status) { this.status = status; }
+    public void changeRole(String role) { this.role = role; }
     public void withdraw() { this.status = MemberStatus.WITHDRAWN; }
 
-    public Long getId() { return id; }
-    public String getLoginId() { return loginId; }
-    public String getPassword() { return password; }
     public String getPasswordHash() { return password; }
-    public String getName() { return name; }
-    public String getEmail() { return email; }
-    public String getPhone() { return phone; }
-    public String getRole() { return role; }
-    public MemberStatus getStatus() { return status; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
 
     public static final class Builder {
         private final Member member = new Member();

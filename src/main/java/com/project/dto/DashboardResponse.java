@@ -4,6 +4,7 @@ import com.project.domain.Station;
 import com.project.domain.Train;
 
 import java.util.List;
+import java.time.LocalDate;
 
 public record DashboardResponse(
 		String now,
@@ -20,7 +21,7 @@ public record DashboardResponse(
 	public record CountCard(long count, long diffFromYesterday) {
 	}
 
-	public record ServiceCard(long total, long normal) {
+	public record ServiceCard(long total, long normal, long runningTrains) {
 	}
 
 	public record ShareChart(long total, List<Share> shares) {
@@ -33,12 +34,14 @@ public record DashboardResponse(
 	}
 
 	public record TrainRow(Long id, String status, String statusLabel, String route,
-						   String trainNo, String driver, String direction, String directionLabel) {
+						   String trainNo, String driver, String direction, String directionLabel, boolean active,
+						   LocalDate registeredAt, LocalDate inspectionDate) {
 
 		public static TrainRow from(Train t) {
 			return new TrainRow(t.getId(), t.getStatus().name(), t.getStatus().getOperationLabel(),
 					t.getRoute(), t.getTrainNo(), t.getDriver(),
-					t.getDirection().name(), t.getDirection().getLabel());
+					 t.getDirection().name(), t.getDirection().getLabel(), t.isActive(),
+					 t.getRegisteredAt(), t.getInspectionDate());
 		}
 	}
 

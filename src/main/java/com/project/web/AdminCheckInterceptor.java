@@ -17,7 +17,14 @@ public class AdminCheckInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession(false);
         Object apiUser = session == null ? null : session.getAttribute(SessionKeys.LOGIN_USER);
         Object pageUser = session == null ? null : session.getAttribute(com.project.web.SessionKeys.LOGIN_MEMBER);
-        if (apiUser instanceof LoginUser user && user.role() == Role.ADMIN) return true;
+        if (apiUser instanceof LoginUser user) {
+            if (user.role() == Role.WEB_ADMIN && request.getRequestURI().startsWith("/admin/api/stations")
+                    && !"GET".equalsIgnoreCase(request.getMethod())) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return false;
+            }
+            if (user.role() == Role.ADMIN || user.role() == Role.WEB_ADMIN) return true;
+        }
         if (pageUser instanceof LoginMember member && Member.ROLE_ADMIN.equals(member.role())) return true;
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
         return false;

@@ -39,6 +39,10 @@ public class MemberService {
             encoded = passwordEncoder.encode(req.password());
         }
         m.updateProfile(req.name().trim(), req.email().trim(), encoded);
+        if (req.phone() != null) {
+            String phone = req.phone().trim();
+            m.changePhone(phone.isEmpty() ? null : phone);
+        }
         return m;
     }
 

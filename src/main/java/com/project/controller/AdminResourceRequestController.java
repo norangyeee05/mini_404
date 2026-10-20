@@ -2,6 +2,7 @@ package com.project.controller;
 
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,14 +27,11 @@ import jakarta.validation.Valid;
 
 /** 관리자 자료실 요청 관리 (2-7). 접근 제어는 AuthInterceptor(/api/admin/**)에서 처리 */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/admin/resource-requests")
 public class AdminResourceRequestController {
 
     private final ResourceRequestService requestService;
-
-    public AdminResourceRequestController(ResourceRequestService requestService) {
-        this.requestService = requestService;
-    }
 
     /** 공통 쿼리 + status(PENDING/COMPLETED), searchType: title(기본) / requester */
     @GetMapping

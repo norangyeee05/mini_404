@@ -15,10 +15,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /** 회원의 자료실 추가 요청 (DB 설계에 없던 테이블 - API 명세서 기준으로 추가) */
 @Entity
 @Table(name = "resource_request")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ResourceRequest {
 
     @Id
@@ -45,9 +50,6 @@ public class ResourceRequest {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    protected ResourceRequest() {
-    }
-
     public static ResourceRequest create(Member member, String title, String content) {
         ResourceRequest r = new ResourceRequest();
         r.member = member;
@@ -73,11 +75,4 @@ public class ResourceRequest {
         this.status = status;
     }
 
-    public Long getId() { return id; }
-    public Member getMember() { return member; }
-    public String getTitle() { return title; }
-    public String getContent() { return content; }
-    public RequestStatus getStatus() { return status; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
 }

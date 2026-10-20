@@ -2,6 +2,7 @@ package com.project.controller;
 
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,18 +27,15 @@ import jakarta.validation.Valid;
 
 /** 내 정보 (2-1): 조회 / 수정 / 탈퇴 - 일반 회원 전용 */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/members/me")
 public class MemberController {
 
     private final MemberService memberService;
 
-    public MemberController(MemberService memberService) {
-        this.memberService = memberService;
-    }
-
     @GetMapping
     public ApiResponse<MeResponse> me(@SessionAttribute(name = SessionKeys.LOGIN_USER) LoginUser user) {
-        user.requireUser();
+        user.requireMemberAccount();
         return ApiResponse.ok(memberService.me(user.id()));
     }
 
@@ -45,13 +43,13 @@ public class MemberController {
     public ApiResponse<Map<String, Long>> update(@SessionAttribute(name = SessionKeys.LOGIN_USER) LoginUser user,
                                                  @Valid @RequestBody UpdateRequest request,
                                                  HttpServletRequest httpRequest) {
-        user.requireUser();
+        user.requireMemberAccount();
         Member updated = memberService.update(user.id(), request);
 
         // 이름이 바뀌었을 수 있으므로 세션 정보 갱신
         HttpSession session = httpRequest.getSession(false);
         if (session != null) {
-            session.setAttribute(SessionKeys.LOGIN_USER, new LoginUser(updated.getId(), updated.getName(), Role.USER));
+            session.setAttribute(SessionKeys.LOGIN_USER, new LoginUser(updated.getId(), updated.getName(), Role.valueOf(updated.getRole())));
         }
         return ApiResponse.ok(Map.of("memberId", updated.getId()), "회원 정보가 수정되었습니다.");
     }
