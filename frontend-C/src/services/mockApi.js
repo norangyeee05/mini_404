@@ -30,7 +30,7 @@ const qnas = [
 ]
 const stations = [
   ['석남', '김민수'], ['산곡', '이수진'], ['부평구청', '박지훈'], ['굴포천', '최유진'], ['삼산체육관', '정하늘'], ['상동', '윤서연'], ['부천종합운동장', '한도윤'],
-].map(([stationName, staffName], i) => ({ stationId: i + 1, stationName, stationOrder: i + 1, staffName, phone: `032-000-000${i + 1}`, address: `인천 7호선 ${stationName}역`, usageInfo: i % 2 ? '상대식 승강장' : '섬식 승강장', active: true, facilityStatus: i === 4 ? 'IN_INSPECTION' : 'INSPECTED', lastInspectionDate: '2026-09-10', nextInspectionDueDate: '2027-09-10', updatedAt: stamp }))
+].map(([stationName, staffName], i) => ({ stationId: i + 1, stationName, stationNo: String(761 - i), stationOrder: i + 1, staffName, phone: `032-000-000${i + 1}`, address: `인천 7호선 ${stationName}역`, usageInfo: i % 2 ? '상대식 승강장' : '섬식 승강장', active: true, facilityStatus: i === 4 ? 'IN_INSPECTION' : 'INSPECTED', lastInspectionDate: '2026-09-10', nextInspectionDueDate: '2027-09-10', updatedAt: stamp }))
 const trains = [
   { trainId: 1, lineId: 7, trainNo: '701', section: '석남 - 부천종합운동장', driver: '김기관', direction: 'UP', status: 'RUNNING', active: true, updatedAt: stamp },
   { trainId: 2, lineId: 7, trainNo: '702', section: '산곡 - 상동', driver: '이기관', direction: 'DOWN', status: 'MAINTENANCE', active: true, updatedAt: stamp },
@@ -107,7 +107,7 @@ function handle(c) {
   if (method === 'patch' && (m = path.match(/^\/admin\/members\/([^/]+)\/role$/))) { const x = find(members, 'memberId', m[1]); failIf(!['USER', 'WEB_ADMIN', 'ADMIN'].includes(b.role), 400, '지원하지 않는 회원 등급입니다.'); x.role = b.role; return x }
   if (method === 'post' && (m = path.match(/^\/admin\/members\/([^/]+)\/password-reset$/))) { const x = find(members, 'memberId', m[1]); x.password = `Temp-${Math.random().toString(36).slice(2, 12)}!`; return { memberId: x.memberId, temporaryPassword: x.password } }
   if (method === 'get' && path === '/admin/dashboard') return { memberCount: members.length, noticeCount: notices.length, waitingQnaCount: qnas.filter(x => x.status === 'WAITING').length, recentNotices: notices.slice(0, 5), recentQnas: qnas.slice(0, 5) }
-  if (method === 'get' && path === '/line7/stations') return stations.filter(x => x.active).sort((a, b) => a.stationOrder - b.stationOrder)
+  if (method === 'get' && path === '/line7/stations') return stations.filter(x => x.active).sort((a, b) => Number(b.stationNo) - Number(a.stationNo) || a.stationOrder - b.stationOrder)
   if (method === 'get' && (m = path.match(/^\/line7\/stations\/([^/]+)$/))) return find(stations, 'stationId', m[1])
   if (method === 'get' && path.match(/^\/line7\/stations\/[^/]+\/transfer$/)) return { transfers: [{ transferLineName: '인천 1호선', transferInfo: '환승 통로 안내' }] }
   if (method === 'get' && path === '/admin/line7/trains') return page(filter(trains, p, ['trainNo', 'driver', 'section', 'status', 'direction']), p)

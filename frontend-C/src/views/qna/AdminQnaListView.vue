@@ -6,7 +6,7 @@ import PageHeader from '../../components/PageHeader.vue'
 import PageBanner from '../../components/PageBanner.vue'
 import PageFooter from '../../components/PageFooter.vue'
 import DeleteModal from '../../components/DeleteModal.vue'
-import { getQnas, getQna, deleteQna as removeQna, answerQna } from './qnaMockData'
+import { getQnas, getQna, deleteQna as removeQna, updateAdminQna } from './qnaMockData'
 import { apiError } from '../../services/backendApi'
 import './admin-qna-list.css'
 
@@ -27,7 +27,6 @@ const editingQna = ref(null)
 const currentPage = ref(1)
 const pageSize = 10
 const totalCount = ref(0)
-const originalQna = ref(null)
 
 onMounted(loadQnas)
 
@@ -40,7 +39,10 @@ async function loadQnas() {
     const result = await getQnas({ page: currentPage.value, size: pageSize, searchType: ['title', 'content', 'writer'].includes(searchField.value) ? searchField.value : undefined, keyword: searchText.value.trim(), status: props.mode === 'pending' ? 'WAITING' : undefined, admin: true })
     qnas.value = result.items
     totalCount.value = result.totalCount ?? result.items.length
-    if (route.query.edit) { const selected = qnas.value.find(item => String(item.id) === String(route.query.edit)); if (selected) editQna(selected) }
+    if (route.query.edit) {
+      const detail = await getQna(route.query.edit, true)
+      editingQna.value = detail
+    }
   } catch (error) { qnas.value = []; totalCount.value = 0; console.error(apiError(error)) }
 }
 watch(currentPage, loadQnas)
@@ -54,15 +56,18 @@ function search() { currentPage.value = 1; loadQnas() }
 async function editQna(qna) {
   try {
     const detail = await getQna(qna.id, true)
-    originalQna.value = { ...qna, ...detail }
     editingQna.value = { ...qna, ...detail }
   } catch (error) { window.alert(apiError(error)) }
 }
 
 async function saveEditedQna() {
-  if (props.mode !== 'pending' && (editingQna.value.title !== originalQna.value.title || editingQna.value.content !== originalQna.value.content || editingQna.value.category !== originalQna.value.category || editingQna.value.visibility !== originalQna.value.visibility)) { window.alert('명세서에는 관리자 Q&A 질문 수정 API가 없습니다. 답변만 등록할 수 있습니다.'); return }
-  if (!editingQna.value.answer?.trim()) { window.alert('답변 내용을 입력해 주세요.'); return }
-  try { await answerQna(editingQna.value.id, editingQna.value.answer.trim(), originalQna.value?.status === '답변완료'); editingQna.value = null; originalQna.value = null; await loadQnas() }
+  try {
+    if (!editingQna.value.answer?.trim()) { window.alert('답변 내용을 입력해 주세요.'); return }
+    await updateAdminQna(editingQna.value.id, { answer: editingQna.value.answer.trim() })
+    editingQna.value = null
+    await router.push('/admin/qna')
+    await loadQnas()
+  }
   catch (error) { window.alert(apiError(error)) }
 }
 
@@ -117,6 +122,7 @@ function openQna(qnaId) {
             <button class="admin-qna-search__button" type="submit">검색</button>
           </form>
 
+          <p class="admin-qna-total-count">전체 {{ totalCount }}건</p>
           <div class="admin-qna-table-scroll">
             <table class="admin-qna-table">
               <thead>
@@ -181,46 +187,15 @@ function openQna(qnaId) {
           <h2>{{ props.mode === 'pending' ? 'Q&A 답변 작성' : 'Q&A 수정' }}</h2>
           <button type="button" aria-label="닫기" @click="editingQna = null">×</button>
         </div>
-        <template v-if="props.mode === 'pending'">
-          <label for="qna-question">질문</label>
-          <textarea id="qna-question" :value="editingQna.content" rows="4" readonly></textarea>
-          <label for="qna-answer">관리자 답변</label>
-          <textarea id="qna-answer" v-model="editingQna.answer" rows="5" placeholder="답변 내용을 입력하세요." required></textarea>
-        </template>
-        <template v-else>
-          <label for="qna-title">제목</label>
-          <input id="qna-title" v-model="editingQna.title" maxlength="200" required />
-          <label for="qna-content">내용</label>
-          <textarea id="qna-content" v-model="editingQna.content" rows="5" required></textarea>
-          <label for="qna-answer">관리자 답변</label>
-          <textarea id="qna-answer" v-model="editingQna.answer" rows="4" placeholder="답변 내용을 입력하세요."></textarea>
-          <div class="admin-qna-edit-modal__row">
-            <label for="qna-visibility">공개 여부</label>
-            <select id="qna-visibility" v-model="editingQna.visibility">
-              <option>전체</option>
-              <option>비공개</option>
-            </select>
-          </div>
-          <div class="admin-qna-edit-modal__row">
-            <label for="qna-category">문의 유형</label>
-            <select id="qna-category" v-model="editingQna.category">
-              <option>시설</option>
-              <option>기타</option>
-              <option>운행</option>
-              <option>자료실</option>
-            </select>
-          </div>
-          <div class="admin-qna-edit-modal__row">
-            <label for="qna-status">답변 상태</label>
-            <select id="qna-status" v-model="editingQna.status">
-              <option>답변대기</option>
-              <option>답변완료</option>
-            </select>
-          </div>
-        </template>
+        <label for="qna-title">제목</label>
+        <input id="qna-title" :value="editingQna.title" readonly aria-readonly="true" />
+        <label for="qna-question">문의 내용</label>
+        <textarea id="qna-question" :value="editingQna.content" rows="5" readonly aria-readonly="true"></textarea>
+        <label for="qna-answer">관리자 답변</label>
+        <textarea id="qna-answer" v-model="editingQna.answer" rows="5" placeholder="답변 내용을 입력하세요." required></textarea>
         <div class="admin-qna-edit-modal__actions">
           <button type="button" @click="editingQna = null">취소</button>
-          <button type="submit">{{ props.mode === 'pending' ? '답변 등록' : '저장' }}</button>
+          <button type="submit">답변 등록</button>
         </div>
       </form>
     </div>

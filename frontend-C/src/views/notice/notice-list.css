@@ -2,6 +2,8 @@
   transform: scaleX(1);
 }
 
+.notice-total-count { align-self: flex-start; margin: 10px 0; color: #467486; font-weight: 700; text-align: left; }
+
 .notice-main {
   flex: 1;
   display: flex;
@@ -443,3 +445,7 @@
     position: static;
   }
 }
+
+/* Q&A sidebar style */
+.notice-sidebar__link { font: inherit; font-size: 15px; cursor: pointer; }
+.notice-sidebar__link:hover, .notice-sidebar__link--active { background: #fff; color: #4e7e8d; }

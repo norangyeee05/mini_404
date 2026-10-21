@@ -1,17 +1,20 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import PageHeader from '../../components/PageHeader.vue'
 import PageFooter from '../../components/PageFooter.vue'
 import SearchIcon from '../../components/SearchIcon.vue'
 import DeleteModal from '../../components/DeleteModal.vue'
 import TrainSidebar from './components/TrainSidebar.vue'
 import TrainForm from './components/TrainForm.vue'
+import RailItemDetail from './components/RailItemDetail.vue'
 import { trains, deleteTrain, fetchTrains } from './services/trainData'
 import { apiError } from '../../services/backendApi'
 import { currentMember } from '../../services/auth'
 const route = useRoute()
+const router = useRouter()
 const isList = computed(() => route.name === 'admin-trains')
+const isDetail = computed(() => route.name === 'admin-train-detail')
 const fullAdmin = computed(() => currentMember.value?.role === 'ADMIN')
 const field = ref('all')
 const keyword = ref('')
@@ -30,6 +33,7 @@ async function loadTrains() {
   catch (error) { trains.value = []; totalCount.value = 0; feedback.value = apiError(error) }
 }
 onMounted(loadTrains)
+watch(isList, (active, previous) => { if (active && !previous) loadTrains() })
 const pages = computed(() => Array.from({ length: Math.min(5, pageCount.value) }, (_, index) => Math.min(Math.max(1, page.value - 2), Math.max(1, pageCount.value - 4)) + index))
 watch(pageCount, count => { page.value = Math.min(page.value, count) })
 watch(page, loadTrains)
@@ -55,18 +59,18 @@ async function confirmDelete() {
             <button class="train-button train-button--reset" type="button" @click="reset">초기화</button>
           </form>
           <RouterLink v-if="fullAdmin" class="train-button train-button--new" to="/admin/line7/trains/new">⊕ 등록하기</RouterLink>
-          <p class="train-count">전체 노선 {{ filtered.length }}개</p>
+          <p class="train-count">전체 {{ filtered.length }}건</p>
           <p v-if="feedback" role="alert">{{ feedback }}</p>
         </div>
         <div class="train-table-scroll">
           <table class="train-table">
             <thead><tr><th>운행 상태</th><th>운행 구간</th><th>열차 번호</th><th>기관사</th><th>최근 업데이트 일시</th><th>상행/하행</th><th>활성화 여부</th><th>관리</th></tr></thead>
             <tbody>
-              <tr v-for="row in rows" :key="row.id">
+              <tr v-for="row in rows" :key="row.id" class="train-row-link" tabindex="0" :aria-label="`${row.number} 열차 상세보기`" @click="router.push(`/admin/line7/trains/${row.id}/detail`)" @keydown.enter.self.prevent="router.push(`/admin/line7/trains/${row.id}/detail`)" @keydown.space.self.prevent="router.push(`/admin/line7/trains/${row.id}/detail`)">
                 <td><span class="train-pill" :class="{ running: row.status === '운행', inspection: row.status === '점검', broken: row.status === '고장' }">{{ row.status }}</span></td>
                 <td>{{ row.section }}</td><td>{{ row.number }}</td><td>{{ row.operator }}</td><td>{{ row.updated }}</td>
                 <td><span class="train-pill" :class="row.direction === '상행' ? 'running' : 'down'">{{ row.direction }}</span></td><td>{{ row.active ? '활성화' : '비활성화' }}</td>
-                <td><div v-if="fullAdmin" class="train-row-actions"><RouterLink class="train-button train-button--edit" :to="'/admin/line7/trains/' + row.id">수정</RouterLink><button class="train-button train-button--delete" type="button" @click="deleting = row.id; deleteComplete = false">삭제</button></div><span v-else>조회 전용</span></td>
+                <td><div v-if="fullAdmin" class="train-row-actions"><RouterLink class="train-button train-button--edit" :to="'/admin/line7/trains/' + row.id" @click.stop>수정</RouterLink><button class="train-button train-button--delete" type="button" @click.stop="deleting = row.id; deleteComplete = false">삭제</button></div><span v-else>조회 전용</span></td>
               </tr>
               <tr v-if="!rows.length"><td colspan="8">검색 결과가 없습니다.</td></tr>
             </tbody>
@@ -81,6 +85,7 @@ async function confirmDelete() {
           <span>총 페이지 수 : {{ pageCount }}</span>
         </div>
       </section>
+      <RailItemDetail v-else-if="isDetail" kind="train" :id="route.params.trainId" :key="route.fullPath" />
       <TrainForm v-else :key="route.fullPath" />
     </main>
     <PageFooter />

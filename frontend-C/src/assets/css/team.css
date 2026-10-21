@@ -232,6 +232,32 @@ a {
   font-size: 11px;
 }
 
+.dashboard-shell .summary-grid .stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.dashboard-shell .summary-grid .stat-card__main {
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.dashboard-shell .summary-grid .stat-card h2 {
+  padding-left: 0;
+  border-left: 0;
+  white-space: normal;
+}
+
+.dashboard-shell .summary-grid .stat-card__note {
+  width: 100%;
+  text-align: center;
+}
+
 .analytics-grid {
   display: grid;
   grid-template-columns: 1.42fr 1.63fr 1fr;

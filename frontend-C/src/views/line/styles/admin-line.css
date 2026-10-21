@@ -103,6 +103,7 @@
   color: #467486;
   font-size: 16px;
   font-weight: 700;
+  text-align: left;
 }
 
 .train-table-scroll {
@@ -232,6 +233,10 @@
   cursor: default;
 }
 
+.train-row-link { cursor: pointer; }
+.train-row-link:hover { background: #e6f0f2; }
+.train-row-link:focus-visible { outline: 2px solid #155369; outline-offset: -2px; }
+
 .train-editor {
   padding: 36px 35px 80px;
 }
@@ -263,6 +268,42 @@
 }
 
 .train-form input, .train-form select {
+  width: 100%;
+  height: 50px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0 15px;
+  color: #858585;
+  background: #fff;
+  font: inherit;
+  font-size: 20px;
+}
+
+.train-number-control {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0 15px;
+  color: #467486;
+  background: #fff;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.train-number-control input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  padding: 0 0 0 4px;
+  color: #858585;
+  background: transparent;
+  outline: none;
+}
+
+.train-form select {
   width: 100%;
   height: 50px;
   border: 1px solid #ddd;

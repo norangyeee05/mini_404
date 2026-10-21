@@ -10,5 +10,6 @@ export async function getQna(id, admin = false) { return qnaFromApi(await (admin
 const qnaFieldsToApi = fields => ({ ...fields, isPrivate: fields.isPrivate ?? (fields.isPublic === false) })
 export async function createQna(fields, files) { return api.qna.create(qnaFieldsToApi(fields), files) }
 export async function updateQna(id, fields, files) { return api.qna.update(id, qnaFieldsToApi(fields), files) }
+export async function updateAdminQna(id, fields) { return api.qna.adminUpdate(id, fields) }
 export async function deleteQna(id, admin = false) { return admin ? api.qna.adminRemove(id) : api.qna.remove(id) }
 export async function answerQna(id, answer, update = false) { return api.qna.answer(id, answer, update) }

@@ -71,6 +71,8 @@ function goToPage(page) {
             <button class="notice-search__button" type="submit">검색</button>
           </form>
 
+          <p class="notice-total-count">전체 {{ totalCount }}건</p>
+
           <div class="notice-table-scroll">
             <table class="notice-table">
               <thead>
@@ -89,8 +91,8 @@ function goToPage(page) {
                     <RouterLink class="notice-table__title-link" :to="{ path: '/notice/detail', query: { id: notice.id } }">{{ notice.title }}</RouterLink>
                   </td>
                   <td>{{ notice.writer }}</td>
-                  <td>{{ notice.viewCount }}</td>
-                  <td>{{ notice.createdAt }}</td>
+                  <td>{{ notice.views }}</td>
+                  <td>{{ notice.date }}</td>
                 </tr>
                 <tr v-if="pageRows.length === 0">
                   <td colspan="5" class="notice-table__empty">검색 결과가 없습니다.</td>

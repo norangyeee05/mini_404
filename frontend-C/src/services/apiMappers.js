@@ -13,7 +13,11 @@ export const facilityStatusFromApi = { INSPECTED: '양호', NEEDS_INSPECTION: '�
 
 export function formatDate(value) {
   if (!value) return ''
-  const date = new Date(value)
+  const source = String(value)
+  // LocalDateTime values from the API have no offset; interpret them as Seoul time.
+  const hasOffset = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(source)
+  const normalized = /^\d{4}-\d{2}-\d{2}$/.test(source) ? `${source}T00:00:00+09:00` : source
+  const date = new Date(hasOffset ? source : `${normalized}+09:00`)
   if (Number.isNaN(date.getTime())) return String(value)
   return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).format(date).replaceAll('-', '.')
 }

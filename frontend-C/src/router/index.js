@@ -53,6 +53,8 @@ const router = createRouter({
     { path: '/qna/edit', component: MemberQnaFormView, props: { mode: 'edit' }, meta: { requiresMember: true } },
     { path: '/qna/detail', component: MemberQnaDetailView, meta: { requiresMember: true } },
     { path: '/qna/:id', redirect: to => ({ path: '/qna/detail', query: { id: to.params.id } }) },
+    { path: '/admin/line7/stations/:stationId/detail', name: 'admin-station-detail', component: AdminStation, meta: { requiresAdmin: true } },
+    { path: '/admin/line7/trains/:trainId/detail', name: 'admin-train-detail', component: AdminRailLine, meta: { requiresAdmin: true } },
     { path: '/admin/line7/stations', name: 'admin-stations', component: AdminStation, meta: { requiresAdmin: true } },
     { path: '/admin/line7/stations/new', name: 'admin-station-new', component: AdminStation, meta: { requiresAdmin: true, requiresFullAdmin: true } },
     { path: '/admin/line7/stations/:stationId', name: 'admin-station-edit', component: AdminStation, meta: { requiresAdmin: true, requiresFullAdmin: true } },

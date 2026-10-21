@@ -74,7 +74,7 @@ onMounted(async () => {
           </div>
           <div class="notice-detail-meta__date">
             <dt>등록일</dt>
-            <dd>{{ notice.createdAt }}</dd>
+            <dd>{{ notice.date }}</dd>
           </div>
         </dl>
 
@@ -100,13 +100,6 @@ onMounted(async () => {
             <p>{{ notice.closing }}</p>
           </template>
 
-          <RouterLink
-            v-if="props.role === 'admin'"
-            class="notice-detail-back-link"
-            to="/admin/notices"
-          >
-            ‹ &nbsp; 목록으로 돌아가기
-          </RouterLink>
         </div>
       <section v-if="notice.files?.length" class="notice-attachment"><h3>첨부파일</h3><div v-for="file in notice.files" :key="file.fileId"><span>{{ file.fileName }}</span><button class="notice-detail-admin-button" type="button" @click="downloadAttachment(file)">↓ 다운로드</button></div><p v-if="attachmentError" role="alert">{{ attachmentError }}</p></section>
       </article>

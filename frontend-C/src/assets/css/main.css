@@ -1035,7 +1035,7 @@ body .resource-list .list-toolbar {
 .dashboard-shell .donut-chart-canvas {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 4;
   width: 100% !important;
   height: 100% !important;
 }
@@ -1044,7 +1044,7 @@ body .resource-list .list-toolbar {
   position: absolute;
   top: 50%;
   left: 50%;
-  z-index: 1;
+  z-index: 3;
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
@@ -1058,3 +1058,11 @@ body .resource-list .list-toolbar {
   width: 100% !important;
   height: 100% !important;
 }
+
+/* Dashboard chart readability and member heading spacing */
+.dashboard-shell .member-panel .panel-title { gap: 10px; padding-left: 10px; }
+.dashboard-shell .member-heading-icon { width: 22px; height: 22px; flex: 0 0 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.dashboard-shell .donut__center { z-index: 3; }
+.dashboard-shell .donut--service .donut__center { width: 58%; height: 58%; }
+.dashboard-shell .donut--service .donut__center strong { font-size: clamp(13px, 1.1vw, 18px); }
+.dashboard-shell .donut--service .donut__center b { font-size: clamp(18px, 1.5vw, 24px); line-height: 1.15; }

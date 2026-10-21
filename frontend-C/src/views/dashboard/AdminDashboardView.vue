@@ -223,7 +223,7 @@ onMounted(async () => {
         </article>
 
         <article class="panel member-panel">
-          <h2 class="panel-title">회원 현황</h2>
+          <h2 class="panel-title"><svg class="member-heading-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM20 8v6M23 11h-6" /></svg>회원 현황</h2>
           <div class="member-chart-content">
             <div class="donut donut--member" role="img" :aria-label="`회원 현황 전체 ${memberTotal}명`">
               <Doughnut class="donut-chart-canvas" :data="memberChartData" :options="memberChartOptions" :plugins="[percentageLabelsPlugin]" />

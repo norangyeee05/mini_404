@@ -4,6 +4,8 @@
   justify-content: space-between;
 }
 
+.resource-total-count { align-self: flex-start; margin: 10px 0; color: #467486; font-weight: 700; text-align: left; }
+
 .detail-manage {
   display: flex;
   gap: 16px;
@@ -509,3 +511,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     margin-top: 12px;
   }
 }
+
+/* Q&A sidebar style */
+.resource-sidebar a { font-size: 15px; }
+.resource-sidebar a:hover, .resource-sidebar a[aria-current="page"] { background: #fff; color: #4e7e8d; }

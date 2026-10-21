@@ -71,7 +71,9 @@ Q&A 문의 유형은 `FACILITY`, `OPERATION`, `ETC`, 처리 상태는 `WAITING`,
 | 자료 요청 삭제 | DELETE | `/admin/resource-requests/{requestId}` | 요청 삭제 |
 | Q&A 목록 | GET | `/admin/qna` | 공통 목록 쿼리; 상태 검색 가능 |
 | Q&A 상세 | GET | `/admin/qna/{qnaId}` | 질문 및 답변 상세 |
+| Q&A 질문 수정 | PUT | `/admin/qna/{qnaId}` | `{ title, content, inquiryType, isPrivate, answer, status }` |
 | Q&A 답변 등록 | POST | `/admin/qna/{qnaId}/answer` | `{ answer }` |
+| Q&A 답변 수정 | PUT | `/admin/qna/{qnaId}/answer` | `{ answer }` |
 | Q&A 삭제 | DELETE | `/admin/qna/{qnaId}` | Q&A 삭제 |
 | 열차 목록 | GET | `/admin/line7/trains` | 공통 목록 쿼리 |
 | 열차 상세 | GET | `/admin/line7/trains/{trainId}` | 열차 상세 |

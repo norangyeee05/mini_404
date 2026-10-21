@@ -1,8 +1,8 @@
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import StationTagPicker from './StationTagPicker.vue'
-import { adminStations, fetchAdminStation, saveStation, usageOptions, facilityOptions } from '../services/adminStationData'
+import { fetchAdminStation, saveStation, usageOptions, facilityOptions } from '../services/adminStationData'
 import { apiError } from '../../../services/backendApi'
 const route = useRoute()
 const router = useRouter()
@@ -10,10 +10,6 @@ const editing = computed(() => route.name === 'admin-station-edit')
 const existing = ref(null)
 const form = reactive({ name: '', english: '', number: '', staff: '', address: '', phone: '', active: true, status: '양호', registered: '', inspection: '', usage: [], facilities: [], transferLine: '', transferText: '', stationOrder: null, nextInspectionDueDate: null, latitude: '', longitude: '' })
 const error = ref('')
-watch(() => form.status, status => {
-  if (!editing.value || !existing.value) return
-  adminStations.value = adminStations.value.map(station => station.id === String(existing.value.id) ? { ...station, status } : station)
-})
 onMounted(async () => {
   if (!editing.value) return
   try {
@@ -30,6 +26,7 @@ function date(value) {
 async function submit() {
   error.value = ''
   if (!form.name.trim() || !form.staff.trim() || !form.address.trim()) { error.value = '역 이름, 역무원, 주소를 입력해 주세요.'; return }
+  if (!/^\d{3,4}$/.test(form.number.trim())) { error.value = '\uC5ED \uBC88\uD638\uB294 \uC22B\uC790 3~4\uC790\uB9AC\uB85C \uC785\uB825\uD574 \uC8FC\uC138\uC694.'; return }
   if (form.phone && !/^0\d{1,2}-\d{3,4}-\d{4}$/.test(form.phone.trim())) { error.value = '연락처를 032-000-0000 형식으로 입력해 주세요.'; return }
   try {
     const values = { ...form, inspectionDate: form.status === '점검 중' ? date(form.inspection) : null, facilityStatus: form.status }
@@ -42,11 +39,11 @@ async function submit() {
 <template>
   <section class="station-admin-editor">
     <template v-if="!editing || existing">
-      <h1>{{ editing ? '역 수정하기' : '역 등록하기' }}</h1>
+      <h1>{{ editing ? '역 정보 수정하기' : '역 등록하기' }}</h1>
       <form id="station-admin-form" novalidate @submit.prevent="submit">
         <div class="station-editor-grid">
           <div class="station-base-panel">
-            <div class="station-name-row"><label for="station-name">역 이름</label><input id="station-name" v-model="form.name" placeholder="ex) 석남" maxlength="40" /><input v-model="form.english" aria-label="역 이름 영문" placeholder="ex) Seongnam" maxlength="80" /><label for="station-number">역 번호</label><input id="station-number" v-model="form.number" placeholder="ex) 1761" maxlength="4" inputmode="numeric" /></div>
+            <div class="station-name-row"><label for="station-name">역 이름</label><input id="station-name" v-model="form.name" placeholder="ex) 석남" maxlength="40" /><input v-model="form.english" aria-label="역 이름 영문" placeholder="ex) Seongnam" maxlength="80" /><label for="station-number">역 번호</label><input id="station-number" v-model="form.number" placeholder="ex) 761" maxlength="4" inputmode="numeric" @input="form.number = form.number.replace(/\D/g, '').slice(0, 4)" /></div>
             <div class="station-staff-row"><label for="station-staff">역무원</label><input id="station-staff" v-model="form.staff" placeholder="ex) 김아무개" maxlength="30" /></div>
             <h2>역 기본 정보</h2>
             <div class="station-address-row"><label for="station-address">주소</label><input id="station-address" v-model="form.address" placeholder="ex) 인천광역시 부평구 길주로 527" /><label for="station-phone">연락처</label><input id="station-phone" v-model="form.phone" placeholder="ex) 032-XXX-XXXX" /></div>

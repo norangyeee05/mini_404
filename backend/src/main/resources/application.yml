@@ -1,0 +1,50 @@
+server:
+  port: 8080
+
+app:
+  upload-dir: uploads
+  seed-sample-data: ${APP_SEED_SAMPLE_DATA:false}
+  cors-allowed-origins: http://localhost:5173,http://127.0.0.1:5173
+  security:
+    session-cookie-secure: ${SESSION_COOKIE_SECURE:false}
+    session-cookie-same-site: ${SESSION_COOKIE_SAME_SITE:Lax}
+  admin:
+    login-id: ${APP_ADMIN_LOGIN_ID:admin}
+    password: ${APP_ADMIN_PASSWORD:${ADMIN_PASSWORD}}
+    name: 관리자
+    email: admin@example.com
+
+spring:
+  application:
+    name: 404
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/mini404}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USER:postgres}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD}}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        secure: ${SESSION_COOKIE_SECURE:false}
+        same-site: ${SESSION_COOKIE_SAME_SITE:Lax}
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 60MB
+
+

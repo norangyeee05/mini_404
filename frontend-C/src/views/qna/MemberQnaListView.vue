@@ -66,6 +66,7 @@ function goToPage(page) {
             <button class="member-qna-register-button" type="button" @click="router.push('/qna/create')">⊕ 등록하기</button>
           </form>
 
+          <p class="member-qna-total-count">전체 {{ totalCount }}건</p>
           <div class="member-qna-table-scroll">
             <table class="member-qna-table">
               <thead>

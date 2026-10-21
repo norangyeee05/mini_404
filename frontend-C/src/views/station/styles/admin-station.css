@@ -297,3 +297,59 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     font-size: 18px;
   }
 }
+
+/* Match the train form's single-card layout and spacing */
+.station-admin-editor {
+  padding: 36px 35px 80px;
+}
+
+.station-admin-editor h1 {
+  margin: 0 0 32px;
+  padding-left: 14px;
+  border-left: 4px solid #155369;
+  font-size: 34px;
+  line-height: 40px;
+}
+
+.station-admin-editor #station-admin-form {
+  min-height: 626px;
+  padding: 20px 18px;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.station-editor-grid {
+  gap: 18px;
+}
+
+.station-base-panel,
+.station-extra-panel {
+  min-height: 0;
+  padding: 12px;
+  background: transparent;
+}
+
+.station-editor-actions {
+  margin: 18px 0 0;
+}
+
+@media (max-width: 760px) {
+  .station-admin-editor {
+    padding: 24px 16px;
+  }
+
+  .station-admin-editor h1 {
+    margin-bottom: 24px;
+    font-size: 26px;
+  }
+
+  .station-admin-editor #station-admin-form {
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .station-base-panel,
+  .station-extra-panel {
+    padding: 8px;
+  }
+}

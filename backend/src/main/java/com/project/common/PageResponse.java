@@ -1,0 +1,23 @@
+package com.project.common;
+
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+/** 목록 공통 응답: totalCount, page, size, items[] */
+public record PageResponse<T>(long totalCount, int page, int size, List<T> items) {
+
+    public static <T> PageResponse<T> of(Page<T> page) {
+        return new PageResponse<>(page.getTotalElements(), page.getNumber() + 1, page.getSize(), page.getContent());
+    }
+
+    /** page는 1부터 시작, size는 1~100으로 보정 */
+    public static Pageable pageable(int page, int size, Sort sort) {
+        int p = Math.max(page, 1) - 1;
+        int s = Math.min(Math.max(size, 1), 100);
+        return PageRequest.of(p, s, sort);
+    }
+}

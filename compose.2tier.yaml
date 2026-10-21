@@ -1,0 +1,39 @@
+name: mini-2tier
+
+services:
+  backend:
+    image: ${DOCKERHUB_USERNAME:-sumi0705}/mini-1-backend:${IMAGE_TAG:-latest}
+    container_name: mini-1-backend
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST:?Set DB_HOST}:${DB_PORT:-5432}/${DB_NAME:-mini404}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+      APP_ADMIN_LOGIN_ID: ${ADMIN_LOGIN_ID:-admin}
+      APP_ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD}
+      APP_UPLOAD_DIR: /app/uploads
+      APP_SEED_SAMPLE_DATA: ${APP_SEED_SAMPLE_DATA:-false}
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:?Set APP_CORS_ALLOWED_ORIGINS}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      SESSION_COOKIE_SAME_SITE: ${SESSION_COOKIE_SAME_SITE:-Lax}
+    volumes:
+      - uploaded_files:/app/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8080'"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 45s
+
+  frontend:
+    image: ${DOCKERHUB_USERNAME:-sumi0705}/mini-1-frontend:${IMAGE_TAG:-latest}
+    container_name: mini-1-frontend
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8088}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  uploaded_files:

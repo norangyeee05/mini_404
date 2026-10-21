@@ -12,8 +12,15 @@ export async function fetchAdminStations(params = {}) {
 }
 export async function fetchAdminStation(id) { return stationFromApi(await api.line.stationAdmin(id)) }
 export async function saveStation(values, id) {
+  const stationNo = String(values.number || '').trim()
+  if (!/^\d{3,4}$/.test(stationNo)) throw new Error('\uC5ED \uBC88\uD638\uB294 \uC22B\uC790 3~4\uC790\uB9AC\uB85C \uC785\uB825\uD574 \uC8FC\uC138\uC694.')
+  const currentStations = responseItems(await api.line.stationsAdmin({ page: 1, size: 100 }))
+  const duplicate = currentStations.some(station =>
+    String(station.stationNo) === stationNo && String(station.stationId) !== String(id ?? '')
+  )
+  if (duplicate) throw new Error('\uC774\uBBF8 \uC0AC\uC6A9 \uC911\uC778 \uC5ED \uBC88\uD638\uC785\uB2C8\uB2E4.')
   const hasOrder = values.stationOrder !== null && values.stationOrder !== '' && Number.isInteger(Number(values.stationOrder))
-  const body = { stationNo: values.number, stationName: values.name, nameEn: values.english || null, staffName: values.staff, phone: values.phone, address: values.address, usageInfo: values.usage.join(', '), facilities: values.facilities.join(', '), transferLine: values.transferLine || null, transferInfo: values.transferText || null, active: values.active, registeredAt: values.registered ? values.registered.replaceAll('.', '-') : null, nextInspectionDueDate: values.nextInspectionDueDate || null, stationOrder: hasOrder ? Number(values.stationOrder) : 0, latitude: Number(values.latitude) || 0, longitude: Number(values.longitude) || 0, facilityStatus: facilityStatusToApi[values.facilityStatus] || values.facilityStatus, lastInspectionDate: values.lastInspectionDate || null, inspectionDate: values.inspectionDate || null }
+  const body = { stationNo, stationName: values.name, nameEn: values.english || null, staffName: values.staff, phone: values.phone, address: values.address, usageInfo: values.usage.join(', '), facilities: values.facilities.join(', '), transferLine: values.transferLine || null, transferInfo: values.transferText || null, active: values.active, registeredAt: values.registered ? values.registered.replaceAll('.', '-') : null, nextInspectionDueDate: values.nextInspectionDueDate || null, stationOrder: hasOrder ? Number(values.stationOrder) : 0, latitude: Number(values.latitude) || 0, longitude: Number(values.longitude) || 0, facilityStatus: facilityStatusToApi[values.facilityStatus] || values.facilityStatus, lastInspectionDate: values.lastInspectionDate || null, inspectionDate: values.inspectionDate || null }
   const response = id ? await api.line.updateStation(id, body) : await api.line.createStation(body)
   if (id) {
     adminStations.value = adminStations.value.map(station => station.id === String(id) ? {

@@ -79,6 +79,8 @@ function closeDelete() {
             <RouterLink class="admin-notice-register-button" to="/notices/create">⊕ 등록하기</RouterLink>
           </form>
 
+          <p class="admin-notice-total-count">전체 {{ totalCount }}건</p>
+
           <div class="admin-notice-table-scroll">
             <table class="admin-notice-table">
               <thead>

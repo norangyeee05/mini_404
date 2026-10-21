@@ -8,6 +8,8 @@
   flex-direction: column;
 }
 
+.admin-qna-total-count { align-self: flex-start; margin: 10px 0; color: #467486; font-weight: 700; text-align: left; }
+
 .admin-qna-page .primary-nav a:nth-child(3)::after {
   transform: scaleX(1);
 }

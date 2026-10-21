@@ -37,7 +37,7 @@ const stationFacilityOverrides = {
 
 export async function fetchStations() {
   const response = await api.line.stations()
-  stationDetails.value = responseItems(response).map(item => ({ id: String(item.stationId), name: item.stationName, stationOrder: item.stationOrder }))
+  stationDetails.value = responseItems(response).map(item => ({ id: String(item.stationId), name: item.stationName, stationNo: item.stationNo, stationOrder: item.stationOrder }))
   return stationDetails.value
 }
 export async function fetchStation(id) {

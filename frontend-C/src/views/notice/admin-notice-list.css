@@ -9,6 +9,14 @@
   padding: 0 12px 10px;
 }
 
+.admin-notice-total-count {
+  align-self: flex-start;
+  margin: 10px 0;
+  color: #467486;
+  font-weight: 700;
+  text-align: left;
+}
+
 .admin-notice-list-hero {
   min-height: 316px;
   display: flex;
@@ -460,3 +468,7 @@
     font-size: 11px;
   }
 }
+
+/* Q&A sidebar style */
+.admin-notice-list-sidebar__link { font: inherit; font-size: 15px; cursor: pointer; }
+.admin-notice-list-sidebar__link:hover, .admin-notice-list-sidebar__link--active { background: #fff; color: #4e7e8d; }

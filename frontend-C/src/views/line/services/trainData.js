@@ -13,7 +13,9 @@ export async function saveTrain(values, id) {
   const lineId = lines.find(line => line.name === '7호선')?.id
   if (!lineId) throw new Error('DB에서 7호선 노선 정보를 찾지 못했습니다.')
   const dateToApi = value => value ? String(value).trim().replaceAll('.', '-') : null
-  const body = { lineId, trainNo: values.number, section: values.section, driver: values.operator, direction: directionToApi[values.direction] || values.direction, status: trainStatusToApi[values.status] || values.status, active: values.active, registeredAt: dateToApi(values.registered), inspectionDate: dateToApi(values.inspection) }
+  const number = String(values.number || '').replace(/^7L-/, '')
+  if (!/^\d{4}$/.test(number)) throw new Error('열차 번호는 7L- 뒤에 숫자 4자리로 입력해 주세요.')
+  const body = { lineId, trainNo: `7L-${number}`, section: values.section, driver: values.operator, direction: directionToApi[values.direction] || values.direction, status: trainStatusToApi[values.status] || values.status, active: values.active, registeredAt: dateToApi(values.registered), inspectionDate: dateToApi(values.inspection) }
   const result = id ? await api.line.updateTrain(id, body) : await api.line.createTrain(body)
   return fetchTrain(id ?? result.trainId ?? result.id)
 }

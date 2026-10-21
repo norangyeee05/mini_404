@@ -3,7 +3,13 @@ import { createMockAdapter } from './mockApi'
 
 export const isMockApiEnabled = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true'
 
-const client = axios.create({ baseURL: '/api', withCredentials: true })
+const client = axios.create({
+  baseURL: '/api',
+  withCredentials: true,
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+  withXSRFToken: true,
+})
 if (isMockApiEnabled) client.defaults.adapter = createMockAdapter()
 
 client.interceptors.response.use(response => response, error => {
@@ -85,6 +91,7 @@ export const api = {
     remove: id => client.delete(`/qna/${id}`).then(data),
     adminList: params => list('/admin/qna', params),
     adminDetail: id => client.get(`/admin/qna/${id}`).then(data),
+    adminUpdate: (id, fields) => json('put', `/admin/qna/${id}`, fields),
     answer: (id, answer, update = false) => json(update ? 'put' : 'post', `/admin/qna/${id}/answer`, { answer }),
     adminRemove: id => client.delete(`/admin/qna/${id}`).then(data),
   },

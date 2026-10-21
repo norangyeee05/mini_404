@@ -348,3 +348,8 @@ input:focus-visible, button:focus-visible, a:focus-visible {
     font-size: 12px;
   }
 }
+
+/* Q&A sidebar style */
+.mypage-sidebar nav { gap: 4px; }
+.mypage-sidebar a { display: flex; align-items: center; min-height: 40px; padding: 0 16px; border-radius: 10px; background: #f8f9f9; color: #858b8d; font-size: 15px; font-weight: 400; }
+.mypage-sidebar a[aria-current] { background: #fff; color: #4e7e8d; }
