@@ -10,11 +10,18 @@
 }
 
 .admin-notice-total-count {
-  align-self: flex-start;
-  margin: 10px 0;
+  margin: 0;
   color: #467486;
   font-weight: 700;
   text-align: left;
+}
+
+.admin-notice-list-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  margin: 10px 0;
 }
 
 .admin-notice-bulk-actions {
@@ -35,7 +42,9 @@
   background: #d47e80;
   color: #fff;
   font: inherit;
+  font-size: 14px;
   font-weight: 700;
+  line-height: normal;
   cursor: pointer;
 }
 

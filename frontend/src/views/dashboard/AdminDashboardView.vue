@@ -27,7 +27,7 @@ const trains = computed(() => managedTrains.value.slice(0, 3).map(row => ({
   ...row, station: row.section, tone: row.status === '운행' ? 'running' : row.status === '점검' ? 'inspection' : 'broken',
 })))
 const stations = computed(() => adminStations.value.slice(0, 3).map(row => ({
-  ...row, tone: row.status === '양호' ? 'running' : row.status === '점검 중' ? 'inspection' : 'broken',
+  ...row, tone: row.status === '양호' ? 'running' : row.status === '점검' ? 'inspection' : 'broken',
 })))
 const deletion = ref(null)
 const deletionComplete = ref(false)

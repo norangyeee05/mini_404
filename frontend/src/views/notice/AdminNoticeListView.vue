@@ -103,10 +103,12 @@ function closeDelete() {
             <RouterLink class="admin-notice-register-button" to="/notices/create">⊕ 등록하기</RouterLink>
           </form>
 
-          <p class="admin-notice-total-count">전체 {{ totalCount }}건</p>
-          <div v-if="selectedIds.length" class="admin-notice-bulk-actions">
-            <span>{{ selectedIds.length }}건 선택</span>
-            <button type="button" :disabled="bulkDeleting" @click="deleteSelected">선택 삭제</button>
+          <div class="admin-notice-list-controls">
+            <p class="admin-notice-total-count">전체 {{ totalCount }}건</p>
+            <div v-if="selectedIds.length" class="admin-notice-bulk-actions">
+              <span>{{ selectedIds.length }}건 선택</span>
+              <button type="button" :disabled="bulkDeleting" @click="deleteSelected">선택 삭제</button>
+            </div>
           </div>
 
           <div class="admin-notice-table-scroll">

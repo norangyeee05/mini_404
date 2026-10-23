@@ -15,7 +15,7 @@ async function submit() {
   error.value = ''
   try {
     const member = await login({ loginId: loginId.value.trim(), password: password.value })
-    router.push(member.role === 'ADMIN' ? '/admin/dashboard' : member.role === 'WEB_ADMIN' ? '/admin/notices' : '/')
+    router.push(member.role === 'ADMIN' ? '/admin/dashboard' : member.role === 'WEB_ADMIN' ? '/admin/members' : '/')
   } catch (exception) {
     invalid.value = true
     error.value = apiError(exception)

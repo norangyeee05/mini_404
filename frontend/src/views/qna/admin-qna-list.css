@@ -425,6 +425,88 @@
   color: #fff;
 }
 
+/* Keep the Q&A board's search and table presentation aligned with the notice list. */
+.admin-qna-search select,
+.admin-qna-search input {
+  border-color: #c7dadd;
+  color: #69777b;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.admin-qna-search select {
+  color: #527c89;
+  font-weight: 700;
+}
+
+.admin-qna-search input:focus,
+.admin-qna-search select:focus {
+  border-color: #6c98a5;
+  outline: none;
+}
+
+.admin-qna-search__button,
+.admin-qna-register-button {
+  height: 40px;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-qna-search__button { min-width: 84px; }
+
+.admin-qna-register-button {
+  min-width: 108px;
+  margin-left: auto;
+  padding: 0 14px;
+  background: #5688cf;
+}
+
+.admin-qna-table {
+  color: #858b8d;
+  font-size: 15px;
+}
+
+.admin-qna-table thead { background: #e7edef; }
+
+.admin-qna-table th { font-weight: 700; }
+
+.admin-qna-table td { border-bottom-color: #e0e8ea; }
+
+.admin-qna-table__title { text-align: center; }
+
+.admin-qna-table__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.admin-qna-row-button {
+  min-width: 58px;
+  min-height: 29px;
+  padding: 0 10px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.admin-qna-row-button--delete { background: #d47e80; }
+
+.admin-qna-pagination button {
+  border-radius: 6px;
+  background: #e7edef;
+  font-size: 15px;
+}
+
+.admin-qna-pagination button.is-current,
+.admin-qna-pagination button:hover:not(:disabled) {
+  background: #bfd4d8;
+  color: #456f7c;
+}
+
 @media (max-width: 1020px) {
   .admin-qna-page {
     padding: 0 12px;
@@ -528,6 +610,13 @@
     font-size: 12px;
   }
 
+  .admin-qna-register-button {
+    min-width: 96px;
+    height: 34px;
+    margin-left: auto;
+    font-size: 12px;
+  }
+
   .admin-qna-table {
     font-size: 12px;
   }
@@ -537,6 +626,8 @@
     min-height: 26px;
     font-size: 11px;
   }
+
+  .admin-qna-table { font-size: 12px; }
 
   .admin-qna-pagination {
     margin-top: 12px;

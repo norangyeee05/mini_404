@@ -29,7 +29,7 @@ async function submit() {
   if (!/^\d{3,4}$/.test(form.number.trim())) { error.value = '\uC5ED \uBC88\uD638\uB294 \uC22B\uC790 3~4\uC790\uB9AC\uB85C \uC785\uB825\uD574 \uC8FC\uC138\uC694.'; return }
   if (form.phone && !/^0\d{1,2}-\d{3,4}-\d{4}$/.test(form.phone.trim())) { error.value = '연락처를 032-000-0000 형식으로 입력해 주세요.'; return }
   try {
-    const values = { ...form, inspectionDate: form.status === '점검 중' ? date(form.inspection) : null, facilityStatus: form.status }
+    const values = { ...form, inspectionDate: form.status === '점검' ? date(form.inspection) : null, facilityStatus: form.status }
     for (const field of ['name','english','number','staff','address','phone','transferText']) values[field] = values[field].trim()
     await saveStation(values, editing.value ? existing.value.id : undefined)
     router.push('/admin/line7/stations')
@@ -47,7 +47,7 @@ async function submit() {
             <div class="station-staff-row"><label for="station-staff">역무원</label><input id="station-staff" v-model="form.staff" placeholder="ex) 김아무개" maxlength="30" /></div>
             <h2>역 기본 정보</h2>
             <div class="station-address-row"><label for="station-address">주소</label><input id="station-address" v-model="form.address" placeholder="ex) 인천광역시 부평구 길주로 527" /><label for="station-phone">연락처</label><input id="station-phone" v-model="form.phone" placeholder="ex) 032-XXX-XXXX" /></div>
-            <div class="station-usage-row"><div><h3>이용정보</h3><StationTagPicker v-model="form.usage" :options="usageOptions" label="이용정보" /></div><label class="station-active">활성화 여부<select v-model="form.active"><option :value="true">활성화</option><option :value="false">비활성화</option></select><template v-if="editing">시설 상태<select v-model="form.status"><option>양호</option><option>점검 중</option><option>필요</option></select></template></label></div>
+            <div class="station-usage-row"><div><h3>이용정보</h3><StationTagPicker v-model="form.usage" :options="usageOptions" label="이용정보" /></div><label class="station-active">활성화 여부<select v-model="form.active"><option :value="true">활성화</option><option :value="false">비활성화</option></select><template v-if="editing">시설 상태<select v-model="form.status"><option>양호</option><option>점검</option><option>필요</option></select></template></label></div>
             <div class="station-date-row"><label>등록일<input v-model="form.registered" placeholder="ex) 2026.10.06" /></label><label>점검일<input v-model="form.inspection" placeholder="ex) 2028.10.05" /><span class="station-inspection-note"><b>*</b> 점검은 2년 주기로 필요합니다.</span></label></div>
           </div>
           <aside class="station-extra-panel">

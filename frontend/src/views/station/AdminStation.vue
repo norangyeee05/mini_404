@@ -66,7 +66,7 @@ async function confirmDelete() {
             <thead><tr><th>시설 상태</th><th>역 이름</th><th>역 번호</th><th>역무원</th><th>최근 업데이트 일시</th><th>활성화 여부</th><th>관리</th></tr></thead>
             <tbody>
               <tr v-for="row in rows" :key="row.id" class="train-row-link" tabindex="0" :aria-label="`${row.name} 역 상세보기`" @click="router.push(`/admin/line7/stations/${row.id}/detail`)" @keydown.enter.self.prevent="router.push(`/admin/line7/stations/${row.id}/detail`)" @keydown.space.self.prevent="router.push(`/admin/line7/stations/${row.id}/detail`)">
-                <td><span class="train-pill" :class="{ running: row.status === '양호', inspection: row.status === '점검 중', broken: row.status === '필요' }">{{ row.status }}</span></td>
+                <td><span class="train-pill" :class="{ running: row.status === '양호', inspection: row.status === '점검', broken: row.status === '필요' }">{{ row.status }}</span></td>
                 <td>{{ row.name }}</td><td>{{ row.number }}</td><td>{{ row.staff }}</td><td>{{ row.updated }}</td>
                 <td>{{ row.active ? '활성화' : '비활성화' }}</td>
                 <td><div v-if="fullAdmin" class="train-row-actions"><RouterLink class="train-button train-button--edit" :to="'/admin/line7/stations/' + row.id" @click.stop>수정</RouterLink><button class="train-button train-button--delete" type="button" @click.stop="deleting = row.id; deleteComplete = false">삭제</button></div><span v-else>조회 전용</span></td>

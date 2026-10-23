@@ -146,7 +146,7 @@ function openQna(qnaId) {
               <SearchIcon />
             </div>
             <button class="admin-qna-search__button" type="submit">검색</button>
-            <button v-if="props.mode === 'all'" class="admin-qna-search__button" type="button" @click="openQuestionEditor()">등록하기</button>
+            <button v-if="props.mode === 'all'" class="admin-qna-register-button" type="button" @click="openQuestionEditor()">⊕ 등록하기</button>
           </form>
 
           <p class="admin-qna-total-count">전체 {{ totalCount }}건</p>
@@ -156,9 +156,10 @@ function openQna(qnaId) {
                 <tr>
                   <th class="admin-qna-col-number">번호</th>
                   <th class="admin-qna-col-title">제목</th>
+                  <th class="admin-qna-col-writer">작성자</th>
+                  <th class="admin-qna-col-views">조회수</th>
                   <th class="admin-qna-col-visibility">공개</th>
                   <th class="admin-qna-col-category">문의 유형</th>
-                  <th class="admin-qna-col-writer">작성자</th>
                   <th class="admin-qna-col-status">상태</th>
                   <th class="admin-qna-col-date">등록일</th>
                   <th class="admin-qna-col-actions">{{ props.mode === 'pending' ? '답변' : '관리' }}</th>
@@ -170,9 +171,10 @@ function openQna(qnaId) {
                   <td class="admin-qna-table__title">
                     <button class="admin-qna-title-link" type="button" @click="openQna(qna.id)">{{ qna.title }}</button>
                   </td>
-                  <td>{{ qna.visibility === '비공개' ? '🔒' : '전체' }}</td>
-                  <td><span :class="['admin-qna-category', `admin-qna-category--${qna.category}`]">{{ qna.category }}</span></td>
                   <td>{{ qna.writer }}</td>
+                  <td>{{ qna.views ?? qna.viewCount ?? 0 }}</td>
+                  <td>{{ qna.visibility === '비공개' ? '🔒 비공개' : '전체' }}</td>
+                  <td><span :class="['admin-qna-category', `admin-qna-category--${qna.category}`]">{{ qna.category }}</span></td>
                   <td><span :class="['admin-qna-status', `admin-qna-status--${qna.status}`]">{{ qna.status }}</span></td>
                   <td>{{ qna.date }}</td>
                   <td class="admin-qna-table__actions">
@@ -183,13 +185,12 @@ function openQna(qnaId) {
                       @click="editQna(qna)"
                     >답변하기</button>
                     <template v-else>
-                      <button class="admin-qna-row-button admin-qna-row-button--edit" type="button" @click="editQuestion(qna)">수정</button>
                       <button class="admin-qna-row-button admin-qna-row-button--delete" type="button" @click="deleteQna(qna.id)">삭제</button>
                     </template>
                   </td>
                 </tr>
                 <tr v-if="filteredQnas.length === 0">
-                  <td colspan="8" class="admin-qna-table__empty">검색 결과가 없습니다.</td>
+                  <td colspan="9" class="admin-qna-table__empty">검색 결과가 없습니다.</td>
                 </tr>
               </tbody>
             </table>
@@ -212,7 +213,7 @@ function openQna(qnaId) {
     <div v-if="editingQna" class="admin-qna-modal-backdrop" @click.self="editingQna = null">
       <form class="admin-qna-edit-modal" @submit.prevent="saveEditedQna">
         <div class="admin-qna-edit-modal__heading">
-          <h2>{{ props.mode === 'pending' ? 'Q&A 답변 작성' : 'Q&A 수정' }}</h2>
+          <h2>Q&amp;A 답변 작성</h2>
           <button type="button" aria-label="닫기" @click="editingQna = null">×</button>
         </div>
         <label for="qna-title">제목</label>

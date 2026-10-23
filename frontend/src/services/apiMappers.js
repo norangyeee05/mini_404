@@ -8,8 +8,8 @@ export const trainStatusToApi = { '운행': 'RUNNING', '점검': 'MAINTENANCE', 
 export const trainStatusFromApi = { NORMAL: '운행', RUNNING: '운행', MAINTENANCE: '점검', FAULT: '고장', BROKEN: '고장' }
 export const directionToApi = { '상행': 'UP', '하행': 'DOWN' }
 export const directionFromApi = { UP: '상행', DOWN: '하행' }
-export const facilityStatusToApi = { '양호': 'INSPECTED', '점검 필요': 'NEEDS_INSPECTION', '필요': 'NEEDS_INSPECTION', '점검 중': 'IN_INSPECTION' }
-export const facilityStatusFromApi = { INSPECTED: '양호', NEEDS_INSPECTION: '필요', IN_INSPECTION: '점검 중' }
+export const facilityStatusToApi = { '양호': 'INSPECTED', '점검 필요': 'NEEDS_INSPECTION', '필요': 'NEEDS_INSPECTION', '점검': 'IN_INSPECTION' }
+export const facilityStatusFromApi = { INSPECTED: '양호', NEEDS_INSPECTION: '필요', IN_INSPECTION: '점검' }
 
 export function formatDate(value) {
   if (!value) return ''

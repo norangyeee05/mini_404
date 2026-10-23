@@ -51,7 +51,7 @@ public final class QnaDto {
     public record ListItem(Long qnaId, String title, InquiryType inquiryType, String writer, int viewCount,
                            boolean isPrivate, QnaStatus status, LocalDateTime createdAt) { }
 
-    public record Detail(Long qnaId, String title, InquiryType inquiryType, String writer,
+    public record Detail(Long qnaId, String title, InquiryType inquiryType, String writer, int viewCount,
                          boolean isPrivate, QnaStatus status, LocalDateTime createdAt, String content,
                          List<FileInfo> files, String answer, boolean isOwner) { }
 

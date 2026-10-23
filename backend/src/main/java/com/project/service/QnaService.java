@@ -74,12 +74,16 @@ public class QnaService {
         return toDetail(find(qnaId), null);
     }
 
+    @Transactional
     public Detail memberDetail(Long qnaId, Long memberId) {
         Qna qna = find(qnaId);
         if (!qna.isPublic() && !memberId.equals(qna.getAuthorId())) {
             throw BusinessException.forbidden("비공개 문의는 작성자만 확인할 수 있습니다.");
         }
-        return toDetail(qna, memberId);
+        if (qnaRepository.increaseViewCount(qnaId) == 0) {
+            throw BusinessException.notFound("Q&A를 찾을 수 없습니다.");
+        }
+        return toDetail(find(qnaId), memberId);
     }
 
     @Transactional
@@ -220,7 +224,7 @@ public class QnaService {
 
     private Detail toDetail(Qna qna, Long viewerId) {
         List<FileInfo> files = attachmentService.list(AttachmentTarget.QNA, qna.getId());
-        return new Detail(qna.getId(), qna.getTitle(), inquiryType(qna), qna.getWriter(), !qna.isPublic(), status(qna),
+        return new Detail(qna.getId(), qna.getTitle(), inquiryType(qna), qna.getWriter(), qna.getViewCount(), !qna.isPublic(), status(qna),
                 qna.getCreatedAt(), qna.getContent(), files, qna.getAnswer(),
                 viewerId != null && viewerId.equals(qna.getAuthorId()));
     }
