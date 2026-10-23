@@ -16,7 +16,7 @@ const fields = [
   { key: 'password', label: '비밀번호', placeholder: '비밀번호(8~64자)', type: 'password', autocomplete: 'new-password', minlength: 8, maxlength: 64 },
   { key: 'passwordConfirm', label: '비밀번호 확인', placeholder: '비밀번호를 다시 입력하세요', type: 'password', autocomplete: 'new-password', minlength: 8, maxlength: 64 },
   { key: 'name', label: '이름', placeholder: '이름을 입력하세요', autocomplete: 'name' },
-  { key: 'email', label: '이메일', placeholder: '이메일을 입력하세요', type: 'email', autocomplete: 'email' },
+  { key: 'email', label: '이메일', placeholder: 'example@domain.com 형식으로 입력하세요', type: 'email', autocomplete: 'email', pattern: '[^\\s@]+@[^\\s@]+\\.[cC][oO][mM]' },
   { key: 'phone', label: '전화번호(선택)', placeholder: '전화번호를 입력하세요', type: 'tel', autocomplete: 'tel', optional: true },
 ]
 async function submit() {
@@ -38,7 +38,7 @@ async function submit() {
         <div class="signup-fields">
           <div v-for="field in fields" :key="field.key" class="signup-field">
             <label :for="`signup-${field.key}`">{{ field.label }} <span v-if="!field.optional" class="required-mark" aria-hidden="true">*</span></label>
-            <input :id="`signup-${field.key}`" v-model="form[field.key]" :type="field.type || 'text'" :placeholder="field.placeholder" :autocomplete="field.autocomplete" :required="!field.optional" :minlength="field.minlength" :maxlength="field.maxlength" :pattern="['loginId', 'name'].includes(field.key) ? '.*\\S.*' : undefined" />
+            <input :id="`signup-${field.key}`" v-model="form[field.key]" :type="field.type || 'text'" :placeholder="field.placeholder" :autocomplete="field.autocomplete" :required="!field.optional" :minlength="field.minlength" :maxlength="field.maxlength" :pattern="field.pattern || (['loginId', 'name'].includes(field.key) ? '.*\\S.*' : undefined)" />
           </div>
         </div>
         <div class="signup-actions">

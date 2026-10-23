@@ -51,7 +51,7 @@ export async function signup({ loginId, password, name, email, phone, agreeTerms
 
 export async function updateProfile({ name, email, phone, password }) {
   if (!name.trim()) throw new Error('이름을 입력해 주세요.')
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) throw new Error('올바른 이메일을 입력해 주세요.')
+  if (!/^[^\s@]+@[^\s@]+\.com$/i.test(email.trim())) throw new Error('이메일은 example@domain.com 형식으로 입력해 주세요.')
   const update = currentMember.value?.adminAccount ? api.admin.updateMe : api.members.updateMe
   if (phone != null && phone.trim().length > 20) throw new Error('전화번호는 20자 이내로 입력해 주세요.')
   const result = await update({ name: name.trim(), email: email.trim(), ...(phone != null ? { phone: phone.trim() } : {}), ...(password ? { password } : {}) })

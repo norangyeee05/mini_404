@@ -28,6 +28,7 @@ public final class MemberDto {
 
             @NotBlank(message = "이메일을 입력해주세요.")
             @Email(message = "이메일 형식이 올바르지 않습니다.")
+            @Pattern(regexp = "(?i)^[^\\s@]+@[^\\s@]+\\.com$", message = "이메일은 example@domain.com 형식으로 입력해주세요.")
             @Size(max = 100, message = "이메일은 100자 이내로 입력해주세요.")
             String email,
 
@@ -68,6 +69,7 @@ public final class MemberDto {
 
             @NotBlank(message = "이메일을 입력해주세요.")
             @Email(message = "이메일 형식이 올바르지 않습니다.")
+            @Pattern(regexp = "(?i)^[^\\s@]+@[^\\s@]+\\.com$", message = "이메일은 example@domain.com 형식으로 입력해주세요.")
             @Size(max = 100, message = "이메일은 100자 이내로 입력해주세요.")
             String email,
 
