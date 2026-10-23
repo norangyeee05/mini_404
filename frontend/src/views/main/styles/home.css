@@ -290,3 +290,12 @@ a:focus-visible {
     min-height: 177px;
   }
 }
+
+.station-line a.station-long-name {
+  flex: 0 0 103px;
+  max-width: 103px;
+  padding-right: 4px;
+  padding-left: 4px;
+  white-space: nowrap;
+}
+
