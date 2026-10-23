@@ -40,7 +40,7 @@ public class AdminMemberService {
     public PageResponse<ListItem> list(String searchType, String keyword, MemberStatus status,
                                                   int page, int size) {
         Pageable pageable = PageResponse.pageable(page, size,
-                Sort.by(Sort.Direction.DESC, "id"));
+                Sort.by(Sort.Order.desc("updatedAt"), Sort.Order.desc("id")));
         Page<ListItem> result = memberRepository.findAll(search(searchType, keyword, status), pageable)
                 .map(m -> new ListItem(
                         m.getId(), m.getName(), m.getLoginId(), m.getEmail(), m.getRole().name(), m.getStatus(), m.getUpdatedAt()));

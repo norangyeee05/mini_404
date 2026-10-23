@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface NoticeRepository extends JpaRepository<Notice, Long>, JpaSpecificationExecutor<Notice> {
-    List<Notice> findTop5ByOrderByIdDesc();
+    List<Notice> findTop5ByOrderByCreatedAtDescIdDesc();
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update Notice n set n.viewCount = n.viewCount + 1 where n.id = :id")

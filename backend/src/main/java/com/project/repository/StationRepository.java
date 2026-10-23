@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface StationRepository extends JpaRepository<Station, Long>, JpaSpecificationExecutor<Station> {
 
-	List<Station> findTop3ByOrderByIdDesc();
+	List<Station> findTop3ByOrderByUpdatedAtDescIdDesc();
 	Optional<Station> findByStationNo(String stationNo);
 }

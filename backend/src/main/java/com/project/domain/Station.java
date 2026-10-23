@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "station")
 @Getter
@@ -29,6 +31,9 @@ public class Station {
 	@Column(nullable = false, length = 20)
 	private OperationStatus status;
 
+	@Column(name = "updated_at")
+	private LocalDateTime updatedAt;
+
 	@Builder
 	public Station(String name, String stationNo, String staff, OperationStatus status) {
 		this.name = name;
@@ -43,4 +48,8 @@ public class Station {
 		this.staff = staff;
 		this.status = status;
 	}
+
+	@PrePersist
+	@PreUpdate
+	void touchUpdatedAt() { this.updatedAt = LocalDateTime.now(); }
 }

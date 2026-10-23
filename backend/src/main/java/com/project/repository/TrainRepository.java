@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface TrainRepository extends JpaRepository<Train, Long>, JpaSpecificationExecutor<Train> {
 
-	List<Train> findTop3ByOrderByIdDesc();
+	List<Train> findTop3ByOrderByUpdatedAtDescIdDesc();
 
 	long countByStatusAndActiveTrue(OperationStatus status);
 }

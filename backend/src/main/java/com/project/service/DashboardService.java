@@ -83,11 +83,11 @@ public class DashboardService {
 				memberShare(MemberStatus.INACTIVE, live.members()),
 				memberShare(MemberStatus.BANNED, live.members())));
 
-		List<TrainRow> trains = trainRepository.findTop3ByOrderByIdDesc().stream()
+		List<TrainRow> trains = trainRepository.findTop3ByOrderByUpdatedAtDescIdDesc().stream()
 				.map(TrainRow::from)
 				.toList();
 
-		List<StationRow> stations = stationRepository.findTop3ByOrderByIdDesc().stream()
+		List<StationRow> stations = stationRepository.findTop3ByOrderByUpdatedAtDescIdDesc().stream()
 				.map(StationRow::from)
 				.toList();
 

@@ -71,7 +71,7 @@ public class ResourceRequestService {
     public PageResponse<ListItem> list(String searchType, String keyword, RequestStatus status,
                                                       int page, int size) {
         Pageable pageable = PageResponse.pageable(page, size,
-                Sort.by(Sort.Direction.DESC, "id"));
+                Sort.by(Sort.Order.desc("updatedAt"), Sort.Order.desc("id")));
         Page<ListItem> result = requestRepository.findAll(search(searchType, keyword, status), pageable)
                 .map(r -> new ListItem(
                         r.getId(), r.getTitle(), r.getMember().getName(), r.getStatus(), r.getCreatedAt()));

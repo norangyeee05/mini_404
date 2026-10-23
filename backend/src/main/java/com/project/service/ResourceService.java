@@ -49,7 +49,7 @@ public class ResourceService {
     /** searchType: title(기본) / writer */
     public PageResponse<ListItem> list(String searchType, String keyword, int page, int size) {
         Pageable pageable = PageResponse.pageable(page, size,
-                Sort.by(Sort.Direction.DESC, "id"));
+                Sort.by(Sort.Order.desc("updatedAt"), Sort.Order.desc("id")));
         Page<ListItem> result = resourceRepository.findAll(search(searchType, keyword), pageable)
                 .map(this::toListItem);
         return PageResponse.of(result);

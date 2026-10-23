@@ -43,14 +43,15 @@ public class QnaService {
     public PageResponse<ListItem> list(String searchType, String keyword, InquiryType inquiryType,
                                        QnaStatus status, int page, int size) {
         Pageable pageable = PageResponse.pageable(page, size,
-                Sort.by(Sort.Direction.DESC, "id"));
+                Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id")));
         Specification<Qna> spec = search(searchType, keyword, inquiryType, status);
         return PageResponse.of(qnaRepository.findAll(spec, pageable).map(this::toListItem));
     }
 
     public PageResponse<ListItem> adminList(String searchType, String keyword, InquiryType inquiryType,
                                             QnaStatus status, int page, int size) {
-        Pageable pageable = PageResponse.pageable(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageResponse.pageable(page, size,
+                Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id")));
         return PageResponse.of(qnaRepository.findAll(search(searchType, keyword, inquiryType, status), pageable)
                 .map(this::toListItem));
     }
@@ -58,7 +59,7 @@ public class QnaService {
     public PageResponse<ListItem> myList(Long authorId, String searchType, String keyword,
                                          InquiryType inquiryType, int page, int size) {
         Pageable pageable = PageResponse.pageable(page, size,
-                Sort.by(Sort.Direction.DESC, "id"));
+                Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id")));
         Specification<Qna> spec = search(searchType, keyword, inquiryType, null)
                 .and((root, query, cb) -> cb.equal(root.get("authorId"), authorId));
         return PageResponse.of(qnaRepository.findAll(spec, pageable).map(this::toListItem));

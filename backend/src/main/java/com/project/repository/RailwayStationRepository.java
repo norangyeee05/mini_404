@@ -21,7 +21,7 @@ public interface RailwayStationRepository extends JpaRepository<RailwayStation, 
 				or (:searchType not in ('stationName', 'stationNo') and
 					(lower(name) like :pattern escape '\\' or lower(station_no) like :pattern escape '\\'))
 			)
-			order by cast(station_no as integer) asc, id asc
+			order by updated_at desc nulls last, id desc
 			""",
 		countQuery = """
 			select count(*) from railway_station

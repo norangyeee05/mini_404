@@ -28,10 +28,10 @@ public class MainService {
 	}
 
 	public List<Notice> getLatestNotices() {
-		return noticeRepository.findTop5ByOrderByIdDesc();
+		return noticeRepository.findTop5ByOrderByCreatedAtDescIdDesc();
 	}
 
 	public List<Qna> getLatestQnas() {
-		return qnaRepository.findTop3ByOrderByIdDesc();
+		return qnaRepository.findTop3ByOrderByCreatedAtDescIdDesc();
 	}
 }

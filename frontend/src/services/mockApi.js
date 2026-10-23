@@ -36,7 +36,7 @@ const trains = [
   { trainId: 2, lineId: 7, trainNo: '702', section: '산곡 - 상동', driver: '이기관', direction: 'DOWN', status: 'MAINTENANCE', active: true, updatedAt: stamp },
   { trainId: 3, lineId: 7, trainNo: '703', section: '부평구청 - 굴포천', driver: '박기관', direction: 'UP', status: 'BROKEN', active: false, updatedAt: stamp },
 ]
-const requests = [{ requestId: 2, title: '역별 시설 안내 요청', content: '역별 엘리베이터 위치 자료를 요청합니다.', status: 'RECEIVED', createdAt: stamp, writer: '테스트회원' }, { requestId: 1, title: '노선도 자료 요청', content: '고해상도 노선도를 요청합니다.', status: 'IN_PROGRESS', createdAt: stamp, writer: '홍길동' }]
+const requests = [{ requestId: 2, title: '역별 시설 안내 요청', content: '역별 엘리베이터 위치 자료를 요청합니다.', status: 'RECEIVED', createdAt: stamp, updatedAt: stamp, writer: '테스트회원' }, { requestId: 1, title: '노선도 자료 요청', content: '고해상도 노선도를 요청합니다.', status: 'IN_PROGRESS', createdAt: stamp, updatedAt: stamp, writer: '홍길동' }]
 
 const session = () => {
   try {
@@ -59,7 +59,7 @@ const bodyOf = c => {
 }
 const pathOf = c => `${String(c.baseURL || '').replace(/\/$/, '')}${new URL(c.url || '/', 'http://mock.local').pathname}`.replace(/\/+/g, '/').replace(/^\/api(?=\/|$)/, '') || '/'
 const page = (rows, p = {}) => { const number = Math.max(1, Number(p.page) || 1), size = Math.max(1, Number(p.size) || 10); return { totalCount: rows.length, page: number, size, items: rows.slice((number - 1) * size, number * size) } }
-const filter = (rows, p = {}, fields = ['title', 'content', 'writer']) => { const q = String(p.keyword || '').trim().toLowerCase(); let found = q ? rows.filter(x => (fields.includes(p.searchType) ? [p.searchType] : fields).some(k => String(x[k] ?? '').toLowerCase().includes(q))) : [...rows]; if (p.status) found = found.filter(x => x.status === p.status); if (p.inquiryType) found = found.filter(x => x.inquiryType === p.inquiryType); return found }
+const filter = (rows, p = {}, fields = ['title', 'content', 'writer']) => { const q = String(p.keyword || '').trim().toLowerCase(); let found = q ? rows.filter(x => (fields.includes(p.searchType) ? [p.searchType] : fields).some(k => String(x[k] ?? '').toLowerCase().includes(q))) : [...rows]; if (p.status) found = found.filter(x => x.status === p.status); if (p.inquiryType) found = found.filter(x => x.inquiryType === p.inquiryType); return found.sort((a, b) => Date.parse(b.updatedAt || b.createdAt || 0) - Date.parse(a.updatedAt || a.createdAt || 0) || (b.id ?? b.noticeId ?? b.resourceId ?? b.qnaId ?? b.memberId ?? b.trainId ?? b.stationId ?? b.requestId ?? 0) - (a.id ?? a.noticeId ?? a.resourceId ?? a.qnaId ?? a.memberId ?? a.trainId ?? a.stationId ?? a.requestId ?? 0)) }
 const fileList = body => body.files ? [{ fileId: Date.now(), fileName: body.files.name || 'sample-file.txt', size: body.files.size || 0 }] : []
 
 function handle(c) {
@@ -89,7 +89,7 @@ function handle(c) {
   if (method === 'get' && path.match(/^\/resources\/[^/]+\/files\/[^/]+$/)) return new Blob(['개발용 샘플 첨부파일입니다.'], { type: 'text/plain' })
   if (method === 'post' && path === '/resources/requests') { const x = { requestId: id.request++, ...b, files: fileList(b), status: 'RECEIVED', writer: current().name, createdAt: stamp }; requests.unshift(x); return { requestId: x.requestId } }
   if (method === 'post' && path === '/admin/resources') { const x = { resourceId: id.resource++, ...b, files: fileList(b), writer: '관리자', viewCount: 0, createdAt: stamp }; resources.unshift(x); return { resourceId: x.resourceId } }
-  if (method === 'put' && (m = path.match(/^\/admin\/resources\/([^/]+)$/))) { const x = find(resources, 'resourceId', m[1]); Object.assign(x, b); return x }
+  if (method === 'put' && (m = path.match(/^\/admin\/resources\/([^/]+)$/))) { const x = find(resources, 'resourceId', m[1]); Object.assign(x, b, { updatedAt: stamp }); return x }
   if (method === 'delete' && (m = path.match(/^\/admin\/resources\/([^/]+)$/))) { const x = find(resources, 'resourceId', m[1]); resources.splice(resources.indexOf(x), 1); return {} }
   if (method === 'get' && path === '/qna') return page(filter(qnas, p), p)
   if (method === 'get' && path === '/qna/my') return page(filter(qnas.filter(x => String(x.memberId) === String(current().memberId)), p, ['title', 'content']), p)
@@ -103,9 +103,9 @@ function handle(c) {
   if (method === 'delete' && (m = path.match(/^\/admin\/qna\/([^/]+)$/))) { const x = find(qnas, 'qnaId', m[1]); qnas.splice(qnas.indexOf(x), 1); return {} }
   if (method === 'get' && path === '/admin/members') return page(filter(members, p, ['name', 'loginId', 'email']), p)
   if (method === 'get' && (m = path.match(/^\/admin\/members\/([^/]+)$/))) return find(members, 'memberId', m[1])
-  if (method === 'patch' && (m = path.match(/^\/admin\/members\/([^/]+)\/status$/))) { const x = find(members, 'memberId', m[1]); x.status = b.status; return x }
-  if (method === 'patch' && (m = path.match(/^\/admin\/members\/([^/]+)\/role$/))) { const x = find(members, 'memberId', m[1]); failIf(!['USER', 'WEB_ADMIN', 'ADMIN'].includes(b.role), 400, '지원하지 않는 회원 등급입니다.'); x.role = b.role; return x }
-  if (method === 'post' && (m = path.match(/^\/admin\/members\/([^/]+)\/password-reset$/))) { const x = find(members, 'memberId', m[1]); x.password = `Temp-${Math.random().toString(36).slice(2, 12)}!`; return { memberId: x.memberId, temporaryPassword: x.password } }
+  if (method === 'patch' && (m = path.match(/^\/admin\/members\/([^/]+)\/status$/))) { const x = find(members, 'memberId', m[1]); Object.assign(x, { status: b.status, updatedAt: stamp }); return x }
+  if (method === 'patch' && (m = path.match(/^\/admin\/members\/([^/]+)\/role$/))) { const x = find(members, 'memberId', m[1]); failIf(!['USER', 'WEB_ADMIN', 'ADMIN'].includes(b.role), 400, '지원하지 않는 회원 등급입니다.'); Object.assign(x, { role: b.role, updatedAt: stamp }); return x }
+  if (method === 'post' && (m = path.match(/^\/admin\/members\/([^/]+)\/password-reset$/))) { const x = find(members, 'memberId', m[1]); Object.assign(x, { password: `Temp-${Math.random().toString(36).slice(2, 12)}!`, updatedAt: stamp }); return { memberId: x.memberId, temporaryPassword: x.password } }
   if (method === 'get' && path === '/admin/dashboard') return { memberCount: members.length, noticeCount: notices.length, waitingQnaCount: qnas.filter(x => x.status === 'WAITING').length, recentNotices: notices.slice(0, 5), recentQnas: qnas.slice(0, 5) }
   if (method === 'get' && path === '/line7/stations') return stations.filter(x => x.active).sort((a, b) => Number(b.stationNo) - Number(a.stationNo) || a.stationOrder - b.stationOrder)
   if (method === 'get' && (m = path.match(/^\/line7\/stations\/([^/]+)$/))) return find(stations, 'stationId', m[1])
@@ -114,15 +114,15 @@ function handle(c) {
   if (method === 'get' && (m = path.match(/^\/admin\/line7\/trains\/([^/]+)$/))) return find(trains, 'trainId', m[1])
   if (method === 'post' && path === '/admin/line7/trains') { const x = { trainId: id.train++, ...b, updatedAt: stamp }; trains.unshift(x); return { trainId: x.trainId } }
   if (method === 'put' && (m = path.match(/^\/admin\/line7\/trains\/([^/]+)$/))) { const x = find(trains, 'trainId', m[1]); Object.assign(x, b, { updatedAt: stamp }); return x }
-  if (method === 'patch' && (m = path.match(/^\/admin\/line7\/trains\/([^/]+)\/active$/))) { const x = find(trains, 'trainId', m[1]); x.active = b.active; return x }
+  if (method === 'patch' && (m = path.match(/^\/admin\/line7\/trains\/([^/]+)\/active$/))) { const x = find(trains, 'trainId', m[1]); Object.assign(x, { active: b.active, updatedAt: stamp }); return x }
   if (method === 'get' && path === '/admin/line7/stations') return page(filter(stations, p, ['stationName', 'staffName']), p)
   if (method === 'get' && (m = path.match(/^\/admin\/line7\/stations\/([^/]+)$/))) return find(stations, 'stationId', m[1])
   if (method === 'post' && path === '/admin/line7/stations') { const x = { stationId: id.station++, ...b, updatedAt: stamp }; stations.push(x); return { stationId: x.stationId } }
   if (method === 'put' && (m = path.match(/^\/admin\/line7\/stations\/([^/]+)$/))) { const x = find(stations, 'stationId', m[1]); Object.assign(x, b, { updatedAt: stamp }); return x }
-  if (method === 'patch' && (m = path.match(/^\/admin\/line7\/stations\/([^/]+)\/active$/))) { const x = find(stations, 'stationId', m[1]); x.active = b.active; return x }
+  if (method === 'patch' && (m = path.match(/^\/admin\/line7\/stations\/([^/]+)\/active$/))) { const x = find(stations, 'stationId', m[1]); Object.assign(x, { active: b.active, updatedAt: stamp }); return x }
   if (method === 'get' && path === '/admin/resource-requests') return page(filter(requests, p), p)
   if (method === 'get' && (m = path.match(/^\/admin\/resource-requests\/([^/]+)$/))) return find(requests, 'requestId', m[1])
-  if (method === 'patch' && (m = path.match(/^\/admin\/resource-requests\/([^/]+)\/status$/))) { const x = find(requests, 'requestId', m[1]); x.status = b.status; return x }
+  if (method === 'patch' && (m = path.match(/^\/admin\/resource-requests\/([^/]+)\/status$/))) { const x = find(requests, 'requestId', m[1]); Object.assign(x, { status: b.status, updatedAt: stamp }); return x }
   if (method === 'delete' && (m = path.match(/^\/admin\/resource-requests\/([^/]+)$/))) { const x = find(requests, 'requestId', m[1]); requests.splice(requests.indexOf(x), 1); return {} }
   err(404, `모의 API에 등록되지 않은 요청: ${method.toUpperCase()} ${path}`)
 }

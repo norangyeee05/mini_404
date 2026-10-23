@@ -30,7 +30,8 @@ public class StationService {
 
 	public StationListResponse list(int page) {
 		Page<Station> result = stationRepository.findAll(
-				PageRequest.of(Math.max(page, 1) - 1, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "id")));
+				PageRequest.of(Math.max(page, 1) - 1, PAGE_SIZE,
+						Sort.by(Sort.Order.desc("updatedAt").nullsLast(), Sort.Order.desc("id"))));
 		return new StationListResponse(result.getContent().stream().map(StationRow::from).toList(), PageInfo.from(result));
 	}
 

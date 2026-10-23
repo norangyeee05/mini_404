@@ -40,7 +40,8 @@ public class TrainService {
 			};
 		};
 		Page<Train> result = trainRepository.findAll(spec,
-				PageRequest.of(Math.max(page, 1) - 1, Math.min(Math.max(size, 1), 100), Sort.by(Sort.Direction.DESC, "id")));
+				PageRequest.of(Math.max(page, 1) - 1, Math.min(Math.max(size, 1), 100),
+						Sort.by(Sort.Order.desc("updatedAt"), Sort.Order.desc("id"))));
 		return new ListResponse(result.getTotalElements(), result.getNumber() + 1, result.getSize(), result.getContent().stream().map(Row::from).toList());
 	}
 
