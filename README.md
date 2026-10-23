@@ -17,10 +17,17 @@
 
 인천교통공사 웹사이트는 공지사항, 자료실, Q&A, 7호선 역·열차 정보와 회원·관리자 기능을 제공합니다.
 
-| 구성 | 기술 | 역할 |
+| 구성 | 세부 기술 | 역할 |
 |---|---|---|
-| 프론트엔드 | Vue 3, Vite, Nginx | 화면 제공, API 요청 전달 |
-| 백엔드 | Java 21, Spring Boot, JPA, Flyway | 인증·권한, 업무 처리, DB 및 파일 관리 |
+| 프론트엔드 프레임워크 | Vue 3, Vue Router | 컴포넌트 기반 화면 구성과 페이지 이동·라우팅 |
+| 프론트엔드 상태·데이터 통신 | Pinia, Axios | 화면 간 상태 관리, 쿠키 기반 세션을 포함한 API 요청 |
+| 프론트엔드 시각화 | Chart.js, vue-chartjs | 통계·대시보드 차트 표현 |
+| 프론트엔드 빌드 | Vite, Node.js 22 | 개발 서버 구동 및 정적 배포 파일 생성 |
+| 웹 서버·프록시 | Nginx | 정적 화면 제공, `/api` 요청을 백엔드로 전달 |
+| 백엔드 언어·프레임워크 | Java 21, Spring Boot 4 | REST API와 서버 애플리케이션 실행 |
+| 백엔드 웹·검증 | Spring MVC, Jakarta Bean Validation | HTTP API 처리와 입력값 검증 |
+| ORM·DB 변경 관리 | Spring Data JPA, Hibernate, Flyway | 객체와 PostgreSQL 데이터 매핑, 스키마 마이그레이션 |
+| 인증·보안 | 서버 세션, 요청 인터셉터, BCrypt, CSRF 토큰 | 로그인 상태·역할 확인, 비밀번호 해시, 변경 요청 보호 |
 | 데이터베이스 | PostgreSQL | 회원, 게시물, 교통정보 저장 |
 
 소스는 하나의 저장소에서 관리하고, 배포할 때 프론트엔드와 백엔드 이미지를 각각 실행합니다.
