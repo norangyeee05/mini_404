@@ -1,0 +1,20 @@
+name: mini-shared-site
+
+services:
+  frontend:
+    image: sumi0705/mini-1-frontend:1.0
+    container_name: mini-shared-frontend
+    restart: unless-stopped
+    environment:
+      MINI_API_UPSTREAM: ${MINI_API_UPSTREAM:?Set MINI_API_UPSTREAM in .env to the central backend URL}
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.shared.conf.template:/etc/nginx/conf.d/shared.conf.template:ro
+    command:
+      - /bin/sh
+      - -c
+      - >-
+        envsubst '$$MINI_API_UPSTREAM' < /etc/nginx/conf.d/shared.conf.template > /etc/nginx/conf.d/default.conf
+        && nginx -t
+        && exec nginx -g 'daemon off;'
