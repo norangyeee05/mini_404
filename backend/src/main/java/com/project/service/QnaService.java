@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.project.common.BusinessException;
+import com.project.common.LoginUser;
 import com.project.common.PageResponse;
 import com.project.common.SearchUtil;
 import com.project.domain.Attachment;
@@ -15,6 +16,7 @@ import com.project.domain.Member;
 import com.project.domain.MemberStatus;
 import com.project.domain.Qna;
 import com.project.domain.QnaStatus;
+import com.project.domain.Role;
 import com.project.dto.QnaDto.Detail;
 import com.project.dto.QnaDto.ListItem;
 import com.project.dto.QnaDto.AdminEditForm;
@@ -81,11 +83,19 @@ public class QnaService {
     }
 
     @Transactional
-    public Long createByAdmin(Long adminId, QuestionForm form) {
-        Admin admin = adminRepository.findById(adminId)
-                .orElseThrow(() -> BusinessException.unauthorized("관리자 정보를 찾을 수 없습니다. 다시 로그인해주세요."));
+    public Long createByAdmin(LoginUser user, QuestionForm form) {
+        if (user.role() != Role.ADMIN && user.role() != Role.WEB_ADMIN) {
+            throw BusinessException.forbidden("Q&A를 등록할 권한이 없습니다.");
+        }
+        String writer = user.adminAccount()
+                ? adminRepository.findById(user.id()).map(Admin::getName)
+                    .orElseThrow(() -> BusinessException.unauthorized("관리자 정보를 찾을 수 없습니다. 다시 로그인해주세요."))
+                : memberRepository.findById(user.id())
+                    .filter(member -> member.getRole() == Role.ADMIN || member.getRole() == Role.WEB_ADMIN)
+                    .map(Member::getName)
+                    .orElseThrow(() -> BusinessException.unauthorized("관리자 정보를 찾을 수 없습니다. 다시 로그인해주세요."));
         Qna saved = qnaRepository.save(Qna.create(form.title().trim(), form.content().trim(),
-                form.inquiryType(), null, admin.getName(), !Boolean.TRUE.equals(form.isPrivate())));
+                form.inquiryType(), null, writer, !Boolean.TRUE.equals(form.isPrivate())));
         return saved.getId();
     }
 

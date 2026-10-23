@@ -15,11 +15,14 @@ const basePath = computed(() => props.admin ? '/admin/resources' : '/resources')
 const deleteStage = ref('')
 const deletingId = ref(null)
 const totalCount = ref(0)
+const selectedIds = ref([])
+const bulkDeleting = ref(false)
 const pageSize = 10
 const page = ref(1)
 const resource = ref(null)
 const pageCount = computed(() => Math.max(1, Math.ceil(totalCount.value / pageSize)))
 const rows = computed(() => resources.value)
+const allPageSelected = computed(() => props.admin && rows.value.length > 0 && rows.value.every(row => selectedIds.value.includes(row.id)))
 const visiblePages = computed(() => { const start = Math.floor((page.value - 1) / 5) * 5 + 1; return Array.from({ length: Math.min(5, pageCount.value - start + 1) }, (_, index) => start + index) })
 const detail = computed(() => Boolean(route.params.resourceId))
 async function load() {
@@ -34,14 +37,33 @@ watch(page, load)
 function requestDelete(id) { deletingId.value = id; deleteStage.value = 'confirm' }
 async function confirmDelete() {
   if (deleteStage.value === 'complete') { deleteStage.value = ''; router.push(basePath.value); return }
-  try { await deleteResource(deletingId.value); totalCount.value = Math.max(0, totalCount.value - 1); deleteStage.value = 'complete' }
+  try { await deleteResource(deletingId.value); selectedIds.value = selectedIds.value.filter(id => String(id) !== String(deletingId.value)); totalCount.value = Math.max(0, totalCount.value - 1); deleteStage.value = 'complete' }
   catch (error) { deleteStage.value = ''; window.alert(apiError(error)) }
 }
 const field = ref('all')
 const keyword = ref('')
 const applied = ref({ field: 'all', keyword: '' })
-function search() { applied.value = { field: field.value, keyword: keyword.value }; page.value = 1; load() }
-function goPage(value) { page.value = Math.min(pageCount.value, Math.max(1, value)) }
+function search() { selectedIds.value = []; applied.value = { field: field.value, keyword: keyword.value }; page.value = 1; load() }
+function goPage(value) { selectedIds.value = []; page.value = Math.min(pageCount.value, Math.max(1, value)) }
+function toggleResource(id) { selectedIds.value = selectedIds.value.includes(id) ? selectedIds.value.filter(value => value !== id) : [...selectedIds.value, id] }
+function toggleCurrentPage() {
+  const pageIds = rows.value.map(row => row.id)
+  selectedIds.value = allPageSelected.value ? selectedIds.value.filter(id => !pageIds.includes(id)) : [...new Set([...selectedIds.value, ...pageIds])]
+}
+async function deleteSelected() {
+  if (!props.admin || !selectedIds.value.length || bulkDeleting.value) return
+  const ids = [...selectedIds.value]
+  if (!window.confirm(`선택한 자료 ${ids.length}건을 삭제하시겠습니까? 첨부파일도 함께 삭제됩니다.`)) return
+  bulkDeleting.value = true
+  try {
+    await api.resources.removeMany(ids)
+    totalCount.value = Math.max(0, totalCount.value - ids.length)
+    selectedIds.value = []
+    if (rows.value.length === ids.length && page.value > 1) page.value -= 1
+    else await load()
+  } catch (error) { window.alert(apiError(error)) }
+  finally { bulkDeleting.value = false }
+}
 async function download(file) {
   if (!file?.fileId) { window.alert('다운로드할 첨부파일이 없습니다.'); return }
   try { const blob = await api.resources.download(resource.value.id, file.fileId); const url = URL.createObjectURL(blob); const anchor = document.createElement('a'); anchor.href = url; anchor.download = file.fileName || file.name; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000) }
@@ -54,7 +76,8 @@ async function download(file) {
     <div v-if="!detail" class="resource-layout">
       <section class="resource-list" aria-label="자료 목록">
         <div class="list-toolbar"><form class="resource-search" @submit.prevent="search"><select v-model="field" aria-label="검색 범위"><option value="all">전체</option><option value="title">제목</option><option value="content">내용</option><option value="title-content">제목+내용</option></select><div class="search-input"><input v-model="keyword" type="search" placeholder="제목 또는 내용을 검색하세요" aria-label="검색어" /><SearchIcon /></div><button class="resource-button" type="submit">검색</button><RouterLink class="request-button" :to="admin ? '/resources/new' : '/qna/create'">{{ admin ? '⊕ 등록하기' : '⊕ 문의/요청' }}</RouterLink></form></div>
-        <p class="resource-total-count">전체 {{ totalCount }}건</p><div class="resource-table-scroll"><table><colgroup><col class="resource-col-number" /><col class="resource-col-title" /><col class="resource-col-author" /><col class="resource-col-views" /><col class="resource-col-date" /><col v-if="admin" class="resource-col-manage" /></colgroup><thead><tr><th>번호</th><th>제목</th><th>작성자</th><th>조회수</th><th>등록일</th><th v-if="admin">관리</th></tr></thead><tbody><tr v-for="row in rows" :key="row.id"><td>{{ row.id }}</td><td><RouterLink :to="`${basePath}/${row.id}`">{{ row.title }}</RouterLink></td><td>{{ row.author }}</td><td>{{ row.views }}</td><td>{{ row.date }}</td><td v-if="admin" class="manage-cell"><div class="resource-row-actions"><RouterLink class="manage-edit" :to="`${basePath}/${row.id}/edit`">수정</RouterLink><button class="manage-delete" type="button" @click="requestDelete(row.id)">삭제</button></div></td></tr><tr v-if="!rows.length"><td :colspan="admin ? 6 : 5">검색 결과가 없습니다.</td></tr></tbody></table></div>
+        <div class="resource-list-controls"><p class="resource-total-count">전체 {{ totalCount }}건</p><div v-if="admin && selectedIds.length" class="resource-bulk-actions"><span>{{ selectedIds.length }}건 선택</span><button type="button" class="manage-delete" :disabled="bulkDeleting" @click="deleteSelected">선택 삭제</button></div></div>
+        <div class="resource-table-scroll"><table><colgroup><col v-if="admin" class="resource-col-select" /><col class="resource-col-number" /><col class="resource-col-title" /><col class="resource-col-author" /><col class="resource-col-views" /><col class="resource-col-date" /><col v-if="admin" class="resource-col-manage" /></colgroup><thead><tr><th v-if="admin" class="select-cell"><input type="checkbox" :checked="allPageSelected" aria-label="현재 페이지 자료 전체 선택" @change="toggleCurrentPage" /></th><th>번호</th><th>제목</th><th>작성자</th><th>조회수</th><th>등록일</th><th v-if="admin">관리</th></tr></thead><tbody><tr v-for="row in rows" :key="row.id"><td v-if="admin" class="select-cell"><input type="checkbox" :checked="selectedIds.includes(row.id)" :aria-label="`${row.title} 선택`" @change="toggleResource(row.id)" /></td><td>{{ row.id }}</td><td><RouterLink :to="`${basePath}/${row.id}`">{{ row.title }}</RouterLink></td><td>{{ row.author }}</td><td>{{ row.views }}</td><td>{{ row.date }}</td><td v-if="admin" class="manage-cell"><div class="resource-row-actions"><RouterLink class="manage-edit" :to="`${basePath}/${row.id}/edit`">수정</RouterLink><button class="manage-delete" type="button" @click="requestDelete(row.id)">삭제</button></div></td></tr><tr v-if="!rows.length"><td :colspan="admin ? 7 : 5">검색 결과가 없습니다.</td></tr></tbody></table></div>
         <nav class="resource-pagination" aria-label="자료실 페이지"><button :disabled="page === 1" aria-label="첫 페이지" @click="goPage(1)">«</button><button :disabled="page === 1" aria-label="이전 페이지" @click="goPage(page - 1)">‹</button><button v-for="number in visiblePages" :key="number" :class="{ active: page === number }" :aria-current="page === number ? 'page' : undefined" @click="goPage(number)">{{ number }}</button><button :disabled="page === pageCount" aria-label="다음 페이지" @click="goPage(page + 1)">›</button><button :disabled="page === pageCount" aria-label="마지막 페이지" @click="goPage(pageCount)">»</button></nav>
       </section>
     </div>

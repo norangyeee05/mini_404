@@ -2,21 +2,26 @@ package com.project.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.nio.file.Path;
 import org.springframework.web.multipart.MultipartFile;
 import com.project.domain.Attachment;
 import com.project.domain.AttachmentTarget;
 import com.project.dto.ResourceDto.FileInfo;
 import com.project.common.BusinessException;
+import com.project.common.LoginUser;
 import com.project.common.PageResponse;
 import com.project.common.SearchUtil;
 import com.project.domain.Admin;
 import com.project.domain.Notice;
+import com.project.domain.Role;
 import com.project.dto.NoticeDto.Detail;
 import com.project.dto.NoticeDto.ListItem;
 import com.project.dto.NoticeDto.NoticeForm;
 import com.project.repository.AdminRepository;
 import com.project.repository.NoticeRepository;
+import com.project.repository.MemberRepository;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,10 +37,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final AdminRepository adminRepository;
+    private final MemberRepository memberRepository;
     private final AttachmentService attachmentService;
     private final FileStorageService fileStorageService;
 
-    /** searchType: title (default) / writer */
+
     public PageResponse<ListItem> list(String searchType, String keyword, int page, int size) {
         Pageable pageable = PageResponse.pageable(page, size,
                 Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id")));
@@ -67,11 +73,23 @@ public class NoticeService {
     }
 
     @Transactional
-    public Long create(Long adminId, NoticeForm form, List<MultipartFile> files) {
-        Admin admin = adminRepository.findById(adminId)
-                .orElseThrow(() -> BusinessException.unauthorized("관리자 정보를 찾을 수 없습니다. 다시 로그인해주세요."));
+    public Long create(LoginUser user, NoticeForm form, List<MultipartFile> files) {
+        if (user.role() != Role.ADMIN && user.role() != Role.WEB_ADMIN) {
+            throw BusinessException.forbidden("공지사항을 등록할 권한이 없습니다.");
+        }
+        String writer;
+        if (user.adminAccount()) {
+            writer = adminRepository.findById(user.id())
+                    .map(Admin::getName)
+                    .orElseThrow(() -> BusinessException.unauthorized("관리자 정보를 찾을 수 없습니다. 다시 로그인해주세요."));
+        } else {
+            writer = memberRepository.findById(user.id())
+                    .filter(member -> member.getRole() == Role.ADMIN || member.getRole() == Role.WEB_ADMIN)
+                    .map(member -> member.getName())
+                    .orElseThrow(() -> BusinessException.unauthorized("관리자 정보를 찾을 수 없습니다. 다시 로그인해주세요."));
+        }
         Notice saved = noticeRepository.save(Notice.create(
-                form.title().trim(), form.content().trim(), admin.getName()));
+                form.title().trim(), form.content().trim(), writer));
         attachmentService.saveAll(files, AttachmentTarget.NOTICE, saved.getId());
         return saved.getId();
     }
@@ -89,6 +107,20 @@ public class NoticeService {
         Notice notice = find(noticeId);
         attachmentService.deleteAll(AttachmentTarget.NOTICE, noticeId);
         noticeRepository.delete(notice);
+    }
+
+    @Transactional
+    public int deleteAll(List<Long> noticeIds) {
+        Set<Long> uniqueIds = new LinkedHashSet<>(noticeIds);
+        List<Notice> selected = noticeRepository.findAllById(uniqueIds);
+        if (selected.size() != uniqueIds.size()) {
+            throw BusinessException.notFound("선택한 공지사항 중 찾을 수 없는 항목이 있습니다.");
+        }
+        for (Notice notice : selected) {
+            attachmentService.deleteAll(AttachmentTarget.NOTICE, notice.getId());
+        }
+        noticeRepository.deleteAll(selected);
+        return selected.size();
     }
 
     private Notice find(Long noticeId) {

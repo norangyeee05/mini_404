@@ -70,6 +70,7 @@ export const api = {
     update: (id, fields, files = []) => multipart('put', `/admin/notices/${id}`, fields, files),
     download: (id, fileId) => client.get(`/notices/${id}/files/${fileId}`, { responseType: 'blob' }).then(data),
     remove: id => client.delete(`/admin/notices/${id}`).then(data),
+    removeMany: ids => json('delete', '/admin/notices/bulk', { ids }),
   },
   resources: {
     list: params => list('/resources', params),
@@ -81,6 +82,7 @@ export const api = {
     create: (fields, files = []) => multipart('post', '/admin/resources', fields, files),
     update: (id, fields, files = []) => multipart('put', `/admin/resources/${id}`, fields, files),
     remove: id => client.delete(`/admin/resources/${id}`).then(data),
+    removeMany: ids => json('delete', '/admin/resources/bulk', { ids }),
   },
   qna: {
     list: params => list('/qna', params),

@@ -8,7 +8,7 @@ import PageHeader from '../../components/PageHeader.vue'
 import PageBanner from '../../components/PageBanner.vue'
 import PageFooter from '../../components/PageFooter.vue'
 import { getNotices, deleteNotice as removeNotice } from './noticeMockData'
-import { apiError } from '../../services/backendApi'
+import { api, apiError } from '../../services/backendApi'
 import './admin-notice-list.css'
 
 const router = useRouter()
@@ -17,6 +17,8 @@ const searchField = ref('all')
 const searchText = ref('')
 const currentPage = ref(1)
 const totalCount = ref(0)
+const selectedIds = ref([])
+const bulkDeleting = ref(false)
 const pageSize = 10
 const pageCount = computed(() => Math.max(1, Math.ceil(totalCount.value / pageSize)))
 const visiblePages = computed(() => { const start = Math.min(Math.max(1, currentPage.value - 2), Math.max(1, pageCount.value - 4)); return Array.from({ length: Math.min(5, pageCount.value) }, (_, index) => start + index) })
@@ -26,8 +28,30 @@ async function loadNotices() {
   catch (error) { notices.value = []; totalCount.value = 0; console.error(apiError(error)) }
 }
 onMounted(loadNotices)
-function search() { currentPage.value = 1; loadNotices() }
-function goToPage(page) { currentPage.value = Math.min(Math.max(1, page), pageCount.value); loadNotices() }
+function search() { selectedIds.value = []; currentPage.value = 1; loadNotices() }
+function goToPage(page) { selectedIds.value = []; currentPage.value = Math.min(Math.max(1, page), pageCount.value); loadNotices() }
+const allPageSelected = computed(() => filteredNotices.value.length > 0 && filteredNotices.value.every(notice => selectedIds.value.includes(notice.id)))
+function toggleNotice(id) { selectedIds.value = selectedIds.value.includes(id) ? selectedIds.value.filter(value => value !== id) : [...selectedIds.value, id] }
+function toggleCurrentPage() {
+  const pageIds = filteredNotices.value.map(notice => notice.id)
+  selectedIds.value = allPageSelected.value
+    ? selectedIds.value.filter(id => !pageIds.includes(id))
+    : [...new Set([...selectedIds.value, ...pageIds])]
+}
+async function deleteSelected() {
+  if (!selectedIds.value.length || bulkDeleting.value) return
+  const ids = [...selectedIds.value]
+  if (!window.confirm(`선택한 공지사항 ${ids.length}건을 삭제하시겠습니까? 첨부파일도 함께 삭제됩니다.`)) return
+  bulkDeleting.value = true
+  try {
+    await api.notices.removeMany(ids)
+    totalCount.value = Math.max(0, totalCount.value - ids.length)
+    selectedIds.value = []
+    if (filteredNotices.value.length === ids.length && currentPage.value > 1) currentPage.value -= 1
+    await loadNotices()
+  } catch (error) { window.alert(apiError(error)) }
+  finally { bulkDeleting.value = false }
+}
 
 function editNotice(notice) {
   router.push({ path: '/admin/notices/edit', query: { id: notice.id } })
@@ -41,7 +65,7 @@ function deleteNotice(noticeId) {
 }
 async function confirmDelete() {
   if (deleteStage.value === 'complete') { closeDelete(); return }
-  try { await removeNotice(deletingId.value); notices.value = notices.value.filter(notice => String(notice.id) !== String(deletingId.value)); totalCount.value = Math.max(0, totalCount.value - 1); deleteStage.value = 'complete' }
+  try { await removeNotice(deletingId.value); notices.value = notices.value.filter(notice => String(notice.id) !== String(deletingId.value)); selectedIds.value = selectedIds.value.filter(id => String(id) !== String(deletingId.value)); totalCount.value = Math.max(0, totalCount.value - 1); deleteStage.value = 'complete' }
   catch (error) { deleteStage.value = ''; console.error(apiError(error)) }
 }
 function closeDelete() {
@@ -80,11 +104,16 @@ function closeDelete() {
           </form>
 
           <p class="admin-notice-total-count">전체 {{ totalCount }}건</p>
+          <div v-if="selectedIds.length" class="admin-notice-bulk-actions">
+            <span>{{ selectedIds.length }}건 선택</span>
+            <button type="button" :disabled="bulkDeleting" @click="deleteSelected">선택 삭제</button>
+          </div>
 
           <div class="admin-notice-table-scroll">
             <table class="admin-notice-table">
               <thead>
                 <tr>
+                  <th class="admin-notice-col-select"><input type="checkbox" :checked="allPageSelected" aria-label="현재 페이지 공지사항 전체 선택" @change="toggleCurrentPage" /></th>
                   <th class="admin-notice-col-number">번호</th>
                   <th class="admin-notice-col-title">제목</th>
                   <th class="admin-notice-col-writer">작성자</th>
@@ -95,6 +124,7 @@ function closeDelete() {
               </thead>
               <tbody>
                 <tr v-for="notice in filteredNotices" :key="notice.id">
+                  <td class="admin-notice-select-cell"><input type="checkbox" :checked="selectedIds.includes(notice.id)" :aria-label="`${notice.title} 선택`" @change="toggleNotice(notice.id)" /></td>
                   <td>{{ notice.id }}</td>
                   <td class="admin-notice-table__title">
                     <RouterLink class="admin-notice-title-link" :to="{ path: '/admin/notices/detail', query: { id: notice.id } }">{{ notice.title }}</RouterLink>
@@ -108,7 +138,7 @@ function closeDelete() {
                   </td>
                 </tr>
                 <tr v-if="filteredNotices.length === 0">
-                  <td colspan="6" class="admin-notice-table__empty">검색 결과가 없습니다.</td>
+                  <td colspan="7" class="admin-notice-table__empty">검색 결과가 없습니다.</td>
                 </tr>
               </tbody>
             </table>

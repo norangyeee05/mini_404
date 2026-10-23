@@ -18,7 +18,7 @@ public class FindController {
 
 	private final MemberService memberService;
 
-	// ----- 아이디 찾기 -----
+
 	@GetMapping("/find-id")
 	public String findIdForm() {
 		return "find-id";
@@ -32,7 +32,7 @@ public class FindController {
 		return "find-id";
 	}
 
-	// ----- 비밀번호 찾기 (본인 확인) -----
+
 	@GetMapping("/find-password")
 	public String findPasswordForm() {
 		return "find-password";
@@ -51,7 +51,7 @@ public class FindController {
 		return "find-password";
 	}
 
-	// ----- 비밀번호 재설정 (본인 확인을 통과한 세션만 접근) -----
+
 	@GetMapping("/reset-password")
 	public String resetForm(HttpSession session) {
 		if (session.getAttribute(SessionKeys.RESET_LOGIN_ID) == null) {

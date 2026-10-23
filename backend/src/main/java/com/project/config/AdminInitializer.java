@@ -13,7 +13,7 @@ import com.project.domain.Admin;
 import com.project.domain.AdminRole;
 import com.project.repository.AdminRepository;
 
-/** 개발 편의용: 관리자 계정이 없으면 application.yml 의 app.admin.* 값으로 최초 1회 생성 */
+
 @Component
 public class AdminInitializer implements ApplicationRunner {
 

@@ -16,7 +16,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/** 첨부파일 공용 테이블 (자료실 / 자료실 요청 / QnA). 대상은 target_type + target_id 로 구분 */
+
 @Entity
 @Table(name = "attachment", indexes = @Index(name = "idx_attachment_target", columnList = "target_type, target_id"))
 @Getter

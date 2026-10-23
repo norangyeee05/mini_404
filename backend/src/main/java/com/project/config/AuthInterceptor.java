@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-/** Session based API authorization. */
+
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
 

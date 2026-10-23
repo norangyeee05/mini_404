@@ -9,11 +9,11 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-/**
- * 비밀번호 해시 (PBKDF2-HMAC-SHA256 + 솔트).
- * Spring Security 없이 JDK 표준 API만 사용한다.
- * 저장 형식: 반복횟수:솔트(Base64):해시(Base64)
- */
+
+
+
+
+
 @Component
 public class PasswordHasher {
 

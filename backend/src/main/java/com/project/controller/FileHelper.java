@@ -14,13 +14,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.project.service.ResourceService.DownloadFile;
 
-/** 컨트롤러 공용: multipart 파일 파라미터 병합, 파일 다운로드 응답 생성 */
+
 final class FileHelper {
 
     private FileHelper() {
     }
 
-    /** 프론트에서 "files" 또는 "files[]" 어느 이름으로 보내도 받을 수 있도록 병합 */
+
     static List<MultipartFile> merge(List<MultipartFile> files, List<MultipartFile> bracketFiles) {
         List<MultipartFile> all = new ArrayList<>();
         if (files != null) {

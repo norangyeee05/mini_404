@@ -15,7 +15,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class MainService {
 
-	/** 역정보: 석남 -> 까치울 (노선 순서) */
+
 	private static final List<String> STATIONS = List.of(
 			"석남", "산곡", "부평구청", "굴포천", "삼산체육관", "상동",
 			"부천시청", "신중동", "춘의", "부천종합운동장", "까치울");

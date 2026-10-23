@@ -17,6 +17,30 @@
   text-align: left;
 }
 
+.admin-notice-bulk-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-height: 36px;
+  color: #467486;
+  font-size: 14px;
+}
+
+.admin-notice-bulk-actions button {
+  min-height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #d47e80;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-notice-bulk-actions button:disabled { opacity: .6; cursor: wait; }
+
 .admin-notice-list-hero {
   min-height: 316px;
   display: flex;
@@ -215,11 +239,15 @@
 }
 
 .admin-notice-col-number {
-  width: 9%;
+  width: 7%;
 }
 
+.admin-notice-col-select { width: 5%; }
+.admin-notice-select-cell { text-align: center; }
+.admin-notice-table input[type="checkbox"] { width: 16px; height: 16px; accent-color: #467b8c; cursor: pointer; }
+
 .admin-notice-col-title {
-  width: 35%;
+  width: 33%;
 }
 
 .admin-notice-col-writer {
@@ -235,7 +263,7 @@
 }
 
 .admin-notice-col-actions {
-  width: 18%;
+  width: 16%;
 }
 
 .admin-notice-table__title {

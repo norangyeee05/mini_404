@@ -25,7 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
-/** 내 정보 (2-1): 조회 / 수정 / 탈퇴 - 일반 회원 전용 */
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/members/me")
@@ -46,7 +46,7 @@ public class MemberController {
         user.requireMemberAccount();
         Member updated = memberService.update(user.id(), request);
 
-        // 이름이 바뀌었을 수 있으므로 세션 정보 갱신
+
         HttpSession session = httpRequest.getSession(false);
         if (session != null) {
             session.setAttribute(SessionKeys.LOGIN_USER, new LoginUser(updated.getId(), updated.getName(), updated.getRole()));

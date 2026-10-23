@@ -5,6 +5,11 @@
 }
 
 .resource-total-count { align-self: flex-start; margin: 10px 0; color: #467486; font-weight: 700; text-align: left; }
+.resource-list-controls { display: flex; align-items: center; justify-content: space-between; min-height: 36px; }
+.resource-bulk-actions { display: flex; align-items: center; gap: 10px; color: #467486; font-size: 14px; }
+.resource-bulk-actions button:disabled { opacity: .6; cursor: wait; }
+.select-cell { text-align: center; }
+.resource-list input[type="checkbox"] { width: 16px; height: 16px; accent-color: #467b8c; cursor: pointer; }
 
 .detail-manage {
   display: flex;
@@ -49,12 +54,13 @@
   background: #d47e80;
 }
 
+.resource-shell--admin .resource-col-select { width: 5%; }
 .resource-shell--admin .resource-col-number {
-  width: 9%;
+  width: 7%;
 }
 
 .resource-shell--admin .resource-col-title {
-  width: 39%;
+  width: 35%;
 }
 
 .resource-shell--admin .resource-col-author {

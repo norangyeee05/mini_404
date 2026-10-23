@@ -26,7 +26,7 @@ import com.project.service.AdminMemberService;
 
 import jakarta.validation.Valid;
 
-/** 관리자 회원관리 (2-6, 대시보드 제외). 접근 제어는 AuthInterceptor(/api/admin/**)에서 처리 */
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/members")
@@ -34,7 +34,7 @@ public class AdminMemberController {
 
     private final AdminMemberService memberService;
 
-    /** 공통 쿼리 + status 필터(선택), searchType: name(기본) / loginId / email */
+
     @GetMapping
     public ApiResponse<PageResponse<ListItem>> list(
             @RequestParam(defaultValue = "1") int page,

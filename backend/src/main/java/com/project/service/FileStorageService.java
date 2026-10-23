@@ -17,7 +17,7 @@ import com.project.common.BusinessException;
 import com.project.domain.Attachment;
 import com.project.domain.AttachmentTarget;
 
-/** 로컬 디스크 파일 저장. 저장 파일명은 UUID(+확장자)로 바꿔 경로 조작/중복을 방지 */
+
 @Service
 public class FileStorageService {
 
@@ -63,7 +63,7 @@ public class FileStorageService {
                 Files.deleteIfExists(p);
             }
         } catch (IOException ignored) {
-            // 파일이 이미 없거나 삭제 실패 시에도 DB 처리는 계속 진행
+
         }
     }
 

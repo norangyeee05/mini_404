@@ -6,13 +6,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-/** 일반 회원 관련 요청/응답 DTO 모음 (회원가입·로그인·내 정보·탈퇴) */
+
 public final class MemberDto {
 
     private MemberDto() {
     }
 
-    /** 회원가입 요청 */
+
     public record SignupRequest(
             @NotBlank(message = "아이디를 입력해주세요.")
             @Pattern(regexp = "^[a-zA-Z0-9_]{4,20}$", message = "아이디는 영문, 숫자, 밑줄(_) 4~20자로 입력해주세요.")
@@ -43,7 +43,7 @@ public final class MemberDto {
     ) {
     }
 
-    /** 로그인 요청 */
+
     public record LoginRequest(
             @NotBlank(message = "아이디를 입력해주세요.") String loginId,
             @NotBlank(message = "비밀번호를 입력해주세요.") String password
@@ -53,15 +53,15 @@ public final class MemberDto {
     public record FindIdRequest(@NotBlank String name, @NotBlank @Email String email) { }
     public record FindIdResponse(String maskedLoginId) { }
 
-    /** 로그인 응답 */
+
     public record LoginResponse(Long memberId, String name, String role, boolean adminAccount) {
     }
 
-    /** 내 정보 조회 응답 */
+
     public record MeResponse(String loginId, String name, String email, String phone) {
     }
 
-    /** 내 정보 수정 요청 (아이디 변경 불가). password는 선택 - 비어 있으면 기존 비밀번호 유지 */
+
     public record UpdateRequest(
             @NotBlank(message = "이름을 입력해주세요.")
             @Size(max = 50, message = "이름은 50자 이내로 입력해주세요.")
@@ -81,7 +81,7 @@ public final class MemberDto {
     ) {
     }
 
-    /** 회원 탈퇴 요청 */
+
     public record WithdrawRequest(
             @NotBlank(message = "아이디를 입력해주세요.") String loginId,
             @NotBlank(message = "비밀번호를 입력해주세요.") String password,

@@ -25,7 +25,7 @@ public class Notice {
     @Column(nullable = false, length = 200)
     private String title;
 
-    /** Nullable to keep pre-existing rows valid when this column is added. */
+
     @Column(columnDefinition = "TEXT")
     private String content;
 

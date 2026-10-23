@@ -31,7 +31,7 @@ public class Qna {
     @Column(nullable = false, length = 50)
     private String writer;
 
-    /** 기존 Q&A 행은 작성자 정보가 없을 수 있어 nullable로 둡니다. */
+
     @Column(name = "author_id")
     private Long authorId;
 

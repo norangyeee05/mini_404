@@ -18,11 +18,11 @@ public class WebConfig implements WebMvcConfigurer {
         this.allowedOrigins = allowedOrigins;
     }
 
-    /** Centralized CORS policy for REST APIs; credentials allow the session cookie. */
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registerApiCors(registry, "/api/**");
-        // Legacy station endpoints still use this prefix.
+
         registerApiCors(registry, "/admin/api/**");
     }
 

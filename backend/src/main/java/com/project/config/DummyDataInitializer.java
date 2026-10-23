@@ -36,11 +36,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 개발/시연용 더미 데이터 초기화.
- * 기존 데이터를 삭제하지 않으며, 각 대상 테이블의 데이터가 목표 수량보다 적을 때만 부족분을 추가합니다.
- * app.seed-sample-data=true 설정일 때만 실행됩니다.
- */
+
+
+
+
+
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "app.seed-sample-data", havingValue = "true")

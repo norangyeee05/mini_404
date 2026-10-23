@@ -17,7 +17,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/** 자료실 게시글 (DB 설계의 RESOURCE 테이블). Spring의 Resource 클래스와 이름이 겹치지 않도록 ResourcePost로 명명 */
+
 @Entity
 @Table(name = "resource")
 @Getter
@@ -38,7 +38,7 @@ public class ResourcePost {
     @JoinColumn(name = "admin_id", nullable = false)
     private Admin admin;
 
-    /** 조회수 (API 명세서의 viewCount - DB 설계에 없던 컬럼이라 추가) */
+
     @Column(name = "view_count", nullable = false)
     private int viewCount;
 

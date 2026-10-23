@@ -57,7 +57,7 @@ public class AdminQnaController {
     public ResponseEntity<ApiResponse<Map<String, Long>>> create(
             @SessionAttribute(name = SessionKeys.LOGIN_USER) LoginUser admin,
             @Valid @RequestBody QuestionForm form) {
-        Long qnaId = qnaService.createByAdmin(admin.id(), form);
+        Long qnaId = qnaService.createByAdmin(admin, form);
         return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED)
                 .body(ApiResponse.ok(Map.of("qnaId", qnaId), "Q&A가 등록되었습니다."));
     }

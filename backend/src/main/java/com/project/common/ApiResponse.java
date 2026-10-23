@@ -1,6 +1,6 @@
 package com.project.common;
 
-/** 응답 구조 통일: { success, data, message } */
+
 public record ApiResponse<T>(boolean success, T data, String message) {
 
     public static <T> ApiResponse<T> ok(T data) {

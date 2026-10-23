@@ -25,7 +25,7 @@ import com.project.service.ResourceRequestService;
 
 import jakarta.validation.Valid;
 
-/** 관리자 자료실 요청 관리 (2-7). 접근 제어는 AuthInterceptor(/api/admin/**)에서 처리 */
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/resource-requests")
@@ -33,7 +33,7 @@ public class AdminResourceRequestController {
 
     private final ResourceRequestService requestService;
 
-    /** 공통 쿼리 + status(PENDING/COMPLETED), searchType: title(기본) / requester */
+
     @GetMapping
     public ApiResponse<PageResponse<ListItem>> list(
             @RequestParam(defaultValue = "1") int page,
@@ -49,7 +49,7 @@ public class AdminResourceRequestController {
         return ApiResponse.ok(requestService.detail(requestId));
     }
 
-    /** (명세서 외 추가) 요청에 첨부된 파일 내려받기 */
+
     @GetMapping("/{requestId}/files/{fileId}")
     public ResponseEntity<Resource> download(@PathVariable Long requestId, @PathVariable Long fileId) {
         return FileHelper.download(requestService.file(requestId, fileId));

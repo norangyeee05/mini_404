@@ -30,7 +30,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
-/** 인증 (2-1): 회원가입, 아이디 중복 확인, 로그인, 로그아웃 */
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -76,7 +76,7 @@ public class AuthController {
                                             HttpServletResponse httpResponse) {
         LoginUser user = authService.login(request);
 
-        // 세션 고정 공격 방지: 기존 세션을 폐기하고 새 세션 발급
+
         HttpSession old = httpRequest.getSession(false);
         if (old != null) {
             old.invalidate();

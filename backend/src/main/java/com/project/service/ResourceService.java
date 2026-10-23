@@ -2,6 +2,8 @@ package com.project.service;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,41 +14,49 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.project.common.BusinessException;
+import com.project.common.LoginUser;
 import com.project.common.PageResponse;
 import com.project.common.SearchUtil;
 import com.project.domain.Admin;
+import com.project.domain.AdminRole;
 import com.project.domain.Attachment;
 import com.project.domain.AttachmentTarget;
 import com.project.domain.ResourcePost;
+import com.project.domain.Member;
+import com.project.domain.Role;
 import com.project.dto.ResourceDto.Detail;
 import com.project.dto.ResourceDto.ListItem;
 import com.project.dto.ResourceDto.PostForm;
 import com.project.repository.AdminRepository;
+import com.project.repository.MemberRepository;
 import com.project.repository.ResourcePostRepository;
 
 import jakarta.persistence.criteria.JoinType;
 
-/** 자료실 (조회·다운로드는 전체 공개, 등록·수정·삭제는 관리자) */
+
 @Service
 @Transactional(readOnly = true)
 public class ResourceService {
 
     private final ResourcePostRepository resourceRepository;
     private final AdminRepository adminRepository;
+    private final MemberRepository memberRepository;
     private final AttachmentService attachmentService;
     private final FileStorageService fileStorageService;
 
     public ResourceService(ResourcePostRepository resourceRepository,
                            AdminRepository adminRepository,
+                           MemberRepository memberRepository,
                            AttachmentService attachmentService,
                            FileStorageService fileStorageService) {
         this.resourceRepository = resourceRepository;
         this.adminRepository = adminRepository;
+        this.memberRepository = memberRepository;
         this.attachmentService = attachmentService;
         this.fileStorageService = fileStorageService;
     }
 
-    /** searchType: title(기본) / writer */
+
     public PageResponse<ListItem> list(String searchType, String keyword, int page, int size) {
         Pageable pageable = PageResponse.pageable(page, size,
                 Sort.by(Sort.Order.desc("updatedAt"), Sort.Order.desc("id")));
@@ -55,7 +65,7 @@ public class ResourceService {
         return PageResponse.of(result);
     }
 
-    /** 상세 조회 (조회수 +1) */
+
     @Transactional
     public Detail detail(Long resourceId) {
         if (resourceRepository.increaseViewCount(resourceId) == 0) {
@@ -67,14 +77,14 @@ public class ResourceService {
                 r.getContent(), attachmentService.list(AttachmentTarget.RESOURCE, r.getId()));
     }
 
-    /** 관리자 상세 조회는 조회수를 증가시키지 않습니다. */
+
     public Detail adminDetail(Long resourceId) {
         ResourcePost r = find(resourceId);
         return new Detail(r.getId(), r.getTitle(), r.getViewCount(), r.getAdmin().getName(), r.getCreatedAt(),
                 r.getContent(), attachmentService.list(AttachmentTarget.RESOURCE, r.getId()));
     }
 
-    /** 다운로드할 파일 (원본 파일명과 저장 경로) */
+
     public DownloadFile file(Long resourceId, Long fileId) {
         find(resourceId);
         Attachment a = attachmentService.get(AttachmentTarget.RESOURCE, resourceId, fileId);
@@ -82,13 +92,30 @@ public class ResourceService {
     }
 
     @Transactional
-    public Long create(Long adminId, PostForm form, List<MultipartFile> files) {
-        Admin admin = adminRepository.findById(adminId)
-                .orElseThrow(() -> BusinessException.unauthorized("관리자 정보를 찾을 수 없습니다. 다시 로그인해주세요."));
+    public Long create(LoginUser user, PostForm form, List<MultipartFile> files) {
+        Admin admin = resolveAdmin(user);
         ResourcePost saved = resourceRepository.save(
                 ResourcePost.create(form.title().trim(), form.content().trim(), admin));
         attachmentService.saveAll(files, AttachmentTarget.RESOURCE, saved.getId());
         return saved.getId();
+    }
+
+    private Admin resolveAdmin(LoginUser user) {
+        if (user.role() != Role.ADMIN && user.role() != Role.WEB_ADMIN) {
+            throw BusinessException.forbidden("자료를 등록할 권한이 없습니다.");
+        }
+        if (user.adminAccount()) {
+            return adminRepository.findById(user.id())
+                    .orElseThrow(() -> BusinessException.unauthorized("관리자 정보를 찾을 수 없습니다. 다시 로그인해주세요."));
+        }
+        Member member = memberRepository.findById(user.id())
+                .filter(value -> value.getRole() == Role.ADMIN || value.getRole() == Role.WEB_ADMIN)
+                .orElseThrow(() -> BusinessException.unauthorized("관리자 정보를 찾을 수 없습니다. 다시 로그인해주세요."));
+        return adminRepository.findByLoginId(member.getLoginId()).orElseGet(() -> {
+            AdminRole role = member.getRole() == Role.ADMIN ? AdminRole.ADMIN : AdminRole.MANAGER;
+            return adminRepository.save(Admin.create(member.getLoginId(), member.getPasswordHash(),
+                    member.getName(), member.getEmail(), role));
+        });
     }
 
     @Transactional
@@ -105,6 +132,20 @@ public class ResourceService {
         ResourcePost r = find(resourceId);
         attachmentService.deleteAll(AttachmentTarget.RESOURCE, resourceId);
         resourceRepository.delete(r);
+    }
+
+    @Transactional
+    public int deleteAll(List<Long> resourceIds) {
+        Set<Long> uniqueIds = new LinkedHashSet<>(resourceIds);
+        List<ResourcePost> selected = resourceRepository.findAllById(uniqueIds);
+        if (selected.size() != uniqueIds.size()) {
+            throw BusinessException.notFound("선택한 자료 중 찾을 수 없는 항목이 있습니다.");
+        }
+        for (ResourcePost resource : selected) {
+            attachmentService.deleteAll(AttachmentTarget.RESOURCE, resource.getId());
+        }
+        resourceRepository.deleteAll(selected);
+        return selected.size();
     }
 
     private ResourcePost find(Long resourceId) {

@@ -53,30 +53,33 @@ public class AuthService {
         return !memberRepository.existsByLoginId(loginId) && !adminRepository.existsByLoginId(loginId);
     }
 
-    /** 회원 → 관리자 순으로 조회해 인증하고 세션에 담을 LoginUser를 반환 */
+
     public LoginUser login(LoginRequest req) {
         Member member = memberRepository.findByLoginId(req.loginId()).orElse(null);
         if (member != null) {
-            if (member.getStatus() == MemberStatus.WITHDRAWN
-                    || !passwordEncoder.matches(req.password(), member.getPassword())) {
+            if (!passwordEncoder.matches(req.password(), member.getPassword())) {
                 throw BusinessException.unauthorized(LOGIN_FAIL);
             }
-            if (member.getStatus() == MemberStatus.BLOCKED) {
-                throw BusinessException.forbidden("임시 차단된 계정입니다. 관리자에게 문의해주세요.");
-            }
-            if (member.getStatus() == MemberStatus.BANNED) {
-                throw BusinessException.forbidden("이용이 정지된 계정입니다. 관리자에게 문의해주세요.");
-            }
+            ensureAccountCanLogin(member.getStatus());
             return new LoginUser(member.getId(), member.getName(), member.getRole());
         }
 
         Admin admin = adminRepository.findByLoginId(req.loginId()).orElse(null);
-        if (admin == null
-                || admin.getStatus() != MemberStatus.ACTIVE
-                || !passwordEncoder.matches(req.password(), admin.getPassword())) {
+        if (admin == null || !passwordEncoder.matches(req.password(), admin.getPassword())) {
             throw BusinessException.unauthorized(LOGIN_FAIL);
         }
+        ensureAccountCanLogin(admin.getStatus());
         Role role = admin.getRole() == AdminRole.MANAGER ? Role.WEB_ADMIN : Role.ADMIN;
         return new LoginUser(admin.getId(), admin.getName(), role, true);
+    }
+
+    private void ensureAccountCanLogin(MemberStatus status) {
+        switch (status) {
+            case ACTIVE -> { }
+            case BANNED -> throw BusinessException.forbidden("강퇴된 계정입니다. 관리자에게 확인해 주세요.");
+            case INACTIVE -> throw BusinessException.forbidden("비활성화된 계정입니다. 관리자에게 문의해 주세요.");
+            case BLOCKED -> throw BusinessException.forbidden("임시 차단된 계정입니다. 관리자에게 문의해 주세요.");
+            case WITHDRAWN -> throw BusinessException.forbidden("탈퇴한 계정은 로그인할 수 없습니다.");
+        }
     }
 }

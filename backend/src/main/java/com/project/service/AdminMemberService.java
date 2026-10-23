@@ -25,7 +25,7 @@ import com.project.repository.MemberRepository;
 
 import jakarta.persistence.criteria.Predicate;
 
-/** 회원관리 서비스. 비밀번호 해시는 응답하지 않으며 초기화 시 임시 비밀번호를 한 번 발급합니다. */
+
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
@@ -36,7 +36,7 @@ public class AdminMemberService {
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final char[] PASSWORD_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%".toCharArray();
 
-    /** searchType: name(기본) / loginId / email, status: 상태 필터(선택) */
+
     public PageResponse<ListItem> list(String searchType, String keyword, MemberStatus status,
                                                   int page, int size) {
         Pageable pageable = PageResponse.pageable(page, size,

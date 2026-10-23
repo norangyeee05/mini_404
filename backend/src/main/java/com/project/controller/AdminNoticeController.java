@@ -9,6 +9,7 @@ import com.project.dto.NoticeDto.ListItem;
 import com.project.common.LoginUser;
 import com.project.common.SessionKeys;
 import com.project.dto.NoticeDto.NoticeForm;
+import com.project.dto.BulkDeleteRequest;
 import com.project.service.NoticeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,7 @@ public class AdminNoticeController {
     public ResponseEntity<ApiResponse<Map<String, Long>>> create(
             @SessionAttribute(name = SessionKeys.LOGIN_USER) LoginUser admin,
             @Valid @RequestBody NoticeForm form) {
-        Long noticeId = noticeService.create(admin.id(), form, List.of());
+        Long noticeId = noticeService.create(admin, form, List.of());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok(Map.of("noticeId", noticeId), "공지사항이 등록되었습니다."));
     }
@@ -63,7 +64,7 @@ public class AdminNoticeController {
             @Validated @ModelAttribute NoticeForm form,
             @RequestParam(value = "files", required = false) List<MultipartFile> files,
             @RequestParam(value = "files[]", required = false) List<MultipartFile> bracketFiles) {
-        Long noticeId = noticeService.create(admin.id(), form, FileHelper.merge(files, bracketFiles));
+        Long noticeId = noticeService.create(admin, form, FileHelper.merge(files, bracketFiles));
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(Map.of("noticeId", noticeId), "공지사항이 등록되었습니다."));
     }
 
@@ -85,5 +86,11 @@ public class AdminNoticeController {
     public ApiResponse<Void> delete(@PathVariable Long noticeId) {
         noticeService.delete(noticeId);
         return ApiResponse.ok(null, "공지사항이 삭제되었습니다.");
+    }
+
+    @DeleteMapping("/bulk")
+    public ApiResponse<Map<String, Integer>> deleteBulk(@Valid @RequestBody BulkDeleteRequest request) {
+        int deletedCount = noticeService.deleteAll(request.ids());
+        return ApiResponse.ok(Map.of("deletedCount", deletedCount), "선택한 공지사항이 삭제되었습니다.");
     }
 }

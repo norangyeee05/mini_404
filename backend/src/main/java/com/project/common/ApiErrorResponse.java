@@ -3,7 +3,7 @@ package com.project.common;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 
-/** Error contract shared by all REST endpoints. */
+
 public record ApiErrorResponse(boolean success, int status, String code, String message,
                                List<FieldError> fieldErrors) {
     public record FieldError(String field, String message) { }

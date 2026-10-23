@@ -4,10 +4,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-/**
- * 아직 담당자가 구현하지 않은 메뉴의 임시 화면.
- * 각 기능(공지사항 등)을 구현할 때 이 매핑을 해당 컨트롤러로 옮기면 된다.
- */
+
+
+
+
 @Controller
 public class PlaceholderController {
 

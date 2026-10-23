@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiErrorResponse.of(HttpStatus.CONFLICT, "이미 존재하는 데이터이거나 처리할 수 없는 요청입니다."));
     }
 
-    /** 404(NoResourceFound), 405, 415 등 Spring이 던지는 HTTP 오류는 상태코드를 그대로 유지 */
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleAny(Exception e) {
         if (e instanceof ErrorResponse er) {

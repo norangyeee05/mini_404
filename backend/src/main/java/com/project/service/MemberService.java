@@ -13,7 +13,7 @@ import com.project.dto.MemberDto.UpdateRequest;
 import com.project.dto.MemberDto.WithdrawRequest;
 import com.project.repository.MemberRepository;
 
-/** 회원 본인의 정보 관리와 계정 찾기 기능 */
+
 @Service
 @Transactional(readOnly = true)
 public class MemberService {

@@ -26,12 +26,15 @@ import com.project.common.SessionKeys;
 import com.project.dto.ResourceDto.PostForm;
 import com.project.dto.ResourceDto.Detail;
 import com.project.dto.ResourceDto.ListItem;
+import com.project.dto.BulkDeleteRequest;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestBody;
 import com.project.service.ResourceService;
 
-/**
- * 관리자 자료실 관리 (2-3). 접근 제어는 AuthInterceptor(/api/admin/**)에서 처리.
- * multipart/form-data: title, content, files[] (수정 시 삭제할 기존 파일은 deleteFileIds 로 전달)
- */
+
+
+
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/resources")
@@ -57,7 +60,7 @@ public class AdminResourceController {
             @Validated @ModelAttribute PostForm form,
             @RequestParam(value = "files", required = false) List<MultipartFile> files,
             @RequestParam(value = "files[]", required = false) List<MultipartFile> bracketFiles) {
-        Long id = resourceService.create(admin.id(), form, FileHelper.merge(files, bracketFiles));
+        Long id = resourceService.create(admin, form, FileHelper.merge(files, bracketFiles));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok(Map.of("resourceId", id), "자료가 등록되었습니다."));
     }
@@ -76,5 +79,11 @@ public class AdminResourceController {
     public ApiResponse<Void> delete(@PathVariable Long resourceId) {
         resourceService.delete(resourceId);
         return ApiResponse.ok(null, "자료가 삭제되었습니다.");
+    }
+
+    @DeleteMapping("/bulk")
+    public ApiResponse<Map<String, Integer>> deleteBulk(@Valid @RequestBody BulkDeleteRequest request) {
+        int deletedCount = resourceService.deleteAll(request.ids());
+        return ApiResponse.ok(Map.of("deletedCount", deletedCount), "선택한 자료가 삭제되었습니다.");
     }
 }

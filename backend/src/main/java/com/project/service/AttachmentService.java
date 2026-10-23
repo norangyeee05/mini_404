@@ -40,7 +40,7 @@ public class AttachmentService {
                 .toList();
     }
 
-    /** 수정 화면에서 선택한 기존 첨부파일만 삭제 (다른 게시글의 파일은 건드리지 않음) */
+
     @Transactional
     public void deleteSelected(AttachmentTarget target, Long targetId, List<Long> fileIds) {
         if (fileIds == null || fileIds.isEmpty()) {

@@ -30,7 +30,7 @@ import com.project.service.ResourceService.DownloadFile;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 
-/** 자료실 추가 요청 (회원이 등록, 관리자가 처리) */
+
 @Service
 @Transactional(readOnly = true)
 public class ResourceRequestService {
@@ -50,7 +50,7 @@ public class ResourceRequestService {
         this.fileStorageService = fileStorageService;
     }
 
-    // ---------- 회원 ----------
+
 
     @Transactional
     public Long create(Long memberId, PostForm form, List<MultipartFile> files) {
@@ -65,9 +65,9 @@ public class ResourceRequestService {
         return saved.getId();
     }
 
-    // ---------- 관리자 ----------
 
-    /** searchType: title(기본) / requester, status: 처리 상태 필터(선택) */
+
+
     public PageResponse<ListItem> list(String searchType, String keyword, RequestStatus status,
                                                       int page, int size) {
         Pageable pageable = PageResponse.pageable(page, size,

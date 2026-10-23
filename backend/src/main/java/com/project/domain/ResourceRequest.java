@@ -19,7 +19,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/** 회원의 자료실 추가 요청 (DB 설계에 없던 테이블 - API 명세서 기준으로 추가) */
+
 @Entity
 @Table(name = "resource_request")
 @Getter
