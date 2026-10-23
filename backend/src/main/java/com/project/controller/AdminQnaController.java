@@ -4,14 +4,16 @@ import java.util.Map;
 
 import com.project.common.ApiResponse;
 import com.project.common.PageResponse;
+import com.project.common.LoginUser;
+import com.project.common.SessionKeys;
 import com.project.domain.InquiryType;
 import com.project.domain.Qna;
 import com.project.domain.QnaStatus;
 import com.project.dto.QnaDto.AnswerForm;
-import com.project.dto.QnaDto.AdminAnswerForm;
 import com.project.dto.QnaDto.Detail;
 import com.project.dto.QnaDto.ListItem;
 import com.project.dto.QnaDto.StatusResult;
+import com.project.dto.QnaDto.QuestionForm;
 import com.project.service.QnaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -50,11 +53,20 @@ public class AdminQnaController {
         return ApiResponse.ok(qnaService.detail(qnaId));
     }
 
+    @PostMapping
+    public ResponseEntity<ApiResponse<Map<String, Long>>> create(
+            @SessionAttribute(name = SessionKeys.LOGIN_USER) LoginUser admin,
+            @Valid @RequestBody QuestionForm form) {
+        Long qnaId = qnaService.createByAdmin(admin.id(), form);
+        return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED)
+                .body(ApiResponse.ok(Map.of("qnaId", qnaId), "Q&A가 등록되었습니다."));
+    }
+
     @PutMapping("/{qnaId}")
-    public ApiResponse<StatusResult> updateQuestion(@PathVariable Long qnaId,
-                                                     @Valid @RequestBody AdminAnswerForm form) {
-        Qna qna = qnaService.adminAnswer(qnaId, form.answer());
-        return ApiResponse.ok(new StatusResult(qna.getId(), QnaStatus.ANSWERED), "답변이 등록되었습니다.");
+    public ApiResponse<Map<String, Long>> updateQuestion(@PathVariable Long qnaId,
+                                                          @Valid @RequestBody QuestionForm form) {
+        Long updatedId = qnaService.updateQuestionByAdmin(qnaId, form);
+        return ApiResponse.ok(Map.of("qnaId", updatedId), "Q&A가 수정되었습니다.");
     }
 
     @GetMapping("/{qnaId}/files/{fileId}")

@@ -13,6 +13,7 @@
 **/.vscode
 **/*.log
 **/*.sql
+!backend/src/main/resources/db/migration/*.sql
 backend/**/*.md
 frontend/docs
 frontend/README*

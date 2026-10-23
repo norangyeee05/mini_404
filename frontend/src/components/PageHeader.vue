@@ -17,7 +17,7 @@ async function signout() { await logout(); router.push('/') }
     <nav class="primary-nav" aria-label="주요 메뉴"><RouterLink v-for="item in navigation" :key="item.to" :to="item.to">{{ item.label }}</RouterLink></nav>
     <nav class="account-nav" aria-label="계정 메뉴">
       <RouterLink v-if="role === 'guest'" class="account-link account-link--guest" to="/login">로그인</RouterLink>
-      <template v-else><RouterLink v-if="fullAdmin" to="/admin/dashboard">대시보드</RouterLink><RouterLink v-if="role === 'admin'" to="/admin/members">회원관리</RouterLink><RouterLink :to="currentMember?.adminAccount ? '/admin/mypage' : '/mypage'">마이페이지</RouterLink><button class="header-logout" @click="signout">로그아웃</button><span class="role-chip">{{ currentMember?.role === 'WEB_ADMIN' ? '웹관리자님' : role === 'admin' ? '관리자님' : `${userName}님` }}</span></template>
+      <template v-else><RouterLink v-if="fullAdmin" to="/admin/dashboard">대시보드</RouterLink><RouterLink v-if="role === 'admin'" to="/admin/members">회원관리</RouterLink><RouterLink v-if="!['ADMIN', 'WEB_ADMIN'].includes(currentMember?.role)" to="/mypage">마이페이지</RouterLink><button class="header-logout" @click="signout">로그아웃</button><span class="role-chip">{{ currentMember?.role === 'WEB_ADMIN' ? '웹관리자님' : role === 'admin' ? '관리자님' : `${userName}님` }}</span></template>
     </nav>
   </header>
 </template>

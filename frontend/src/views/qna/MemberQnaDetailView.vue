@@ -6,7 +6,6 @@ import PageBanner from '../../components/PageBanner.vue'
 import PageFooter from '../../components/PageFooter.vue'
 import DeleteModal from '../../components/DeleteModal.vue'
 import { getQna, deleteQna as removeQna } from './qnaMockData'
-import { currentMember } from '../../services/auth'
 import { apiError } from '../../services/backendApi'
 import './member-qna-detail.css'
 
@@ -14,7 +13,7 @@ const route = useRoute()
 const router = useRouter()
 
 const qna = ref({ id: null, title: '', writer: '', views: 0, date: '', status: '답변대기', visibility: '', category: '', content: '', answer: '' })
-const isOwner = computed(() => Boolean(qna.value.id) && qna.value.writer === currentMember.value?.name)
+const isOwner = computed(() => qna.value.isOwner === true)
 const isAnswered = computed(() => qna.value.status === '답변완료')
 const displayDate = computed(() => qna.value.date.split(' ')[0])
 const deleteStage = ref('')
@@ -22,7 +21,11 @@ const deleteStage = ref('')
 onMounted(async () => {
   if (!route.query.id) return
   try { qna.value = await getQna(route.query.id) }
-  catch (error) { console.error(apiError(error)) }
+  catch (error) {
+    if (error.response?.status === 403) window.alert('권한이 없습니다.')
+    else window.alert(apiError(error))
+    router.replace('/qna')
+  }
 })
 
 function deleteQna() {

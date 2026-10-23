@@ -53,7 +53,7 @@ public final class QnaDto {
 
     public record Detail(Long qnaId, String title, InquiryType inquiryType, String writer,
                          boolean isPrivate, QnaStatus status, LocalDateTime createdAt, String content,
-                         List<FileInfo> files, String answer) { }
+                         List<FileInfo> files, String answer, boolean isOwner) { }
 
     public record StatusResult(Long qnaId, QnaStatus status) { }
 }

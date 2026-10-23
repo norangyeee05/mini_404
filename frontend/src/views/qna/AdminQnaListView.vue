@@ -6,8 +6,9 @@ import PageHeader from '../../components/PageHeader.vue'
 import PageBanner from '../../components/PageBanner.vue'
 import PageFooter from '../../components/PageFooter.vue'
 import DeleteModal from '../../components/DeleteModal.vue'
-import { getQnas, getQna, deleteQna as removeQna, updateAdminQna } from './qnaMockData'
+import { getQnas, getQna, deleteQna as removeQna, updateAdminQna, createAdminQna, updateAdminQuestion } from './qnaMockData'
 import { apiError } from '../../services/backendApi'
+import { inquiryToApi } from '../../services/apiMappers'
 import './admin-qna-list.css'
 
 const props = defineProps({
@@ -24,6 +25,7 @@ const router = useRouter()
 const searchField = ref('all')
 const searchText = ref('')
 const editingQna = ref(null)
+const questionEditor = ref(null)
 const currentPage = ref(1)
 const pageSize = 10
 const totalCount = ref(0)
@@ -41,7 +43,7 @@ async function loadQnas() {
     totalCount.value = result.totalCount ?? result.items.length
     if (route.query.edit) {
       const detail = await getQna(route.query.edit, true)
-      editingQna.value = detail
+      openQuestionEditor(detail)
     }
   } catch (error) { qnas.value = []; totalCount.value = 0; console.error(apiError(error)) }
 }
@@ -60,15 +62,39 @@ async function editQna(qna) {
   } catch (error) { window.alert(apiError(error)) }
 }
 
+async function editQuestion(qna) {
+  try { openQuestionEditor({ ...qna, ...await getQna(qna.id, true) }) }
+  catch (error) { window.alert(apiError(error)) }
+}
+
 async function saveEditedQna() {
   try {
     if (!editingQna.value.answer?.trim()) { window.alert('답변 내용을 입력해 주세요.'); return }
-    await updateAdminQna(editingQna.value.id, { answer: editingQna.value.answer.trim() })
+    await updateAdminQna(editingQna.value.id, editingQna.value.answer.trim(), editingQna.value.status === '답변완료')
     editingQna.value = null
     await router.push('/admin/qna')
     await loadQnas()
   }
   catch (error) { window.alert(apiError(error)) }
+}
+
+function openQuestionEditor(qna = null) {
+  questionEditor.value = qna
+    ? { id: qna.id, title: qna.title || '', category: qna.category || '운행', isPrivate: qna.isPrivate === true, content: qna.content || '' }
+    : { id: null, title: '', category: '운행', isPrivate: false, content: '' }
+}
+
+async function saveQuestion() {
+  const form = questionEditor.value
+  if (!form?.title.trim() || !form?.content.trim()) { window.alert('제목과 내용을 입력해 주세요.'); return }
+  const fields = { title: form.title.trim(), inquiryType: inquiryToApi[form.category], isPrivate: form.isPrivate, content: form.content.trim() }
+  try {
+    if (form.id) await updateAdminQuestion(form.id, fields)
+    else await createAdminQna(fields)
+    questionEditor.value = null
+    if (route.query.edit) await router.replace('/admin/qna')
+    await loadQnas()
+  } catch (error) { window.alert(apiError(error)) }
 }
 
 const deleteStage = ref('')
@@ -120,6 +146,7 @@ function openQna(qnaId) {
               <SearchIcon />
             </div>
             <button class="admin-qna-search__button" type="submit">검색</button>
+            <button v-if="props.mode === 'all'" class="admin-qna-search__button" type="button" @click="openQuestionEditor()">등록하기</button>
           </form>
 
           <p class="admin-qna-total-count">전체 {{ totalCount }}건</p>
@@ -156,6 +183,7 @@ function openQna(qnaId) {
                       @click="editQna(qna)"
                     >답변하기</button>
                     <template v-else>
+                      <button class="admin-qna-row-button admin-qna-row-button--edit" type="button" @click="editQuestion(qna)">수정</button>
                       <button class="admin-qna-row-button admin-qna-row-button--delete" type="button" @click="deleteQna(qna.id)">삭제</button>
                     </template>
                   </td>
@@ -196,6 +224,31 @@ function openQna(qnaId) {
         <div class="admin-qna-edit-modal__actions">
           <button type="button" @click="editingQna = null">취소</button>
           <button type="submit">답변 등록</button>
+        </div>
+      </form>
+    </div>
+
+    <div v-if="questionEditor" class="admin-qna-modal-backdrop" @click.self="questionEditor = null">
+      <form class="admin-qna-edit-modal" @submit.prevent="saveQuestion">
+        <div class="admin-qna-edit-modal__heading">
+          <h2>{{ questionEditor.id ? 'Q&A 질문 수정' : 'Q&A 등록' }}</h2>
+          <button type="button" aria-label="닫기" @click="questionEditor = null">×</button>
+        </div>
+        <label for="admin-qna-question-title">제목</label>
+        <input id="admin-qna-question-title" v-model="questionEditor.title" maxlength="200" required />
+        <label for="admin-qna-question-category">문의 유형</label>
+        <select id="admin-qna-question-category" v-model="questionEditor.category">
+          <option>운행</option><option>시설</option><option>기타</option>
+        </select>
+        <label for="admin-qna-question-visibility">공개 설정</label>
+        <select id="admin-qna-question-visibility" v-model="questionEditor.isPrivate">
+          <option :value="false">전체 공개</option><option :value="true">비공개</option>
+        </select>
+        <label for="admin-qna-question-content">문의 내용</label>
+        <textarea id="admin-qna-question-content" v-model="questionEditor.content" rows="6" required></textarea>
+        <div class="admin-qna-edit-modal__actions">
+          <button type="button" @click="questionEditor = null">취소</button>
+          <button type="submit">저장</button>
         </div>
       </form>
     </div>

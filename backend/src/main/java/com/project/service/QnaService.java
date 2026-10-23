@@ -9,6 +9,7 @@ import com.project.common.PageResponse;
 import com.project.common.SearchUtil;
 import com.project.domain.Attachment;
 import com.project.domain.AttachmentTarget;
+import com.project.domain.Admin;
 import com.project.domain.InquiryType;
 import com.project.domain.Member;
 import com.project.domain.MemberStatus;
@@ -19,6 +20,7 @@ import com.project.dto.QnaDto.ListItem;
 import com.project.dto.QnaDto.AdminEditForm;
 import com.project.dto.QnaDto.QuestionForm;
 import com.project.repository.MemberRepository;
+import com.project.repository.AdminRepository;
 import com.project.repository.QnaRepository;
 import com.project.dto.ResourceDto.FileInfo;
 import jakarta.persistence.criteria.Predicate;
@@ -37,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class QnaService {
     private final QnaRepository qnaRepository;
     private final MemberRepository memberRepository;
+    private final AdminRepository adminRepository;
     private final AttachmentService attachmentService;
     private final FileStorageService fileStorageService;
 
@@ -66,7 +69,7 @@ public class QnaService {
     }
 
     public Detail detail(Long qnaId) {
-        return toDetail(find(qnaId));
+        return toDetail(find(qnaId), null);
     }
 
     public Detail memberDetail(Long qnaId, Long memberId) {
@@ -74,7 +77,23 @@ public class QnaService {
         if (!qna.isPublic() && !memberId.equals(qna.getAuthorId())) {
             throw BusinessException.forbidden("비공개 문의는 작성자만 확인할 수 있습니다.");
         }
-        return toDetail(qna);
+        return toDetail(qna, memberId);
+    }
+
+    @Transactional
+    public Long createByAdmin(Long adminId, QuestionForm form) {
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> BusinessException.unauthorized("관리자 정보를 찾을 수 없습니다. 다시 로그인해주세요."));
+        Qna saved = qnaRepository.save(Qna.create(form.title().trim(), form.content().trim(),
+                form.inquiryType(), null, admin.getName(), !Boolean.TRUE.equals(form.isPrivate())));
+        return saved.getId();
+    }
+
+    @Transactional
+    public Long updateQuestionByAdmin(Long qnaId, QuestionForm form) {
+        Qna qna = find(qnaId);
+        qna.update(form.title().trim(), form.content().trim(), form.inquiryType(), !Boolean.TRUE.equals(form.isPrivate()));
+        return qna.getId();
     }
 
     @Transactional
@@ -189,10 +208,11 @@ public class QnaService {
         return new ListItem(qna.getId(), qna.getTitle(), inquiryType(qna), qna.getWriter(), qna.getViewCount(), !qna.isPublic(), status(qna), qna.getCreatedAt());
     }
 
-    private Detail toDetail(Qna qna) {
+    private Detail toDetail(Qna qna, Long viewerId) {
         List<FileInfo> files = attachmentService.list(AttachmentTarget.QNA, qna.getId());
         return new Detail(qna.getId(), qna.getTitle(), inquiryType(qna), qna.getWriter(), !qna.isPublic(), status(qna),
-                qna.getCreatedAt(), qna.getContent(), files, qna.getAnswer());
+                qna.getCreatedAt(), qna.getContent(), files, qna.getAnswer(),
+                viewerId != null && viewerId.equals(qna.getAuthorId()));
     }
 
     private InquiryType inquiryType(Qna qna) {
