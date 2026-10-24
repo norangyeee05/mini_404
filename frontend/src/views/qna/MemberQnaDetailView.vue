@@ -17,16 +17,23 @@ const isOwner = computed(() => qna.value.isOwner === true)
 const isAnswered = computed(() => qna.value.status === '답변완료')
 const displayDate = computed(() => qna.value.date.split(' ')[0])
 const deleteStage = ref('')
+const accessDenied = ref(false)
+const returnQuery = computed(() => ({ ...(route.query.page ? { page: route.query.page } : {}), ...(route.query.mine === 'true' ? { mine: 'true' } : {}) }))
+const returnLocation = computed(() => ({ path: '/qna', query: returnQuery.value }))
 
 onMounted(async () => {
   if (!route.query.id) return
   try { qna.value = await getQna(route.query.id) }
   catch (error) {
-    if (error.response?.status === 403) window.alert('권한이 없습니다.')
-    else window.alert(apiError(error))
-    router.replace('/qna')
+    if (error.response?.status === 403 || error.status === 403) accessDenied.value = true
+    else { window.alert(apiError(error)); router.replace(returnLocation.value) }
   }
 })
+
+function closeAccessDenied() {
+  accessDenied.value = false
+  router.replace(returnLocation.value)
+}
 
 function deleteQna() {
   if (!isOwner.value) return
@@ -86,7 +93,7 @@ function closeDelete() {
       </article>
 
       <div class="member-qna-detail-actions">
-        <RouterLink class="member-qna-detail-button" to="/qna">목록</RouterLink>
+        <RouterLink class="member-qna-detail-button" :to="returnLocation">목록</RouterLink>
         <div v-if="isOwner" class="member-qna-detail-actions__right">
           <button class="member-qna-detail-button" type="button" @click="router.push({ path: '/qna/edit', query: { id: qna.id } })">수정</button>
           <button class="member-qna-detail-button" type="button" @click="deleteQna">삭제</button>
@@ -96,5 +103,17 @@ function closeDelete() {
 
     <PageFooter />
     <DeleteModal v-if="deleteStage" :completed="deleteStage === 'complete'" @confirm="confirmDelete" @close="closeDelete" />
+    <div v-if="accessDenied" class="qna-access-backdrop" role="presentation"><section class="qna-access-dialog" role="alertdialog" aria-labelledby="qna-access-title" aria-describedby="qna-access-description"><svg class="qna-access-icon" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47" fill="none" stroke="#ff4b59" stroke-width="5" /><path d="M50 32 V57" stroke="#ff6671" stroke-width="6" /><circle cx="50" cy="65" r="3.5" fill="#ff6671" /></svg><h2 id="qna-access-title">접근 권한이 없습니다.</h2><p id="qna-access-description">본인이 작성한 글이 아니므로 공개가 불가합니다.</p><button type="button" class="qna-access-confirm" @click="closeAccessDenied">확인</button></section></div>
   </div>
 </template>
+
+<style scoped>
+.qna-access-backdrop { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; background: rgba(67,84,105,.4); }
+.qna-access-dialog { width: 650px; max-width: calc(100vw - 32px); padding: 42px 40px 50px; border-radius: 28px; background: #fff; color: #000; text-align: center; box-shadow: 0 12px 50px #0003; }
+.qna-access-icon { display: block; width: 100px; height: 100px; margin: 0 auto; }
+.qna-access-dialog h2 { margin: 40px 0 20px; font-size: 30px; }
+.qna-access-dialog p { margin: 0; color: #858585; font-size: 19px; font-weight: 600; }
+.qna-access-confirm { display: block; width: min(400px, 100%); height: 42px; margin: 40px auto 0; border: 0; border-radius: 8px; background: #eee; color: #000; font-size: 16px; cursor: pointer; }
+.qna-access-confirm:hover { background: #ddd; }
+@media (max-width: 600px) { .qna-access-dialog { padding: 36px 20px; } .qna-access-dialog h2 { font-size: 24px; } .qna-access-dialog p { font-size: 16px; } }
+</style>

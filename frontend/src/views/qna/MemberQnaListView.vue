@@ -25,8 +25,9 @@ async function loadQnas() {
   try { const result = await getQnas({ page: currentPage.value, size: pageSize, searchType: ['title', 'content'].includes(searchField.value) ? searchField.value : undefined, keyword: searchText.value.trim(), mine: route.query.mine === 'true' }); qnas.value = result.items; totalCount.value = result.totalCount ?? result.items.length }
   catch (error) { qnas.value = []; totalCount.value = 0; console.error(apiError(error)) }
 }
-onMounted(loadQnas)
+onMounted(() => { currentPage.value = Math.max(1, Number(route.query.page) || 1); loadQnas() })
 watch(currentPage, loadQnas)
+watch(() => route.query.page, page => { const nextPage = Math.max(1, Number(page) || 1); if (nextPage !== currentPage.value) currentPage.value = nextPage })
 watch(() => route.query.mine, () => { currentPage.value = 1; loadQnas() })
 function search() { currentPage.value = 1; loadQnas() }
 
@@ -84,7 +85,7 @@ function goToPage(page) {
                 <tr v-for="qna in visibleQnas" :key="qna.id">
                   <td>{{ qna.id }}</td>
                   <td class="member-qna-table__title">
-                    <button class="member-qna-title-link" type="button" @click="router.push({ path: '/qna/detail', query: { id: qna.id } })">{{ qna.title }}</button>
+                    <button class="member-qna-title-link" type="button" @click="router.push({ path: '/qna/detail', query: { id: qna.id, page: currentPage, ...(route.query.mine === 'true' ? { mine: 'true' } : {}) } })">{{ qna.title }}</button>
                   </td>
                   <td>{{ qna.visibility === '비공개' ? '🔒' : '전체' }}</td>
                   <td><span :class="['member-qna-category', `member-qna-category--${qna.category}`]">{{ qna.category }}</span></td>
