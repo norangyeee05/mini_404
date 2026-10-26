@@ -6,11 +6,9 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [vue()],
-
     server: {
       host: 'localhost',
       port: 5173,
-
       proxy: {
         '/api': {
           target: env.VITE_API_PROXY_TARGET || 'http://localhost:8080',
@@ -18,5 +16,5 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
-  },
+  }
 })
